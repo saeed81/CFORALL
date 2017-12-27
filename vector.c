@@ -33,10 +33,7 @@ void vector_add(vector *vv, int b){
       vv->size *= 2;
       int *temp = NULL;
       int *temp = (int *) realloc(vv->aa, vv->size * sizeof(int));
-      if (temp == NULL){
-        vv->aa = NULL;
-          return;
-      }
+      if (temp == NULL) return;
       vv->aa = temp;
       vv->aa[vv->counter] = b;
       vv->counter += 1;
