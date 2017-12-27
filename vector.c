@@ -32,7 +32,7 @@ void vector_add(vector *vv, int b){
     else{
       vv->size *= 2;
       int *temp = NULL;
-      int *temp = (int *) realloc(vv->aa, vv->size * sizeof(int));
+      temp = (int *) realloc(vv->aa, vv->size * sizeof(int));
       if (temp == NULL) return;
       vv->aa = temp;
       vv->aa[vv->counter] = b;
@@ -101,7 +101,7 @@ int main(void){
 
   vector_init(&vv);
 
-  for (int ii=0; ii < 16; ++ii){
+  for (int ii=0; ii < 64; ++ii){
     vector_add(&vv, ii);
   }
   
