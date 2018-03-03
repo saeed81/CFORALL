@@ -54,17 +54,21 @@ char **split(char *st, char delim, int *NF){
 	if (nj == nc){
 	  tt = temp;
 	  ni = 0;
-	  while(*++tt != '\0'){
-	    ++ni;
+	  tt++;
+	  while(*tt != '\0'){
+	    tt++;
+	    ni++;
 	  }
-	  cout[nc] = (char*)malloc(sizeof(char)*(ni));
+	  cout[nc] = (char*)malloc(sizeof(char)*(ni+1));
 	  tt = temp;
 	  ni = 0;
-	  while(*++tt != '\0'){
+	  tt++;
+	  while(*tt != '\0'){
 	    cout[nc][ni] = *tt;
-	    ++ni;
+	    tt++;
+	    ni++;
 	  }
-	  cout[nc][ni-1] = '\0';
+	  cout[nc][ni] = '\0';
 	}
       }
       temp++;
@@ -77,8 +81,14 @@ int main(void){
   int NF = 0;
   int NFF = 0;
 
-  char str[] ="t=time_counter&lat=latetitude&lon=longitude&z=level";
+  char str1[] ="t=time_counter";
+  char **cout1 = split(str1,'=',&NF);
 
+  for (int i=0; i < NF;++i){
+    printf("%s\n",*(cout1+i));
+  }
+
+  char str[] ="t=time_counter&lat=latetitude&lon=longitude&z=level";
   char **cout = split(str,'&',&NF);
 
   for (int i=0; i < NF;++i){
@@ -99,25 +109,30 @@ int main(void){
       nc++;
   }
 
-  printf("%d\n",nc);
+  printf("number of character in the file %d\n",nc);
   rewind(fin);
 
   char *fcontent = (char*)malloc(sizeof(char)*(nc+1));
 
-  for (int i=0; i < nc;++i) fcontent[i] = '0';
+  for (int i=0; i < nc;++i) fcontent[i] = ' ';
+
   fcontent[nc] = '\0';
  
   nc = 0;
   
   while(!feof(fin)){
-    fcontent[nc] = fgetc(fin);
+    char c = fgetc(fin);
+    if (c == '\n') break;
+    fcontent[nc] =c;  
+    printf("%c",fcontent[nc]);
     nc++;
   }
-
+  printf("\n");
   fcontent[nc] = '\0';
   
   fclose(fin);
 
+  
   NF = 0;
   NFF = 0;
   cout = NULL;
