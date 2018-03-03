@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include"strcomp.h"
 
 char **split(char *st, char delim, int *NF){
   
@@ -131,7 +132,6 @@ int main(void){
   fcontent[nc] = '\0';
   
   fclose(fin);
-
   
   NF = 0;
   NFF = 0;
@@ -147,6 +147,49 @@ int main(void){
     }
     printf("\n");
   }
+
+
+  char geo[] = "lat:12.0,lon:13.0,time:12.0,station:stockholm";
+
+  char *lat = NULL, *lon = NULL, *tid = NULL, *station = NULL;
+
+  NF = 0;
+  NFF = 0;
+  cout = NULL;
+  cout = split(geo,',',&NF);
+  printf("%d NF\n",NF);
+
+  for (int i=0; i < NF;++i){
+    char **coutt = split(*(cout+i),':',&NFF);
+    if (Strcmp(*coutt,"lat"))     lat = *(coutt+1);
+    if (Strcmp(*coutt,"lon"))     lon = *(coutt+1);
+    if (Strcmp(*coutt,"time"))    tid = *(coutt+1);
+    if (Strcmp(*coutt,"station")) station = *(coutt+1);
+  }
+
+  printf("lat is %s \n",lat);
+  printf("lon is %s \n",lon);
+  printf("tid is %s \n",tid);
+  printf("station is %s \n",station);
+
+  char *dicgeo[] = {"lat:12.0","lon:13.0","time:12.0","station:stockholm"};
+
+  int lengeo = sizeof(dicgeo)/sizeof(dicgeo[0]);
+  
+  printf("%d\n",lengeo);
+
+  for (int i=0; i < lengeo;++i){
+    char **coutt = split(*(cout+i),':',&NFF);
+    if (Strcmp(*coutt,"lat"))     lat = *(coutt+1);
+    if (Strcmp(*coutt,"lon"))     lon = *(coutt+1);
+    if (Strcmp(*coutt,"time"))    tid = *(coutt+1);
+    if (Strcmp(*coutt,"station")) station = *(coutt+1);
+  }
+
+  printf("lat is %s \n",lat);
+  printf("lon is %s \n",lon);
+  printf("tid is %s \n",tid);
+  printf("station is %s \n",station);
 
   return 0;
 }
