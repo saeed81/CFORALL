@@ -1,8 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-
-#define MEMSIZE (16)
+#define MEMSIZE (8)
 
 typedef struct{
   char *beg;
@@ -15,31 +14,36 @@ void getpool(Pool *pool, int np){
   pool->cpool = (char *) malloc(np*sizeof(char));
   pool->beg = pool->cpool;
   pool->end = (pool->cpool + np -1);
-  
 }
+
 void destroypool(Pool *pool){
   if (pool->cpool != NULL )free(pool->cpool);
+  pool->beg = NULL;
+  pool->end = NULL;
 }
 
 char *push_pool(Pool *pool,int ni){
-  char *temp = pool->beg;
-  pool->beg += ni;
+  char *temp = NULL;
+  if ( pool->beg != NULL && ( (pool->end -pool->beg + 1) >= ni)){
+    temp = pool->beg;
+    pool->beg += ni;
+  }
   return temp;
 }
 
 void print_address(char *pt, int nx){
   char *temp = pt;
+  if (temp != NULL){
   for (int i=0; i < nx; i++){
     printf("%p\n",temp);
     temp++;
   }
+  }
 }
 
 void pool_info(Pool *pool){
-  
   printf("beg = %p \t end = %p\t\n",pool->beg,pool->end);
 }
-
 
 int main(void){
 
@@ -58,9 +62,9 @@ int main(void){
   printf("\n");
 
   char *ar2 = NULL; 
-  ar2 = push_pool(&pool,4);
+  ar2 = push_pool(&pool,2);
   pool_info(&pool);
-  print_address(ar2,4);
+  print_address(ar2,5);
  
   destroypool(&pool);
 
