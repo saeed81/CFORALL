@@ -55,7 +55,7 @@ int stoi(char *st){
 
 int main(void){
 
-  char str[] = " -12345 ";
+  char str[] = " +12345 ";
 
   printf("%d\n",stoi(str));
 
