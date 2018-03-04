@@ -11,13 +11,17 @@ int pow10(int n){
 
 int stoi(char *st){
 
+
+  int sign = 0;
+
   int nc=0;
   char *temp = st;
 
   while (*temp != '\0' ){
-    nc++;
+    if ( *temp != ' ') nc++;
     temp++;
   }
+  printf("%d\n",nc);
   nc--;
   int d = 0;
   int c = 1;
@@ -26,16 +30,23 @@ int stoi(char *st){
       c = -1;
       nc--; 
       st++;
+      sign += 1;
+      if (sign > 1 ) return 0;
     }
     else if (*st == '+'){
       c = 1;
       nc--; 
       st++;
+      sign += 1;
+      if (sign > 1 ) return 0;
     }
-    else {
+    else if( *st != ' ') {
       d += ((int)(*st - '0')*pow10(nc));
       st++;
       nc--;
+    }
+    else {
+      st++;
     }
   }
 
@@ -44,7 +55,7 @@ int stoi(char *st){
 
 int main(void){
 
-  char str[] = "+86";
+  char str[] = " -12345 ";
 
   printf("%d\n",stoi(str));
 
