@@ -41,6 +41,20 @@ void print_address(char *pt, int nx){
   }
 }
 
+
+void print_values(char *pt, int nx){
+  char *temp = pt;
+  if (temp != NULL){
+  for (int i=0; i < nx; i++){
+    printf("%c\n",*temp);
+    temp++;
+  }
+  }
+}
+
+
+
+
 void pool_info(Pool *pool){
   printf("beg = %p \t end = %p\t\n",pool->beg,pool->end);
 }
@@ -59,12 +73,22 @@ int main(void){
   pool_info(&pool);
   print_address(ar1,4);
   
+  *ar1 = 'a';
+  *(ar1+1) = 'b';
+  *(ar1+2) = 'c';
+  *(ar1+3) = 'c';
+  
+  print_values(ar1,4);
+
   printf("\n");
 
   char *ar2 = NULL; 
   ar2 = push_pool(&pool,2);
+  *ar2 = 'A';
+  *(ar2+1) = 'B';
+  print_values(ar2,2);
   pool_info(&pool);
-  print_address(ar2,5);
+  print_address(ar2,2);
  
   destroypool(&pool);
 
