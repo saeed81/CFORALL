@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-
 int pow10(int n){
   int d = 1;
   if (n > 0){ 
@@ -10,11 +9,9 @@ int pow10(int n){
   return d;
 }
 
-
-int strtoi(char *st){
+int stoi(char *st){
 
   int nc=0;
-  
   char *temp = st;
 
   while (*temp != '\0' ){
@@ -29,33 +26,27 @@ int strtoi(char *st){
       c = -1;
       nc--; 
       st++;
-      printf("%d\n",nc);
+    }
+    else if (*st == '+'){
+      c = 1;
+      nc--; 
+      st++;
     }
     else {
       d += ((int)(*st - '0')*pow10(nc));
       st++;
       nc--;
-      printf("%d\n",nc);
     }
   }
 
   return (c*d);
 }
 
-
-
 int main(void){
 
-  char str[] = "-865439";
+  char str[] = "+86";
 
-  int a = (int)(str[1] - '0');
-  int b = (int)(str[2] - '0');
-  
-  printf("%d\n",a);
-  printf("%d\n",b);
-  printf("%d\n",-(10 * a + b));
-
-  printf("%d\n",strtoi(str));
+  printf("%d\n",stoi(str));
 
   return 0;
 }
