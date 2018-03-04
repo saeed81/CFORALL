@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define MEMSIZE (32)
+#define MEMSIZE (64 * 1024 * 1024)
 
 typedef struct{
   char *beg;
@@ -66,7 +66,6 @@ int main(void){
   pool->beg = NULL, pool->end =NULL, pool->cpool =NULL, pool->cur = 0;
   getpool(pool,MEMSIZE);  
   pool_info(pool);
-  print_address(pool->cpool,MEMSIZE);
 
   printf("\n");
 
@@ -112,6 +111,31 @@ int main(void){
 
   pool_info(pool);
   
+  float *fp = (float *)(push_pool(pool,4*sizeof(float)));
+
+  if (fp != NULL ){
+    fp[0] = 1.0;
+    fp[1] = 2.0;
+    fp[2] = 3.0;
+    fp[3] = 4.0;
+    printf("%p\n",fp);
+    printf("%p\n",fp+1);
+    printf("%p\n",fp+2);
+    printf("%p\n",fp+3);
+  }
+
+  float *fpp = (float *)(push_pool(pool,1024*sizeof(float)));
+
+  if (fpp != NULL ){
+    for (int i=0; i < 1024;++i){
+      *(fpp+i) = (float)(i * i);
+    }
+    
+    for (int i=0; i < 20;++i){
+      printf("%f\n",*(fpp+i));
+    }
+  }
+  pool_info(pool);
   destroypool(pool);
 
   free(pool);
