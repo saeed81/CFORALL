@@ -2,54 +2,66 @@
 #include<stdlib.h>
 
 
-#define MEMSIZE (8)
+#define MEMSIZE (16)
 
-char *getpool(size_t np){
+typedef struct{
+  char *beg;
+  char *end;
+  char *cpool;
+}Pool;
 
-  char *cpool = (char *)malloc(np *sizeof(char));
-  return cpool;
+
+void getpool(Pool *pool, int np){
+  pool->cpool = (char *) malloc(np*sizeof(char));
+  pool->beg = pool->cpool;
+  pool->end = (pool->cpool + np -1);
+  
 }
-void destroypool(char **cpool){
-  if (*cpool != NULL )free(*cpool);
-  *cpool = NULL;
+void destroypool(Pool *pool){
+  if (pool->cpool != NULL )free(pool->cpool);
 }
 
-void push_pool(char **pool, char **ar, int nx, int psize){
-      *ar = *pool;
-      *(ar+1) = *(pool+1);
+char *push_pool(Pool *pool,int ni){
+  char *temp = pool->beg;
+  pool->beg += ni;
+  return temp;
 }
 
-
-void print_address(void *pt, int nx){
-  for (int i=0; i < nx; ++i){
-    (void)(printf("%p\n",pt+i));
+void print_address(char *pt, int nx){
+  char *temp = pt;
+  for (int i=0; i < nx; i++){
+    printf("%p\n",temp);
+    temp++;
   }
 }
 
+void pool_info(Pool *pool){
+  
+  printf("beg = %p \t end = %p\t\n",pool->beg,pool->end);
+}
+
+
 int main(void){
 
-  char *pool = getpool(MEMSIZE);
-
-  print_address(pool,MEMSIZE);
+  Pool pool = {NULL,NULL,NULL};
+  getpool(&pool,MEMSIZE);  
+  pool_info(&pool);
+  print_address(pool.cpool,MEMSIZE);
 
   printf("\n");
 
-  char *arr = NULL;
-
-  push_pool(&pool,&arr,4,MEMSIZE);
-
-  print_address(arr,4);
+  char *ar1 = NULL;
+  ar1 = push_pool(&pool,4);
+  pool_info(&pool);
+  print_address(ar1,4);
   
-  *arr = 'a';
-  *(arr+1) = 'b';
-  *(arr+2) = 'c';
-  *(arr+3) = 'd';
+  printf("\n");
 
-  printf("%c\n",*arr);
-  printf("%c\n",*(arr+1));
-  printf("%c\n",*(arr+2));
-  printf("%c\n",*(arr+3));
-  
+  char *ar2 = NULL; 
+  ar2 = push_pool(&pool,4);
+  pool_info(&pool);
+  print_address(ar2,4);
+ 
   destroypool(&pool);
 
   return 0;
