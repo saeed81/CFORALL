@@ -82,8 +82,10 @@ int main(void){
   int NF = 0;
   int NFF = 0;
 
-  char str1[] ="t=time_counter";
+  char str1[] ="t=time_counter=";
   char **cout1 = split(str1,'=',&NF);
+
+  printf("NF %d\n", NF);
 
   for (int i=0; i < NF;++i){
     printf("%s\n",*(cout1+i));
@@ -101,6 +103,7 @@ int main(void){
     printf("\n");
   }
 
+  #if 0
   FILE *fin = fopen("config.dat","r");
   
   int nc = 0;
@@ -147,7 +150,7 @@ int main(void){
     }
     printf("\n");
   }
-
+  #endif
 
   char geo[] = "lat:12.0,lon:13.0,time:12.0,station:stockholm";
 

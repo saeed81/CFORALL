@@ -3,7 +3,6 @@
 #include<stdarg.h>
 
 union {
-
   struct {
     void (*add)(int *, int);
     void (*mul)(int *, int);
@@ -19,8 +18,6 @@ union {
   };
 
 }LIBF;
-
-
 
 
 void addc(int *a, int c){
