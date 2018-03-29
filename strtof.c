@@ -132,9 +132,7 @@ int main(void){
   printf("%f\n",stof(st));
 
   return 0;
-  
-  return 0;
-}
+ }
 
 
 
