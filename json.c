@@ -29,7 +29,107 @@ int Strcmp(char *s1, char *s2){
   
   return 1;
 }
+ 
+void get(char *content, long fs, char *key, char *value){
+
+  long int  jf = -1, je = -1;
+ 
+  for (long int i=0; i < fs; ++i){
+    if (content[i] == '{') {
+      jf = i;
+      break;
+    }
+  }
+
+  for (long int i=(fs-1); i >= 0; --i){
+    if (content[i] == '}'){
+      je = i;
+      break;
+    }
+  }
+ 
+  printf("first occurance of { is at position %ld \n", jf);
+  printf("first occurance of } is at position %ld \n", je);
+
+
+  for (long int i=0; i < jf; ++i){
+    if (content[i] == ':') {
+      jf = -1;
+      break;
+    }
+  }
+
+  printf("content[%d] is %c \n", fs -1, content[fs-1]);
+  printf("content[%d] is %c \n", fs -2, content[fs-2]);
+  printf("content[%d] is %c \n", fs -3, content[fs-3]);
   
+  for (long int i=(fs-1); i > je; --i){
+    if ((content[i] != ' ') && (content[i] != EOF) && (content[i] != '\n') ){
+      je = -1;
+      break;
+    }
+  }
+  
+  if ( jf == (-1) || je == (-1)) {
+    printf("content is not a valid json object\n");
+    return;
+  }
+  
+  jf++; 
+  je--;
+
+  long int jlf = jf, jle = je; 
+  long int klf = 0 , kle = 0 ; 
+  
+  char element[2048] = {'\0'};
+  int nc = -1;
+  int nk = -1;
+  int stop = 0;
+  for (long int i=jf; i <=je; ++i) {
+    if (content[i] == ':'){
+      for (int j = jlf; j < i; ++j){
+	nc++;
+	element[nc] = content[j];
+      }
+      for (int ii=0; ii <= nc; ++ii){
+	printf("%c",element[ii]);
+      }
+      for (int ii=0; ii < 1024; ++ii){
+	element[ii] = '\0';
+      }
+      printf("\n");
+      for (int j = (i+1); j <=je; ++j){
+	if (content[j] == ','){
+	  jle = (j+1);
+	  break;
+	}
+      }
+      //we test if , inside of dictionary or not
+      stop = 0;
+      for (int j=(i+1);j< (jle-1) && !stop;++j){
+	if (content[j] == '{'){
+	  printf("is a dictionary starts at %d\n",j);
+	  for (int k=(j+1); k <=je; ++k){
+	    if (content[k] == '}'){
+	      printf("end of this dictionary is at %d\n",k);
+	      klf = (k+1);
+	      jlf = klf;
+	      stop = 1;
+	      break;
+	    }
+	  }
+	}
+      }
+      //now lets find the end of dictionary
+    }
+    if (stop == 0) jlf = jle; 
+    nc = -1;
+    printf("\n");
+    printf("jlf is %d \n",jlf);
+  }
+  return;
+}
+
 void extract(char *content, long fs, char *key, char *value){
 
   long int  jf = -1, je = -1;
@@ -56,7 +156,7 @@ void extract(char *content, long fs, char *key, char *value){
   }
   
   printf("first occurance of { is at position %ld \n", jf);
-  printf("first occurance of } is at position %ld \n", je);
+  printf("last occurance of } is at position %ld \n", je);
 
   jf++; 
   je--;
@@ -88,98 +188,12 @@ void extract(char *content, long fs, char *key, char *value){
     }
   }
 }
- 
-void extract1(char *content, long fs, char *key, char *value){
 
-  long int  jf = -1, je = -1;
- 
-  for (long int i=0; i < fs; ++i){
-
-    if (content[i] == '{') {
-      jf = i;
-      break;
-    }
-  }
-
-  for (long int i=0; i < jf; ++i){
-
-    if (content[i] == ':') {
-      jf = -1;
-      break;
-    }
-  }
-
-
-
-  for (long int i=(fs-1); i >= 0; --i){
-    if (content[i] == '}'){
-      je = i;
-      break;
-    }
-  }
-  
-  if ( jf == (-1) || je == (-1)) {
-    printf("content is not a valid json object\n");
-    return;
-  }
-  
-  printf("first occurance of { is at position %ld \n", jf);
-  printf("first occurance of } is at position %ld \n", je);
-
-  jf++; 
-  je--;
-
-  long int jlf = jf, jle = je; 
-  long int klf = 0, kle = 0; 
-
-  char element[1024] = {'\0'};
-  int nc = -1;
-  int nk = -1;
-
-  for (long int i=jf; i <=je; ++i) {
-    if (content[i] == ':'){
-      for (int j = jlf; j < i; ++j){
-	nc++;
-	element[nc] = content[j];
-      }
-      for (int ii=0; ii <= nc; ++ii){
-	printf("%c",element[ii]);
-      }
-      for (int ii=0; ii < 1024; ++ii){
-	element[ii] = '\0';
-      }
-      printf("\n");
-      for (int j = (i+1); j <= je; ++j){
-	if (content[j] == '{'){
-	  printf(" the content after : is a dictionary as \n");
-	  klf = ++j;
-	  for (int k=klf; k <=je; k++){
-	    if (content[k] == '}'){
-	      kle = k;
-	      printf(" k is %d\n",k);
-	      break;
-	    }
-	  }
-	  printf(" klf %d  and kle %d\n",klf,kle);
-	  for (int k=klf; k < kle; ++k){
-	    printf("%c",content[k]);
-	  }
-	}
-      }
-      nc = -1;
-      printf("\n");
-      kle += 1; 
-      jlf = kle;
-    }
-  }
-  return;
-}
-
-int main(void){
+int main(int argc, char *argv[]){
 
   FILE *inp = NULL;
 
-  inp = fopen("config.json","r");
+  inp = fopen(argv[1],"r");
 
   if (inp == NULL) return 1;
 
@@ -200,7 +214,7 @@ int main(void){
   printf("file size is %ld\n",fs);
   printf("content is %s\n",content);
 
-  extract1(content,fs,NULL,NULL);
+  get(content,fs,NULL,NULL);
   
   free(content);
 
