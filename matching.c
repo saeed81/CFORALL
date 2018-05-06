@@ -4,21 +4,29 @@
 
 int main(void){
 
-  char *str = "((()))";
+  char str[] = "(((())))";
   char *tmp = str;
   char *fstr = str;
-  fstr++;
-  tmp++;
-  tmp++;
+  int nel = 1; //element number 1 based not zero 
+  
+  for (int i=0; i < nel; ++i){
+    tmp++;
+  }
+
+  for (int i=1; i < nel; ++i){
+    fstr++;
+  }
+
   int n = sizeof(str) / sizeof(*str);
+  printf("size str is %d\n",n);
   n--;
+  printf("size str is %d\n",n);
   int *iloc = (int *)malloc(n*sizeof(int));
   for (int i=0; i < n; ++i ){
     iloc[i] = -1;
   }
 
   int nl = -1;
-  int nel = 2;
   int nlt = 0;
   int exist = 0;
   while(*tmp != '\0'){
@@ -62,7 +70,7 @@ int main(void){
 
   int npr = 0;
 
-  for(int i=2; i <n; ++i ){
+  for(int i=0; i <n; ++i ){
     if (str[i] == ')'){
       npr++;
     }
@@ -78,7 +86,17 @@ int main(void){
   }
   printf("number of internal match is %d \n", nm);
 
-  
+  npr = 0;
+  int imatch = 0;
+  nm++;
+  for(int i=0; i <n; ++i ){
+    if (str[i] == ')'){
+      npr++;
+      if (npr == nm) imatch = i;
+    }
+  }
+  printf("number of npr is %d \n", npr);
+  printf("position of the match is at  %d \n", imatch);
 
 
   free(iloc);
