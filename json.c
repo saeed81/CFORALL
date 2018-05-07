@@ -78,15 +78,23 @@ void get(char *content, long fs, char *key, char *value){
   jf++; 
   je--;
 
-  long int jlf = jf, jle = je; 
+  long int jlf = jf, jle = -1; 
   long int klf = 0 , kle = 0 ; 
   
   char element[2048] = {'\0'};
   int nc = -1;
   int nk = -1;
   int stop = 0;
+  long int ncount = 0;
   for (long int i=jf; i <=je; ++i) {
     if (content[i] == ':'){
+      for (int j = (i+1); j <=je; ++j){
+	if (content[j] == ','){
+	  jle = j;
+	  break;
+	}
+      }
+      if (ncount == 0) jlf = jf;
       for (int j = jlf; j < i; ++j){
 	nc++;
 	element[nc] = content[j];
@@ -94,19 +102,30 @@ void get(char *content, long fs, char *key, char *value){
       for (int ii=0; ii <= nc; ++ii){
 	printf("%c",element[ii]);
       }
-      for (int ii=0; ii < 1024; ++ii){
+      printf("\n");
+      //printf("jlf is now %d\n",jlf);
+      for (int ii=0; ii < 2048; ++ii){
 	element[ii] = '\0';
       }
-      printf("\n");
-      for (int j = (i+1); j <=je; ++j){
-	if (content[j] == ','){
-	  jle = (j+1);
+      for (int j=(i+1);j<= (jle-1);++j){
+	if (content[j] == '{'){
+	  //printf("it seems like there is a dictionary around , at %d\n",j);
 	  break;
 	}
       }
-      //we test if , inside of dictionary or not
-      stop = 0;
-      for (int j=(i+1);j< (jle-1) && !stop;++j){
+      for (int j=(i+1);j<= (jle-1);++j){
+	if (content[j] == '}'){
+	  //printf(" , is not in a dictory %d\n",j);
+	  break;
+	}
+      }
+
+            
+
+      //we test if , is inside of dictionary or not
+      #if 0
+      stop = 1;
+      for (int j=(i+1);j<= (jle-1) && !stop;++j){
 	if (content[j] == '{'){
 	  printf("is a dictionary starts at %d\n",j);
 	  for (int k=(j+1); k <=je; ++k){
@@ -120,13 +139,17 @@ void get(char *content, long fs, char *key, char *value){
 	  }
 	}
       }
+      #endif
       //now lets find the end of dictionary
+      //if (stop == 0) jlf = jle;
+      //printf("jlf is %d",jlf);
+      jlf = (jle +1);
+      ncount++;
     }
-    if (stop == 0) jlf = jle; 
     nc = -1;
-    printf("\n");
-    printf("jlf is %d \n",jlf);
+    //printf("\n");
   }
+  printf("\n");
   return;
 }
 
