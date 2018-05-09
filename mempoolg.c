@@ -13,14 +13,14 @@ typedef struct{
 }Pool;
 
 
-void getpool(Pool *pool, int np){
+void init_pool(Pool *pool, int np){
   pool->cpool = POOL;
   pool->beg = pool->cpool;
   pool->end = (pool->cpool + np -1);
   pool->cur = -1;
 }
 
-void destroypool(Pool *pool){
+void del_pool(Pool *pool){
   pool->cpool = NULL;
   pool->beg = NULL;
   pool->end = NULL;
@@ -58,20 +58,20 @@ void print_values(char *pt, int nx){
   }
 }
 
-void pool_info(Pool *pool){
+void info_pool(Pool *pool){
   printf("beg = %p \t end = %p\t cur= %d\n",(void *)pool->beg,(void *)pool->end,pool->cur);
 }
 
 int main(void){
 
   Pool pool =  {NULL, NULL, NULL, 0};
-  getpool(&pool,MEMSIZE);  
-  pool_info(&pool);
+  init_pool(&pool,MEMSIZE);  
+  info_pool(&pool);
   printf("\n");
 
   char *ar1 = NULL;
   ar1 = push_pool(&pool,4);
-  pool_info(&pool);
+  info_pool(&pool);
 
   printf("address char \n");
   print_address(ar1,4);
@@ -82,9 +82,6 @@ int main(void){
   printf("%p\n",(void *)(POOL+2));
   printf("%p\n",(void *)(POOL+3));
 
-  return 1;
-  
-  
   *ar1 = 'a';
   *(ar1+1) = 'b';
   *(ar1+2) = 'c';
@@ -99,7 +96,7 @@ int main(void){
   *ar2 = 'A';
   *(ar2+1) = 'B';
   print_values(ar2,2);
-  pool_info(&pool);
+  info_pool(&pool);
   print_address(ar2,2);
  
 
@@ -120,7 +117,7 @@ int main(void){
   printf("%p\n",ip+2);
   printf("%p\n",ip+3);
 
-  pool_info(&pool);
+  info_pool(&pool);
   
   float *fp = (float *)(push_pool(&pool,4*sizeof(float)));
 
@@ -146,8 +143,8 @@ int main(void){
       printf("%f\n",*(fpp+i));
     }
   }
-  pool_info(&pool);
-  destroypool(&pool);
+  info_pool(&pool);
+  del_pool(&pool);
 
   return 0;
 }

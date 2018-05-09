@@ -1,23 +1,20 @@
-#include<stdio.h>
-#include<stdlib.h>
+#ifndef MATCHING_H
+#define MATCHING_H
+
 
 #define LSYMB '{'
 #define RSYMB '}'
 
-
-
-int main(void){
-
-  char str[]= "{{{{{{}}}}}}";
-  char *tmp = str;
-  char *fstr= str;
-  int  nel  = 3; //element number 1 not an index 
-  int  cnel  = nel; //element number 1 not an index 
+void match(char *str,int first, int *last){
+  
+  char *tmp  = str;
+  char *fstr = str;
+  int  nel   = first; //element number 1 not an index 
+  int  cnel  = nel;   //element number 1 not an index 
   
   for (int i=0; i < nel; ++i){
     tmp++;
   }
-
   for (int i=1; i < nel; ++i){
     fstr++;
   }
@@ -100,12 +97,14 @@ int main(void){
       if (npr == nm) imatch = i;
     }
   }
+  *ilast = imatch;
   
   printf("position of the match for %c is at  %d %c\n", str[cnel-1],imatch,str[imatch]);
 
   free(iloc);
-  return 0;
+  
+  return;
 
 }
 
-
+#endif
