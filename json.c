@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include"matching.h"
 
 int getLen(char *str){
 
@@ -275,7 +276,7 @@ int main(int argc, char *argv[]){
 
   long int fs = ftell(inp);
 
-  rewind(inp);
+  fseek(inp,0,SEEK_SET);
 
   char *content = (char *)malloc((fs+1) * sizeof(char));
 
@@ -288,11 +289,9 @@ int main(int argc, char *argv[]){
   printf("file size is %ld\n",fs);
   printf("content is %s\n",content);
 
-  //get(content,fs,NULL,NULL);
-  
   int first = -1, last = -1;
 
-  printf("%d\n",find("\"startdate\"",content,&first,&last));
+  printf("%d\n",find("\"name\"",content,&first,&last));
 
   printf("%d\n",first);
   printf("%d\n",last);
@@ -307,6 +306,80 @@ int main(int argc, char *argv[]){
       break;
     }
   }
+  
+  if (incol == -1)return 1;
+  
+  int ka = incol, kb = -1, kc = -1;
+ 
+  
+  if (ka >= 0){
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == '{'){
+	kb =  i;
+	break;
+      }
+    }
+  }
+  //check what is between : and {
+  
+  printf("kb is %d \n",kb);
+  
+  if (kb >= 0 ){
+    int stop = 0; 
+    for (int i=(kb-1); i >(ka) ; --i){
+      if (content[i] != ' '){
+	printf("there is soemthing before {. Now we search for ,\n");
+	stop = 1;
+	break;
+      }
+    }
+    if (stop){
+      for (int i=(ka+1); i < (kb) ; ++i){
+	if (content[i] == ','){
+	  printf("we found ,\n");
+	  kc = i;
+	  break;
+	}
+      }
+      for (int i=(ka+1); i < (kc) ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+    else {
+
+      char *tmp = &content[kb];
+      int index = -1;
+      match(tmp, 1, (fs-kb+1),'{', &index);
+      printf("match { is at index %d and kb + index %d\n",index, kb +index);
+      printf("value=>\n");
+      for (int i=(kb); i <= (kb+index) ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  else{
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == ','){
+	kc =  i;
+	break;
+      }
+    }
+    if ( kc < 0) {
+      printf("kc is < 0 value=>\n");
+      for (int i=(ka+1); i < (fs-1) ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+    else{
+      printf("kc > 0 value=>\n");
+      for (int i=(ka+1); i < kc ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  
+  printf("\n");
+  #if 0
   int ifkey = (incol+1);
   int iekey = -1;
   for (int i=(incol+1); i< fs;++i){
@@ -319,10 +392,10 @@ int main(int argc, char *argv[]){
   printf("value=>");
   for (int i=ifkey;i<=iekey;++i)printf("%c",content[i]);
   printf("\n");
+  #endif
 
   free(content);
 
   return 0;
 
 }
-
