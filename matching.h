@@ -1,17 +1,28 @@
 #ifndef MATCHING_H
 #define MATCHING_H
 
+void match(char *str, int element, int len, char symbol, int *index){
 
-#define LSYMB '{'
-#define RSYMB '}'
+  char osymbol = '0';
 
-void match(char *str,int first, int *last){
-  
+  switch (symbol){
+  case '{':
+    osymbol = '}';
+    break;
+  case '(':
+    osymbol = ')';
+    break;
+  case '[':
+    osymbol = ']';
+    break;
+  default:
+    break;
+  }
+
   char *tmp  = str;
   char *fstr = str;
-  int  nel   = first; //element number 1 not an index 
-  int  cnel  = nel;   //element number 1 not an index 
-  
+  int nel    = element; //element number 1 based not zero                  
+
   for (int i=0; i < nel; ++i){
     tmp++;
   }
@@ -19,7 +30,7 @@ void match(char *str,int first, int *last){
     fstr++;
   }
 
-  int n = sizeof(str) / sizeof(*str);
+  int n = len;
   printf("size str is %d\n",n);
   n--;
   printf("size str is %d\n",n);
@@ -73,7 +84,7 @@ void match(char *str,int first, int *last){
   int npr = 0;
 
   for(int i=0; i <n; ++i ){
-    if (str[i] == RSYMB){
+    if (str[i] == osymbol){
       npr++;
     }
   }
@@ -84,6 +95,9 @@ void match(char *str,int first, int *last){
   for(int i=0; i <n; ++i ){
     if (iloc[i] > 0 ){
       nm++;
+      if ((iloc[i+1]) < 0 && (i <=(n-2))){
+	break;
+      }
     }
   }
   printf("number of internal match is %d \n", nm);
@@ -91,15 +105,17 @@ void match(char *str,int first, int *last){
   npr = 0;
   int imatch = 0;
   nm++;
-  for(int i=0; i <n; ++i ){
-    if (str[i] == RSYMB){
+  for(int i=(element-1); i <n; ++i ){
+    if (str[i] == osymbol){
       npr++;
       if (npr == nm) imatch = i;
     }
   }
-  *ilast = imatch;
+  *index = imatch;
   
-  printf("position of the match for %c is at  %d %c\n", str[cnel-1],imatch,str[imatch]);
+  printf("number of npr is %d \n", npr);
+  printf("position of the match is at  %d \n", imatch);
+
 
   free(iloc);
   
