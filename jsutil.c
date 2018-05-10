@@ -1,19 +1,21 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include"matching.h"
-
-
+#include"sflib.h"
 
 #define LEN(a) (sizeof(a) / sizeof(a[0]))
 
 int main(void){
 
 
-  char str[] = "named : {fn:saeed,ln:falaht,aa:{bb:cc,dd:ee}}, names : saeed";
+  long int len = -1;
 
-  int len = LEN(str);
+  //char str[] = "named : {fn:saeed,ln:falaht,aa:{bb:cc,dd:ee}}, names : saeed";
+  char *str = readlinesfromfile("sshconfig.json",&len);
 
-  printf("len is %d\n", len);
+  printf("len is %ld\n", len);
+
+  printf("%s\n",str);
 
   int ka = -1, kb = -1, kc = -1, kd = -1;
 
