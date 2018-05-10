@@ -8,6 +8,46 @@
 char string[N] = {'\0'};
 char stringa[N] = {'\0'};
 
+void joinstrdelim(char delim, char *str,...){
+
+  va_list vs;
+
+  va_start(vs,str);
+
+  int ne = 0;
+  char *tmp     = NULL;
+  
+  while(*str != '\0'){ 
+    stringa[ne] = *str;
+    str++;
+    ne++;
+  }
+  stringa[ne] = delim;
+  ne++;
+
+  while((tmp=va_arg(vs,char *)) != NULL){
+    
+    while(*tmp != '\0'){ 
+      stringa[ne] = *tmp;
+      tmp++;
+      ne++;
+    }
+    stringa[ne] = delim;
+    ne++;
+  }
+
+  for (int i=(N-1); i>=0; --i ){
+    if (stringa[i] == delim){
+      stringa[i] = '\0';
+      break;
+    }
+  }
+  
+  stringa[ne] = '\0';
+  va_end(vs);
+  return ;
+}
+
 
 void joinstr(char *str,...){
 
@@ -41,37 +81,13 @@ void joinstr(char *str,...){
 
 int main(void){
 
-  char *str1="www.smhi.se/";
-  char *str2="oceandata";
-  char *str3=":80";
-  char *str4="?station";
+  char *str1="2018";
+  char *str2="04";
+  char *str3="12";
+  char *str4="date";
 
-  #if 0
-
-  int ne = 0;
-
-  while (*str1 != '\0'){
-    string[ne] = *str1;
-    str1++;
-    ne++;
-  }
-  while (*str2 != '\0'){
-    string[ne] = *str2;
-    str2++;
-    ne++;
-  }
-  while (*str3 != '\0'){
-    string[ne] = *str3;
-    str3++;
-    ne++;
-  }
-  string[ne] = '\0';
-
-  printf("%s\n",string);
-
-  #endif
-
-  joinstr(str1,str2,str3,str4,NULL);
+  //joinstr(str1,str2,str3,str4,NULL);
+  joinstrdelim('/',str1,str2,str3,str4,NULL);
   
   printf("%s\n",stringa);
 
