@@ -1,19 +1,19 @@
 #ifndef MATCHING_H
 #define MATCHING_H
 
-void match(char *str, int element, int len, char symbol, int *index){
+void match(char *str, int element, int len, char lsymbol, int *index){
 
-  char osymbol = '0';
+  char rsymbol = '0';
 
-  switch (symbol){
+  switch (lsymbol){
   case '{':
-    osymbol = '}';
+    rsymbol = '}';
     break;
   case '(':
-    osymbol = ')';
+    rsymbol = ')';
     break;
   case '[':
-    osymbol = ']';
+    rsymbol = ']';
     break;
   default:
     break;
@@ -43,15 +43,15 @@ void match(char *str, int element, int len, char symbol, int *index){
   int nlt   = 0;
   int exist = 0;
   while(*tmp != '\0'){
-    if (*tmp == RSYMB){
-      printf("we reach %c at %d we do backward search now to find %c \n",RSYMB,nel,LSYMB);
+    if (*tmp == rsymbol){
+      printf("we reach %c at %d we do backward search now to find %c \n",rsymbol,nel,lsymbol);
       char *ltm = tmp;
       ltm--;
       nlt = (nel -1);
       exist = 0;
       while (ltm != fstr){
-	if (*ltm == LSYMB){
-	  printf("we found corresponding %d%c\n",nlt,LSYMB);
+	if (*ltm == lsymbol){
+	  printf("we found corresponding %d%c\n",nlt,lsymbol);
 	  nl++;
 	  if (nl==0) {
 	    iloc[nl] = nlt;
@@ -76,15 +76,17 @@ void match(char *str, int element, int len, char symbol, int *index){
   }
    
   printf("\n");
-
+  
+  #if 0
   for(int i=0; i < n; ++i){
     printf("%i \n", iloc[i]);
   }
+  #endif 
 
   int npr = 0;
 
   for(int i=0; i <n; ++i ){
-    if (str[i] == osymbol){
+    if (str[i] == rsymbol){
       npr++;
     }
   }
@@ -106,7 +108,7 @@ void match(char *str, int element, int len, char symbol, int *index){
   int imatch = 0;
   nm++;
   for(int i=(element-1); i <n; ++i ){
-    if (str[i] == osymbol){
+    if (str[i] == rsymbol){
       npr++;
       if (npr == nm) imatch = i;
     }
