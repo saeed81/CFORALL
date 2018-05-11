@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc -std=c99 -Wall $1 -o main.x
+gcc -o2 -std=c99 -Wall -pedantic $1 -o main.x
