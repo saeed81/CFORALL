@@ -21,63 +21,78 @@ void match(char *str, int element, int len, char lsymbol, int *index){
 
   char *tmp  = str;
   char *fstr = str;
-  int nel    = element; //element number 1 based not zero                  
+  int nel    = element; //element number 1 based not zero
+  
+  int nsym = 0;
 
-  for (int i=0; i < nel; ++i){
+  while(*tmp != '\0'){
+    if ( *tmp == lsymbol) nsym++;
+    tmp++;
+  }
+
+  tmp = str;
+ 
+  printf("tmp pointer is %c\n", *tmp);
+  printf("in total we have %d %c\n", nsym,lsymbol);
+
+  for (int i=1; i < nel; ++i){
     tmp++;
   }
   for (int i=1; i < nel; ++i){
     fstr++;
   }
 
-  int n = len;
+  int n = nsym;
   printf("size str is %d\n",n);
-  n--;
-  printf("size str is %d\n",n);
-  int *iloc = (int *)malloc(n*sizeof(int));
-  for (int i=0; i < n; ++i ){
+  int *iloc = (int *)malloc(nsym*sizeof(int));
+  for (int i=0; i < nsym; ++i ){
     iloc[i] = -1;
   }
 
   int nl    = -1;
   int nlt   = 0;
   int exist = 0;
-  while(*tmp != '\0'){
+  int stop = 0;
+  char *ltm = NULL;
+  while(*tmp != '\0' && (stop == 0)){
     if (*tmp == rsymbol){
-      printf("we reach %c at %d we do backward search now to find %c \n",rsymbol,nel,lsymbol);
-      char *ltm = tmp;
+      printf("we reach %c at %d we do backward search now to find %c \n",rsymbol,(tmp - fstr),lsymbol);
+      ltm = tmp;
       ltm--;
-      nlt = (nel -1);
       exist = 0;
-      while (ltm != fstr){
+      while (ltm >= fstr){
 	if (*ltm == lsymbol){
-	  printf("we found corresponding %d%c\n",nlt,lsymbol);
-	  nl++;
-	  if (nl==0) {
-	    iloc[nl] = nlt;
-	    //break;
+	  printf("we found corresponding %d %c\n",(ltm - fstr),lsymbol);
+	  for (int i=0; i < n; ++i){
+	    if (iloc[i] == (ltm - fstr) ){
+	      exist = 1;
+	      break;
+	    }
 	  }
-	  else{
-	    for (int i=0; i< n;++i){
-	      if (iloc[i] == nlt ){
-		exist = 1;
+	  if(exist == 0){
+	    for (int i=0; i < n; ++i){
+	      if (iloc[i] < 0 ){
+		iloc[i] = ltm - fstr;
 		break;
 	      }
 	    }
-	    if (!exist) iloc[nl] = nlt;
 	  }
-	}
+	  }
 	ltm--;
-	nlt--;
+      }
+    }
+    for (int i=0; i < n; ++i){
+      if (iloc[i] == 0 ){
+	stop = 1;
+	break;
       }
     }
     tmp++;
-    nel++;
   }
    
   printf("\n");
   
-  #if 0
+  #if 1
   for(int i=0; i < n; ++i){
     printf("%i \n", iloc[i]);
   }
@@ -85,29 +100,25 @@ void match(char *str, int element, int len, char lsymbol, int *index){
 
   int npr = 0;
 
-  for(int i=0; i <n; ++i ){
+  for(int i=(element-1); i <n; ++i ){
     if (str[i] == rsymbol){
       npr++;
     }
   }
-  printf("number of npr is %d \n", npr);
+  printf("number of %c is %d \n", rsymbol, npr);
 
   int nm= 0;
 
   for(int i=0; i <n; ++i ){
-    if (iloc[i] > 0 ){
+    if (iloc[i] >= 0 ){
       nm++;
-      if ((iloc[i+1]) < 0 && (i <=(n-2))){
-	break;
-      }
     }
   }
   printf("number of internal match is %d \n", nm);
 
   npr = 0;
   int imatch = 0;
-  nm++;
-  for(int i=(element-1); i <n; ++i ){
+  for(int i=(element-1); i <len; ++i ){
     if (str[i] == rsymbol){
       npr++;
       if (npr == nm) imatch = i;

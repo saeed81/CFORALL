@@ -287,11 +287,11 @@ int main(int argc, char *argv[]){
   content[fs] = '\0';
 
   printf("file size is %ld\n",fs);
-  printf("content is %s\n",content);
+  //printf("content is %s\n",content);
 
   int first = -1, last = -1;
 
-  printf("%d\n",find("\"name\"",content,&first,&last));
+  printf("%d\n",find("\"2017020803\"",content,&first,&last));
 
   printf("%d\n",first);
   printf("%d\n",last);
