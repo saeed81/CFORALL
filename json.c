@@ -286,15 +286,19 @@ int main(int argc, char *argv[]){
 
   content[fs] = '\0';
 
-  printf("file size is %ld\n",fs);
+  //printf("file size is %ld\n",fs);
   //printf("content is %s\n",content);
+
+  int iok = checksymbolbeforeparse(content);
+  if (iok != 0) return 1;
+
 
   int first = -1, last = -1;
 
-  printf("%d\n",find("\"2017020803\"",content,&first,&last));
+  find(argv[2],content,&first,&last);
 
-  printf("%d\n",first);
-  printf("%d\n",last);
+  //printf("%d\n",first);
+  //printf("%d\n",last);
 
   printf("key=>");
   for (int i=first;i<=last;++i)printf("%c",content[i]);
@@ -322,7 +326,7 @@ int main(int argc, char *argv[]){
   }
   //check what is between : and {
   
-  printf("kb is %d \n",kb);
+  //printf("kb is %d \n",kb);
   
   if (kb >= 0 ){
     int stop = 0; 
@@ -350,7 +354,7 @@ int main(int argc, char *argv[]){
       char *tmp = &content[kb];
       int index = -1;
       match(tmp, 1, (fs-kb+1),'{', &index);
-      printf("match { is at index %d and kb + index %d\n",index, kb +index);
+      //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       printf("value=>\n");
       for (int i=(kb); i <= (kb+index) ; ++i){
 	printf("%c",content[i]);
