@@ -70,7 +70,7 @@ char *addquote(char *str){
   char *reg = NULL;
   int n = 0;
 
-  printf("string  %s with the length of %d has no quote character. We will add to it \n",str, len);
+  //printf("string  %s with the length of %d has no quote character. We will add to it \n",str, len);
   reg = (char *)malloc(len+1+2);
   char *trg = reg;
   *reg = '\"';
@@ -82,12 +82,12 @@ char *addquote(char *str){
     tmp++;
     reg++;
   }
-  printf("n is %d \n",n);
+  //printf("n is %d \n",n);
   *reg = '\"';
   reg++;
   *reg='\0';
   reg = trg;
-  printf("reg is %s \n",reg);
+  //printf("reg is %s \n",reg);
   
   trg = reg;
   len = 0;
@@ -95,7 +95,7 @@ char *addquote(char *str){
     trg++;
     len++;
   }
-  printf("string  %s with the length of %d has quote character. We will add to it \n",str, len);
+  //printf("string  %s with the length of %d has quote character. We will add to it \n",str, len);
   
   return reg;
 }

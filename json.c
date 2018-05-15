@@ -26,9 +26,7 @@ int find(char *reg, char *str, int *first, int *last){
   for (int j=0; j < lns; ++j){
     i = 0;
     if (str[j] == reg[i]){
-
       //printf("we found the first instance of the first character at j %d\n",j);                                                                                                      
-  
       //printf("we need to find the other characters\n");                                                                                                                              
       *first = j;
       k  = j+1;
@@ -266,6 +264,12 @@ void extract(char *content, long fs, char *key, char *value){
 
 int main(int argc, char *argv[]){
 
+
+  if ( argc != 3){
+    printf("Usage %s jsonfile key\n", argv[0]);
+    return 1;
+  }
+
   FILE *inp = NULL;
 
   inp = fopen(argv[1],"r");
@@ -274,7 +278,9 @@ int main(int argc, char *argv[]){
 
   fseek(inp,0,SEEK_END);
 
-  long int fs = ftell(inp);
+  long int fs = 0L;
+  
+  fs = ftell(inp);
 
   fseek(inp,0,SEEK_SET);
 
@@ -306,8 +312,8 @@ int main(int argc, char *argv[]){
 
   find(quotekey,content,&first,&last);
 
-  printf("%d\n",first);
-  printf("%d\n",last);
+  //printf("%d\n",first);
+  //printf("%d\n",last);
 
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
@@ -339,7 +345,6 @@ int main(int argc, char *argv[]){
     }
   }
   //check what is between : and {
-  
   //printf("kb is %d \n",kb);
   
   if (kb >= 0 ){
