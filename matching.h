@@ -42,6 +42,64 @@ int checksymbolbeforeparse(char *str){
   return 0;
 }
 
+int checkforquote(char *str){
+  
+  char *tmp = str;
+  int exist = 0;
+  if (*tmp == '\"') exist++;
+  while (*tmp != '\0'){
+    tmp++;
+  }
+  tmp--;
+  if (*tmp == '\"') exist++;
+  
+  if (exist == 2 ) return 0;
+  
+  return 1;
+}
+char *addquote(char *str){
+  
+  char *tmp = str;
+  int exist = 0;
+  int len   = 0;
+  
+  while (*tmp != '\0'){
+    tmp++;
+    len++;
+  }
+  char *reg = NULL;
+  int n = 0;
+
+  printf("string  %s with the length of %d has no quote character. We will add to it \n",str, len);
+  reg = (char *)malloc(len+1+2);
+  char *trg = reg;
+  *reg = '\"';
+  reg++;
+  tmp = str;
+  while (*tmp != '\0'){
+    *reg = *tmp;
+    n++;
+    tmp++;
+    reg++;
+  }
+  printf("n is %d \n",n);
+  *reg = '\"';
+  reg++;
+  *reg='\0';
+  reg = trg;
+  printf("reg is %s \n",reg);
+  
+  trg = reg;
+  len = 0;
+  while (*trg != '\0'){
+    trg++;
+    len++;
+  }
+  printf("string  %s with the length of %d has quote character. We will add to it \n",str, len);
+  
+  return reg;
+}
+
 void match(char *str, int element, int len, char lsymbol, int *index){
 
   char rsymbol = '0';

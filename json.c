@@ -292,13 +292,27 @@ int main(int argc, char *argv[]){
   int iok = checksymbolbeforeparse(content);
   if (iok != 0) return 1;
 
+  char *key      = argv[2];
+  char *quotekey = NULL;
+
+  if ( checkforquote(key) ) {
+    quotekey = addquote(key);
+  }
+  else{
+    quotekey = key;
+  }
 
   int first = -1, last = -1;
 
-  find(argv[2],content,&first,&last);
+  find(quotekey,content,&first,&last);
 
-  //printf("%d\n",first);
-  //printf("%d\n",last);
+  printf("%d\n",first);
+  printf("%d\n",last);
+
+  if ( first == (-1) || last == (-1)){
+    printf("%s does not exist in the file \n",quotekey);
+    return 1;
+  }
 
   printf("key=>");
   for (int i=first;i<=last;++i)printf("%c",content[i]);
