@@ -2,6 +2,7 @@
 #include<stdlib.h>
 
 #define endl printf("\n")
+#define LEN(a) (sizeof(a) / sizeof(a[0]))
 
 void findc(char *s, char sym, int *j){
   int n = 0;
@@ -69,7 +70,7 @@ int main(void){
 
   char str[] = "{lat:12,lon:10,info:{par:vind,value:[1,2,3,4,5]}}";
 
-  int nx = sizeof(str) / sizeof(str[0]);
+  int nx = LEN(str);
 
   int j = -1;
 
@@ -132,8 +133,6 @@ int main(void){
   printf("%s string is int yes(1), no(0) : %d",si[1],isint(si[1]));endl;
   printf("%s string is int yes(1), no(0) : %d",si[2],isint(si[2]));endl;
   printf("%s string is int yes(1), no(0) : %d",si[3],isint(si[3]));endl;
-
-
 
   return 0;
   
