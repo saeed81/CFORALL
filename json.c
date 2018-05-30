@@ -338,7 +338,7 @@ int main(int argc, char *argv[]){
   
   if (ka >= 0){
     for (int i=(ka+1); i < fs; ++i){
-      if (content[i] == '{'){
+      if (content[i] == '{' || content[i] == '['){
 	kb =  i;
 	break;
       }
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]){
     int stop = 0; 
     for (int i=(kb-1); i >(ka) ; --i){
       if (content[i] != ' '){
-	printf("there is soemthing before {. Now we search for ,\n");
+	printf("there is something before {. Now we search for ,\n");
 	stop = 1;
 	break;
       }
@@ -368,13 +368,14 @@ int main(int argc, char *argv[]){
 	printf("%c",content[i]);
       }
     }
-    else {
+    else{
 
       char *tmp = &content[kb];
       int index = -1;
-      match(tmp, 1, (fs-kb+1),'{', &index);
+      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
+      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
-      printf("value=>\n");
+      printf("here in the match value=>\n");
       for (int i=(kb); i <= (kb+index) ; ++i){
 	printf("%c",content[i]);
       }
@@ -388,9 +389,11 @@ int main(int argc, char *argv[]){
       }
     }
     if ( kc < 0) {
-      printf("kc is < 0 value=>\n");
+      printf("kc %d is < 0 value=>\n",kc);
       for (int i=(ka+1); i < (fs-1) ; ++i){
-	printf("%c",content[i]);
+	if (content[i] != '}'){
+	  printf("%c",content[i]);
+	}
       }
     }
     else{
@@ -412,7 +415,7 @@ int main(int argc, char *argv[]){
     }
   }
   printf("\n");
-  printf("value=>");
+  printf("here end value=>");
   for (int i=ifkey;i<=iekey;++i)printf("%c",content[i]);
   printf("\n");
   #endif
