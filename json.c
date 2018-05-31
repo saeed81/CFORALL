@@ -105,189 +105,6 @@ int Strcmp(char *s1, char *s2){
   return 1;
 }
  
-void get(char *content, long fs, char *key, char *value){
-
-  long int  jf = -1, je = -1;
- 
-  for (long int i=0; i < fs; ++i){
-    if (content[i] == '{') {
-      jf = i;
-      break;
-    }
-  }
-
-  for (long int i=(fs-1); i >= 0; --i){
-    if (content[i] == '}'){
-      je = i;
-      break;
-    }
-  }
- 
-  printf("first occurance of { is at position %ld \n", jf);
-  printf("first occurance of } is at position %ld \n", je);
-
-
-  for (long int i=0; i < jf; ++i){
-    if (content[i] == ':') {
-      jf = -1;
-      break;
-    }
-  }
-
-  printf("content[%d] is %c \n", fs -1, content[fs-1]);
-  printf("content[%d] is %c \n", fs -2, content[fs-2]);
-  printf("content[%d] is %c \n", fs -3, content[fs-3]);
-  
-  for (long int i=(fs-1); i > je; --i){
-    if ((content[i] != ' ') && (content[i] != EOF) && (content[i] != '\n') ){
-      je = -1;
-      break;
-    }
-  }
-  
-  if ( jf == (-1) || je == (-1)) {
-    printf("content is not a valid json object\n");
-    return;
-  }
-  
-  jf++; 
-  je--;
-
-  long int jlf = jf, jle = -1; 
-  long int klf = 0 , kle = 0 ; 
-  
-  char element[2048] = {'\0'};
-  int nc = -1;
-  int nk = -1;
-  int stop = 0;
-  long int ncount = 0;
-  for (long int i=jf; i <=je; ++i) {
-    if (content[i] == ':'){
-      /*for (int j = (i+1); j <=je; ++j){
-	if (content[j] == ','){
-	  jle = j;
-	  break;
-	}
-      }
-      */
-      if (ncount == 0) jlf = jf;
-      //we need to check if this : is inside of dictionary
-      for (int j = jlf; j < i; ++j){
-	nc++;
-	element[nc] = content[j];
-      }
-      for (int ii=0; ii <= nc; ++ii){
-	printf("%c",element[ii]);
-      }
-      printf("\n");
-      //printf("jlf is now %d\n",jlf);
-      for (int ii=0; ii < 2048; ++ii){
-	element[ii] = '\0';
-      }
-      for (int j=(i+1);j<= (jle-1);++j){
-	if (content[j] == '{'){
-	  //printf("it seems like there is a dictionary around , at %d\n",j);
-	  break;
-	}
-      }
-      for (int j=(i+1);j<= (jle-1);++j){
-	if (content[j] == '}'){
-	  //printf(" , is not in a dictory %d\n",j);
-	  break;
-	}
-      }
-
-      //we test if , is inside of dictionary or not
-      #if 0
-      stop = 1;
-      for (int j=(i+1);j<= (jle-1) && !stop;++j){
-	if (content[j] == '{'){
-	  printf("is a dictionary starts at %d\n",j);
-	  for (int k=(j+1); k <=je; ++k){
-	    if (content[k] == '}'){
-	      printf("end of this dictionary is at %d\n",k);
-	      klf = (k+1);
-	      jlf = klf;
-	      stop = 1;
-	      break;
-	    }
-	  }
-	}
-      }
-      #endif
-      //now lets find the end of dictionary
-      //if (stop == 0) jlf = jle;
-      //printf("jlf is %d",jlf);
-      jlf = (jle +1);
-      ncount++;
-    }
-    nc = -1;
-    //printf("\n");
-  }
-  printf("\n");
-  return;
-}
-
-void extract(char *content, long fs, char *key, char *value){
-
-  long int  jf = -1, je = -1;
- 
-  for (long int i=0; i < fs; ++i){
-
-    if (content[i] == '{') {
-      jf = i;
-      break;
-    }
-  }
-
-  for (long int i=(fs-1); i >= 0; --i){
-
-    if (content[i] == '}'){
-      je = i;
-      break;
-    }
-  }
-  
-  if ( jf == (-1) || je == (-1)) {
-    printf("content is not a valid json object\n");
-    return;
-  }
-  
-  printf("first occurance of { is at position %ld \n", jf);
-  printf("last occurance of } is at position %ld \n", je);
-
-  jf++; 
-  je--;
-
-  long int jlf = jf, jle = je; 
-
-  char element[1024] = {'\0'};
-  int nc = -1;
-
-  for (long int i=jf; i <=je; ++i) {
-    if (content[i] == ','){
-      for (int j = jlf; j < i; ++j){
-	if (content[j] == ':') { 
-	  break;
-	}else{
-	  nc++;
-	  element[nc] = content[j];
-	}
-      }
-      for (int ii=0; ii < nc; ++ii){
-	printf("%c",element[ii]);
-      }
-      for (int ii=0; ii < 1024; ++ii){
-	element[ii] = '\0';
-      }
-      nc = -1;
-      printf("\n");
-      jlf = ++i;
-    }
-  }
-}
-
-
 char *json_load(char *filename){
 
   FILE *inp = NULL;
@@ -313,10 +130,9 @@ char *json_load(char *filename){
   content[fs] = '\0';
   
   if (checksymbolbeforeparse(content) != 0){
+    free(content);
     content = NULL;
   }
-
-
 
   return content;
 }
@@ -328,18 +144,19 @@ void getvalue(char *content, char *key,...){
   char *str = content;
   long int fs = 0L;
   while(*str != '\0'){
-    fs += 1;
+    fs++;
     str++;
   }
   fs++;
 
   va_list vs;
+
   va_start(vs,key);
 
   char *tmp = NULL;
   char *quotekey = NULL;
   
-  if ( checkforquote(key) ) {
+  if ( checkforquote(key)) {
     quotekey = addquote(key);
   }
   else{
@@ -351,7 +168,7 @@ void getvalue(char *content, char *key,...){
 
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
-    return 1;
+    return;
   }
 
   printf("key=>");
@@ -365,7 +182,7 @@ void getvalue(char *content, char *key,...){
     }
   }
   
-  if (incol == -1)return 1;
+  if (incol == -1)return;
   
   int ka = incol, kb = -1, kc = -1;
   int findex = -1;
@@ -398,7 +215,7 @@ void getvalue(char *content, char *key,...){
 	  break;
 	}
       }
-      printf("block 1 value=>\n");
+      //printf("block 1 value=>\n");
       findex = (ka+1);
       lindex = (kc-1);
       for (int i=(ka+1); i < (kc) ; ++i){
@@ -410,16 +227,16 @@ void getvalue(char *content, char *key,...){
       }
     }
     else{
-      char *tmp = &content[kb];
+      char *tmp1 = &content[kb];
       int index = -1;
-      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
-      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      if (content[kb] == '{')match(tmp1, 1, (fs-kb+1),'{', &index);
+      if (content[kb] == '[')match(tmp1, 1, (fs-kb+1),'[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
-      printf("block 2 value=>\n");
+      //printf("block 2 value=>\n");
       findex = kb;
       lindex = (kb+index);
       for (int i=(kb); i <= (kb+index) ; ++i){
-	printf("%c",content[i]);
+	//printf("%c",content[i]);
       }
     }
   }
@@ -431,7 +248,7 @@ void getvalue(char *content, char *key,...){
       }
     }
     if ( kc < 0) {
-      printf("block 3 value=>\n");
+      //printf("block 3 value=>\n");
       findex = (ka+1);
       lindex = (fs-1-1);
       for (int i=(ka+1); i < (fs-1) ; ++i){
@@ -442,7 +259,7 @@ void getvalue(char *content, char *key,...){
       }
     }
     else{
-      printf("block 4 value=>\n");
+      //printf("block 4 value=>\n");
       findex = (ka+1);
       lindex = (kc -1);
       for (int i=(ka+1); i < kc ; ++i){
@@ -450,19 +267,26 @@ void getvalue(char *content, char *key,...){
       }
     }
   }
-  
+  int narg = 1;
   printf("\n");
-  
   //first value found we contniue with second one
+  //for (int i=findex; i <= lindex ; ++i){
+  //	printf("%c",content[i]);
+  //}
+
+  printf("narg is %d and key is %s\n",narg,key);
+  printf("value is \n");
   for (int i=findex; i <= lindex ; ++i){
-	printf("%c",content[i]);
+    printf("%c",content[i]);
   }
+   
   printf("\n");
   typevalue(content,findex,lindex);
 
   // we find the second value first value would a key now
   tmp = content;
   char *keyt = NULL;
+  
   while((key=va_arg(vs,char *)) != NULL){
     keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
     int ncount = 0;
@@ -474,9 +298,9 @@ void getvalue(char *content, char *key,...){
     //ncount++;
     keyt[ncount] = '\0';
     for (int i=0; i < ncount;++i){
-      printf("%c",keyt[i]);
+      //printf("%c",keyt[i]);
     }
-    if (tmp != NULL) free(tmp);
+    if ((narg > 1) && (tmp != NULL)) free(tmp);
     
     if ( checkforquote(key) ) {
       quotekey = addquote(key);
@@ -488,16 +312,16 @@ void getvalue(char *content, char *key,...){
     find(quotekey,keyt,&first,&last);
     fs = (lindex-findex+1+1);
     
-    printf("%d\n",first);
-    printf("%d\n",last);
+    //printf("%d\n",first);
+    //printf("%d\n",last);
 
     if ( first == (-1) || last == (-1)){
       printf("%s does not exist in the file \n",quotekey);
-      return 1;
+      return;
     }
 
-    printf("key=>");
-    for (int i=first;i<=last;++i)printf("%c",keyt[i]);
+    //printf("key=>");
+    //for (int i=first;i<=last;++i)printf("%c",keyt[i]);
 
     incol = -1;
     for (int i=(last+1);i < fs;++i){
@@ -506,7 +330,7 @@ void getvalue(char *content, char *key,...){
 	break;
       }
     }
-    if (incol == -1)return 1;
+    if (incol == -1)return;
   
     ka = incol, kb = -1, kc = -1;
     findex = -1;
@@ -540,7 +364,7 @@ void getvalue(char *content, char *key,...){
 	  break;
 	}
       }
-      printf("block 1 value=>\n");
+      //printf("block 1 value=>\n");
       findex = (ka+1);
       lindex = (kc-1);
       for (int i=(ka+1); i < (kc) ; ++i){
@@ -552,16 +376,16 @@ void getvalue(char *content, char *key,...){
       }
     }
     else{
-      char *tmp = &keyt[kb];
+      char *tmp1 = &keyt[kb];
       int index = -1;
-      if (keyt[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
-      if (keyt[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      if (keyt[kb] == '{')match(tmp1, 1, (fs-kb+1),'{', &index);
+      if (keyt[kb] == '[')match(tmp1, 1, (fs-kb+1),'[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
-      printf("block 2 value=>\n");
+      //printf("block 2 value=>\n");
       findex = kb;
       lindex = (kb+index);
       for (int i=(kb); i <= (kb+index) ; ++i){
-	printf("%c",keyt[i]);
+	//printf("%c",keyt[i]);
       }
     }
   }
@@ -573,7 +397,7 @@ void getvalue(char *content, char *key,...){
       }
     }
     if ( kc < 0) {
-      printf("block 3 value=>\n");
+      //printf("block 3 value=>\n");
       findex = (ka+1);
       lindex = (fs-1-1);
       for (int i=(ka+1); i < (fs-1) ; ++i){
@@ -584,7 +408,7 @@ void getvalue(char *content, char *key,...){
       }
     }
     else{
-      printf("block 4 value=>\n");
+      //printf("block 4 value=>\n");
       findex = (ka+1);
       lindex = (kc -1);
       for (int i=(ka+1); i < kc ; ++i){
@@ -593,22 +417,24 @@ void getvalue(char *content, char *key,...){
     }
   }
     printf("\n");
+    
+    narg++;
+    printf("narg is %d and key is %s\n",narg,key);
+    printf("value is \n");
     for (int i=findex; i <= lindex ; ++i){
       printf("%c",keyt[i]);
     }
     printf("\n");
     typevalue(keyt,findex,lindex);
-
     tmp = keyt;
     
-
-    //free(content);
-    //free(keyt);
   }
   if (keyt != NULL) free(keyt);
   
   return ;
 }
+
+#if 0
 
 int main(int argc, char *argv[]){
 
@@ -894,3 +720,4 @@ int main(int argc, char *argv[]){
   return 0;
 
 }
+#endif
