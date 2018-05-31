@@ -11,6 +11,32 @@ int getLen(char *str){
   return len;
 }
 
+int iswhitespace(char c){
+
+  if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\n')){
+    return 1;
+  }
+  
+  return 0;
+}
+
+
+void typevalue(char *ar, int findex, int lindex){
+
+  if (ar[findex] == '[' && ar[lindex] == ']'){
+    printf("value is array\n");
+  }
+  else if (ar[findex] == '{' && ar[lindex] == '}'){
+    printf("value is dictionary\n");
+  }
+  else{
+    printf("value is either string or float");
+  }
+  
+  return;
+}
+
+
 int find(char *reg, char *str, int *first, int *last){
 
   int  lnr = getLen(reg);
@@ -334,7 +360,8 @@ int main(int argc, char *argv[]){
   if (incol == -1)return 1;
   
   int ka = incol, kb = -1, kc = -1;
- 
+  int findex = -1;
+  int lindex = -1;
   
   if (ka >= 0){
     for (int i=(ka+1); i < fs; ++i){
@@ -350,8 +377,8 @@ int main(int argc, char *argv[]){
   if (kb >= 0 ){
     int stop = 0; 
     for (int i=(kb-1); i >(ka) ; --i){
-      if (content[i] != ' '){
-	printf("there is something before {. Now we search for ,\n");
+      if (iswhitespace(content[i]) == 0){
+	//printf("there is something before {. Now we search for ,\n");
 	stop = 1;
 	break;
       }
@@ -359,23 +386,31 @@ int main(int argc, char *argv[]){
     if (stop){
       for (int i=(ka+1); i < (kb) ; ++i){
 	if (content[i] == ','){
-	  printf("we found ,\n");
+	  //printf("we found ,\n");
 	  kc = i;
 	  break;
 	}
       }
+      printf("block 1 value=>\n");
+      findex = (ka+1);
+      lindex = (kc-1);
       for (int i=(ka+1); i < (kc) ; ++i){
-	printf("%c",content[i]);
+	if (content[i] == '}'){
+	  //printf("%c",content[i]);
+	  lindex = (i-1);
+	  break;
+	}
       }
     }
     else{
-
       char *tmp = &content[kb];
       int index = -1;
       if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
       if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
-      printf("here in the match value=>\n");
+      printf("block 2 value=>\n");
+      findex = kb;
+      lindex = (kb+index);
       for (int i=(kb); i <= (kb+index) ; ++i){
 	printf("%c",content[i]);
       }
@@ -389,15 +424,20 @@ int main(int argc, char *argv[]){
       }
     }
     if ( kc < 0) {
-      printf("kc %d is < 0 value=>\n",kc);
+      printf("block 3 value=>\n");
+      findex = (ka+1);
+      lindex = (fs-1-1);
       for (int i=(ka+1); i < (fs-1) ; ++i){
-	if (content[i] != '}'){
-	  printf("%c",content[i]);
+	if (content[i] == '}'){
+	  lindex = (i-1);
+	  break;
 	}
       }
     }
     else{
-      printf("kc > 0 value=>\n");
+      printf("block 4 value=>\n");
+      findex = (ka+1);
+      lindex = (kc -1);
       for (int i=(ka+1); i < kc ; ++i){
 	printf("%c",content[i]);
       }
@@ -420,6 +460,16 @@ int main(int argc, char *argv[]){
   printf("\n");
   #endif
 
+
+  for (int i=findex; i <= lindex ; ++i){
+	printf("%c",content[i]);
+  }
+
+  printf("\n");
+
+  typevalue(content,findex,lindex);
+
+  printf("\n");
   free(content);
 
   return 0;
