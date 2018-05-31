@@ -288,7 +288,7 @@ void extract(char *content, long fs, char *key, char *value){
 }
 
 
-char *json_load(char *filename, long int *fs){
+char *json_load(char *filename){
 
   FILE *inp = NULL;
 
@@ -298,25 +298,33 @@ char *json_load(char *filename, long int *fs){
 
   fseek(inp,0,SEEK_END);
 
-  *fs = ftell(inp);
+  long int fs = ftell(inp);
 
   fseek(inp,0,SEEK_SET);
 
   char *content = NULL;
   
-  content = (char *)malloc((*fs+1) * sizeof(char));
+  content = (char *)malloc((fs+1) * sizeof(char));
 
-  fread(content,1,*fs,inp);
+  fread(content,1,fs,inp);
 
   fclose(inp);
 
-  content[*fs] = '\0';
+  content[fs] = '\0';
   
+  if (checksymbolbeforeparse(content) != 0){
+    content = NULL;
+  }
+
+
+
   return content;
 }
 
 void getvalue(char *content, char *key,...){
 
+  if (content == NULL) return; 
+  
   char *str = content;
   long int fs = 0L;
   while(*str != '\0'){
@@ -598,6 +606,7 @@ void getvalue(char *content, char *key,...){
     //free(keyt);
   }
   if (keyt != NULL) free(keyt);
+  
   return ;
 }
 
@@ -608,21 +617,13 @@ int main(int argc, char *argv[]){
     return 1;
   }
 
-  long int fs = 0L;
-  char *content = json_load(argv[1],&fs);
-  
-  //printf("file size is %ld\n",fs);
-  //printf("content is %s\n",content);
-  
-  int iok = checksymbolbeforeparse(content);
-  if (iok != 0){
-    printf("%s file is not a valid json\n",argv[1]);
-    return 1;
-  }
-
+  char *content = json_load(argv[1]);
   getvalue(content,"server","prod",NULL);
   
   
+
+
+
   #if 0
   char *key      = argv[2];
   char *quotekey = NULL;
