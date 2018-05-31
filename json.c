@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include"matching.h"
+#include<stdarg.h>
 
 int getLen(char *str){
 
@@ -12,14 +13,12 @@ int getLen(char *str){
 }
 
 int iswhitespace(char c){
-
   if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\n')){
     return 1;
   }
   
   return 0;
 }
-
 
 void typevalue(char *ar, int findex, int lindex){
 
@@ -288,42 +287,343 @@ void extract(char *content, long fs, char *key, char *value){
   }
 }
 
+
+char *json_load(char *filename, long int *fs){
+
+  FILE *inp = NULL;
+
+  inp = fopen(filename,"r");
+
+  if (inp == NULL) return NULL;
+
+  fseek(inp,0,SEEK_END);
+
+  *fs = ftell(inp);
+
+  fseek(inp,0,SEEK_SET);
+
+  char *content = NULL;
+  
+  content = (char *)malloc((*fs+1) * sizeof(char));
+
+  fread(content,1,*fs,inp);
+
+  fclose(inp);
+
+  content[*fs] = '\0';
+  
+  return content;
+}
+
+void getvalue(char *content, char *key,...){
+
+  char *str = content;
+  long int fs = 0L;
+  while(*str != '\0'){
+    fs += 1;
+    str++;
+  }
+  fs++;
+
+  va_list vs;
+  va_start(vs,key);
+
+  char *tmp = NULL;
+  char *quotekey = NULL;
+  
+  if ( checkforquote(key) ) {
+    quotekey = addquote(key);
+  }
+  else{
+    quotekey = key;
+  }
+  
+  int first = -1, last = -1;
+  find(quotekey,content,&first,&last);
+
+  if ( first == (-1) || last == (-1)){
+    printf("%s does not exist in the file \n",quotekey);
+    return 1;
+  }
+
+  printf("key=>");
+  for (int i=first;i<=last;++i)printf("%c",content[i]);
+
+  int incol = -1;
+  for (int i=(last+1);i < fs;++i){
+    if (content[i] == ':'){
+      incol = i;
+      break;
+    }
+  }
+  
+  if (incol == -1)return 1;
+  
+  int ka = incol, kb = -1, kc = -1;
+  int findex = -1;
+  int lindex = -1;
+  
+  if (ka >= 0){
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == '{' || content[i] == '['){
+	kb =  i;
+	break;
+      }
+    }
+  }
+  //check what is between : and {
+  //printf("kb is %d \n",kb);
+  if (kb >= 0 ){
+    int stop = 0; 
+    for (int i=(kb-1); i >(ka) ; --i){
+      if (iswhitespace(content[i]) == 0){
+	//printf("there is something before {. Now we search for ,\n");
+	stop = 1;
+	break;
+      }
+    }
+    if (stop){
+      for (int i=(ka+1); i < (kb) ; ++i){
+	if (content[i] == ','){
+	  //printf("we found ,\n");
+	  kc = i;
+	  break;
+	}
+      }
+      printf("block 1 value=>\n");
+      findex = (ka+1);
+      lindex = (kc-1);
+      for (int i=(ka+1); i < (kc) ; ++i){
+	if (content[i] == '}'){
+	  //printf("%c",content[i]);
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      char *tmp = &content[kb];
+      int index = -1;
+      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
+      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      //printf("match { is at index %d and kb + index %d\n",index, kb +index);
+      printf("block 2 value=>\n");
+      findex = kb;
+      lindex = (kb+index);
+      for (int i=(kb); i <= (kb+index) ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  else{
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == ','){
+	kc =  i;
+	break;
+      }
+    }
+    if ( kc < 0) {
+      printf("block 3 value=>\n");
+      findex = (ka+1);
+      lindex = (fs-1-1);
+      for (int i=(ka+1); i < (fs-1) ; ++i){
+	if (content[i] == '}'){
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      printf("block 4 value=>\n");
+      findex = (ka+1);
+      lindex = (kc -1);
+      for (int i=(ka+1); i < kc ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  
+  printf("\n");
+  
+  //first value found we contniue with second one
+  for (int i=findex; i <= lindex ; ++i){
+	printf("%c",content[i]);
+  }
+  printf("\n");
+  typevalue(content,findex,lindex);
+
+  // we find the second value first value would a key now
+  tmp = content;
+  char *keyt = NULL;
+  while((key=va_arg(vs,char *)) != NULL){
+    keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
+    int ncount = 0;
+    for (int i=findex; i <= lindex ; ++i){
+      keyt[ncount]=tmp[i];
+      //printf("%c\t%c\n",tmp[i],keyt[ncount]);
+      ncount++;
+    }
+    //ncount++;
+    keyt[ncount] = '\0';
+    for (int i=0; i < ncount;++i){
+      printf("%c",keyt[i]);
+    }
+    if (tmp != NULL) free(tmp);
+    
+    if ( checkforquote(key) ) {
+      quotekey = addquote(key);
+    }
+    else{
+      quotekey = key;
+    }
+    first = -1, last = -1;
+    find(quotekey,keyt,&first,&last);
+    fs = (lindex-findex+1+1);
+    
+    printf("%d\n",first);
+    printf("%d\n",last);
+
+    if ( first == (-1) || last == (-1)){
+      printf("%s does not exist in the file \n",quotekey);
+      return 1;
+    }
+
+    printf("key=>");
+    for (int i=first;i<=last;++i)printf("%c",keyt[i]);
+
+    incol = -1;
+    for (int i=(last+1);i < fs;++i){
+      if (keyt[i] == ':'){
+	incol = i;
+	break;
+      }
+    }
+    if (incol == -1)return 1;
+  
+    ka = incol, kb = -1, kc = -1;
+    findex = -1;
+    lindex = -1;
+  
+    if (ka >= 0){
+      for (int i=(ka+1); i < fs; ++i){
+	if (keyt[i] == '{' || keyt[i] == '['){
+	  kb =  i;
+	  break;
+	}
+      }
+    }
+  //check what is between : and {
+  //printf("kb is %d \n",kb);
+  
+    if (kb >= 0 ){
+      int stop = 0; 
+      for (int i=(kb-1); i >(ka) ; --i){
+	if (iswhitespace(keyt[i]) == 0){
+	//printf("there is something before {. Now we search for ,\n");
+	stop = 1;
+	break;
+      }
+    }
+    if (stop){
+      for (int i=(ka+1); i < (kb) ; ++i){
+	if (keyt[i] == ','){
+	  //printf("we found ,\n");
+	  kc = i;
+	  break;
+	}
+      }
+      printf("block 1 value=>\n");
+      findex = (ka+1);
+      lindex = (kc-1);
+      for (int i=(ka+1); i < (kc) ; ++i){
+	if (keyt[i] == '}'){
+	  //printf("%c",content[i]);
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      char *tmp = &keyt[kb];
+      int index = -1;
+      if (keyt[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
+      if (keyt[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      //printf("match { is at index %d and kb + index %d\n",index, kb +index);
+      printf("block 2 value=>\n");
+      findex = kb;
+      lindex = (kb+index);
+      for (int i=(kb); i <= (kb+index) ; ++i){
+	printf("%c",keyt[i]);
+      }
+    }
+  }
+  else{
+    for (int i=(ka+1); i < fs; ++i){
+      if (keyt[i] == ','){
+	kc =  i;
+	break;
+      }
+    }
+    if ( kc < 0) {
+      printf("block 3 value=>\n");
+      findex = (ka+1);
+      lindex = (fs-1-1);
+      for (int i=(ka+1); i < (fs-1) ; ++i){
+	if (keyt[i] == '}'){
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      printf("block 4 value=>\n");
+      findex = (ka+1);
+      lindex = (kc -1);
+      for (int i=(ka+1); i < kc ; ++i){
+	printf("%c",keyt[i]);
+      }
+    }
+  }
+    printf("\n");
+    for (int i=findex; i <= lindex ; ++i){
+      printf("%c",keyt[i]);
+    }
+    printf("\n");
+    typevalue(keyt,findex,lindex);
+
+    tmp = keyt;
+    
+
+    //free(content);
+    //free(keyt);
+  }
+  if (keyt != NULL) free(keyt);
+  return ;
+}
+
 int main(int argc, char *argv[]){
 
-
-  if ( argc != 3){
+  if ( argc != 2){
     printf("Usage %s jsonfile key\n", argv[0]);
     return 1;
   }
 
-  FILE *inp = NULL;
-
-  inp = fopen(argv[1],"r");
-
-  if (inp == NULL) return 1;
-
-  fseek(inp,0,SEEK_END);
-
   long int fs = 0L;
+  char *content = json_load(argv[1],&fs);
   
-  fs = ftell(inp);
-
-  fseek(inp,0,SEEK_SET);
-
-  char *content = (char *)malloc((fs+1) * sizeof(char));
-
-  fread(content,1,fs,inp);
-
-  fclose(inp);
-
-  content[fs] = '\0';
-
   //printf("file size is %ld\n",fs);
   //printf("content is %s\n",content);
-
+  
   int iok = checksymbolbeforeparse(content);
-  if (iok != 0) return 1;
+  if (iok != 0){
+    printf("%s file is not a valid json\n",argv[1]);
+    return 1;
+  }
 
+  getvalue(content,"server","prod",NULL);
+  
+  
+  #if 0
   char *key      = argv[2];
   char *quotekey = NULL;
 
@@ -333,9 +633,8 @@ int main(int argc, char *argv[]){
   else{
     quotekey = key;
   }
-
+  
   int first = -1, last = -1;
-
   find(quotekey,content,&first,&last);
 
   //printf("%d\n",first);
@@ -362,6 +661,147 @@ int main(int argc, char *argv[]){
   int ka = incol, kb = -1, kc = -1;
   int findex = -1;
   int lindex = -1;
+  
+  if (ka >= 0){
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == '{' || content[i] == '['){
+	kb =  i;
+	break;
+      }
+    }
+  }
+  //check what is between : and {
+  //printf("kb is %d \n",kb);
+  if (kb >= 0 ){
+    int stop = 0; 
+    for (int i=(kb-1); i >(ka) ; --i){
+      if (iswhitespace(content[i]) == 0){
+	//printf("there is something before {. Now we search for ,\n");
+	stop = 1;
+	break;
+      }
+    }
+    if (stop){
+      for (int i=(ka+1); i < (kb) ; ++i){
+	if (content[i] == ','){
+	  //printf("we found ,\n");
+	  kc = i;
+	  break;
+	}
+      }
+      printf("block 1 value=>\n");
+      findex = (ka+1);
+      lindex = (kc-1);
+      for (int i=(ka+1); i < (kc) ; ++i){
+	if (content[i] == '}'){
+	  //printf("%c",content[i]);
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      char *tmp = &content[kb];
+      int index = -1;
+      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
+      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      //printf("match { is at index %d and kb + index %d\n",index, kb +index);
+      printf("block 2 value=>\n");
+      findex = kb;
+      lindex = (kb+index);
+      for (int i=(kb); i <= (kb+index) ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  else{
+    for (int i=(ka+1); i < fs; ++i){
+      if (content[i] == ','){
+	kc =  i;
+	break;
+      }
+    }
+    if ( kc < 0) {
+      printf("block 3 value=>\n");
+      findex = (ka+1);
+      lindex = (fs-1-1);
+      for (int i=(ka+1); i < (fs-1) ; ++i){
+	if (content[i] == '}'){
+	  lindex = (i-1);
+	  break;
+	}
+      }
+    }
+    else{
+      printf("block 4 value=>\n");
+      findex = (ka+1);
+      lindex = (kc -1);
+      for (int i=(ka+1); i < kc ; ++i){
+	printf("%c",content[i]);
+      }
+    }
+  }
+  
+  printf("\n");
+  
+  //first value found we contniue with second one
+  for (int i=findex; i <= lindex ; ++i){
+	printf("%c",content[i]);
+  }
+  printf("\n");
+  typevalue(content,findex,lindex);
+
+  // we find the second value first value would a key now
+
+  char *keyt = (char *)malloc((lindex-findex+1+1));
+  int ncount = 0;
+  for (int i=findex; i <= lindex ; ++i){
+    keyt[ncount]=content[i];
+    ncount++;
+  }
+
+  free(content);
+
+  keyt[ncount] = '\0';
+  
+  key = "NS01_GEBCO";
+  content = keyt;
+  
+  if ( checkforquote(key) ) {
+    quotekey = addquote(key);
+  }
+  else{
+    quotekey = key;
+  }
+
+  first = -1, last = -1;
+
+  find(quotekey,content,&first,&last);
+
+  //printf("%d\n",first);
+  //printf("%d\n",last);
+
+  if ( first == (-1) || last == (-1)){
+    printf("%s does not exist in the file \n",quotekey);
+    return 1;
+  }
+
+  printf("key=>");
+  for (int i=first;i<=last;++i)printf("%c",content[i]);
+
+  incol = -1;
+  for (int i=(last+1);i < fs;++i){
+    if (content[i] == ':'){
+      incol = i;
+      break;
+    }
+  }
+  
+  if (incol == -1)return 1;
+  
+  ka = incol, kb = -1, kc = -1;
+  findex = -1;
+  lindex = -1;
   
   if (ka >= 0){
     for (int i=(ka+1); i < fs; ++i){
@@ -444,34 +884,12 @@ int main(int argc, char *argv[]){
     }
   }
   
+
+
   printf("\n");
-  #if 0
-  int ifkey = (incol+1);
-  int iekey = -1;
-  for (int i=(incol+1); i< fs;++i){
-    if (content[i] == ','){
-      iekey = (i-1);
-      break;
-    }
-  }
-  printf("\n");
-  printf("here end value=>");
-  for (int i=ifkey;i<=iekey;++i)printf("%c",content[i]);
-  printf("\n");
+  //free(content);
+  free(keyt);
   #endif
-
-
-  for (int i=findex; i <= lindex ; ++i){
-	printf("%c",content[i]);
-  }
-
-  printf("\n");
-
-  typevalue(content,findex,lindex);
-
-  printf("\n");
-  free(content);
-
   return 0;
 
 }
