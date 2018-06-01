@@ -22,19 +22,24 @@ int iswhitespace(char c){
   return 0;
 }
 
-void typevalue(char *ar, int findex, int lindex){
+char typevalue(char *ar, int findex, int lindex){
+
+  char type = '\0';
 
   if (ar[findex] == '[' && ar[lindex] == ']'){
     printf("value is array\n");
+    type = 'a';
   }
   else if (ar[findex] == '{' && ar[lindex] == '}'){
     printf("value is dictionary\n");
+    type = 'd';
   }
   else{
     printf("value is either string or float");
+    type = 's';
   }
   
-  return;
+  return type;
 }
 
 
@@ -141,8 +146,8 @@ char *json_load(char *filename){
 
 char *getvalue(char *content, char *key,...){
 
-  if (content == NULL) return NULL; 
-  
+  if (content == NULL) return NULL;
+  if (key == NULL) return NULL; 
   char *str = content;
   long int fs = 0L;
   while(*str != '\0'){
@@ -150,7 +155,6 @@ char *getvalue(char *content, char *key,...){
     str++;
   }
   fs++;
-
   va_list vs;
   va_start(vs,key);
 
@@ -230,8 +234,8 @@ char *getvalue(char *content, char *key,...){
     else{
       char *tmp1 = &content[kb];
       int index = -1;
-      if (content[kb] == '{')match(tmp1, 1, (fs-kb+1),'{', &index);
-      if (content[kb] == '[')match(tmp1, 1, (fs-kb+1),'[', &index);
+      if (content[kb] == '{')match(tmp1, 1, '{', &index);
+      if (content[kb] == '[')match(tmp1, 1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       //printf("block 2 value=>\n");
       findex = kb;
@@ -280,9 +284,9 @@ char *getvalue(char *content, char *key,...){
   //for (int i=findex; i <= lindex ; ++i){
   //  printf("%c",content[i]);
   //}
-   
-  //printf("\n");
-  //typevalue(content,findex,lindex);
+  char type = '\0'; 
+  printf("\n");
+  type = typevalue(content,findex,lindex);
 
   // we find the second value first value would a key now
   tmp = content;
@@ -369,8 +373,8 @@ char *getvalue(char *content, char *key,...){
     else{
       char *tmp1 = &keyt[kb];
       int index = -1;
-      if (keyt[kb] == '{')match(tmp1, 1, (fs-kb+1),'{', &index);
-      if (keyt[kb] == '[')match(tmp1, 1, (fs-kb+1),'[', &index);
+      if (keyt[kb] == '{')match(tmp1, 1,'{', &index);
+      if (keyt[kb] == '[')match(tmp1, 1,'[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       //printf("block 2 value=>\n");
       findex = kb;
@@ -415,8 +419,8 @@ char *getvalue(char *content, char *key,...){
     //for (int i=findex; i <= lindex ; ++i){
     //  printf("%c",keyt[i]);
     //}
-    //printf("\n");
-    //typevalue(keyt,findex,lindex);
+    printf("\n");
+    type = typevalue(keyt,findex,lindex);
     tmp = keyt;
     if ( narg > 1 ){
       keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
@@ -530,8 +534,8 @@ int main(int argc, char *argv[]){
     else{
       char *tmp = &content[kb];
       int index = -1;
-      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
-      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      if (content[kb] == '{')match(tmp, 1, '{', &index);
+      if (content[kb] == '[')match(tmp, 1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       printf("block 2 value=>\n");
       findex = kb;
@@ -672,8 +676,8 @@ int main(int argc, char *argv[]){
     else{
       char *tmp = &content[kb];
       int index = -1;
-      if (content[kb] == '{')match(tmp, 1, (fs-kb+1),'{', &index);
-      if (content[kb] == '[')match(tmp, 1, (fs-kb+1),'[', &index);
+      if (content[kb] == '{')match(tmp, 1, '{', &index);
+      if (content[kb] == '[')match(tmp, 1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       printf("block 2 value=>\n");
       findex = kb;

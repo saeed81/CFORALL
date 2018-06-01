@@ -60,7 +60,6 @@ int checkforquote(char *str){
 char *addquote(char *str){
   
   char *tmp = str;
-  int exist = 0;
   int len   = 0;
   
   while (*tmp != '\0'){
@@ -100,7 +99,7 @@ char *addquote(char *str){
   return reg;
 }
 
-void match(char *str, int element, int len, char lsymbol, int *index){
+void match(char *str, int element, char lsymbol, int *index){
 
   char rsymbol = '0';
 
