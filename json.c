@@ -13,7 +13,7 @@ int getLen(char *str){
 }
 
 int iswhitespace(char c){
-  if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\n')){
+  if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\r')){
     return 1;
   }
   
