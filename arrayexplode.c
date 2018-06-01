@@ -40,8 +40,8 @@ void fun(char *c){
 
 int main(void){
 
-  char c[] = "[{[{}]}]";
-  char cd[] = "[1,2,3,4,5]";
+  char c[] = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
+  char cd[] = "[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]";
   int len  = sizeof(c) / sizeof(c[0]);
   int lend = sizeof(cd) / sizeof(cd[0]);
   char type = '\0';
@@ -97,8 +97,8 @@ int main(void){
       }
     }
   }
-
-
+  printf("number of elements is %d\n",nel);
+  
   if (cd[0] == '['){
     printf("this is array\n");
     type = 'a';
@@ -149,6 +149,7 @@ int main(void){
       }
     }
   }
+
   j = 1;
   if (dicel == 0 ){
     while( j < lend){
@@ -156,20 +157,16 @@ int main(void){
       nel++;
       for (int i=j;i < lend;++i){
 	if (cd[i] == ','){
-	  j = i;
+	  j = (i+1);
 	  icol = 1;
 	  break;
 	}
       }
+      printf("j is %d\n",j);
       if (icol == 0) break;
     }
   }
 
-
-
-  
-
-  
   //fun("10");
 
   //printf("%d\n",power10(5));
