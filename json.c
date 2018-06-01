@@ -137,9 +137,9 @@ char *json_load(char *filename){
   return content;
 }
 
-void getvalue(char *content, char *key,...){
+char *getvalue(char *content, char *key,...){
 
-  if (content == NULL) return; 
+  if (content == NULL) return NULL; 
   
   char *str = content;
   long int fs = 0L;
@@ -150,7 +150,6 @@ void getvalue(char *content, char *key,...){
   fs++;
 
   va_list vs;
-
   va_start(vs,key);
 
   char *tmp = NULL;
@@ -168,11 +167,11 @@ void getvalue(char *content, char *key,...){
 
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
-    return;
+    return NULL;
   }
 
-  printf("key=>");
-  for (int i=first;i<=last;++i)printf("%c",content[i]);
+  //printf("key=>");
+  //for (int i=first;i<=last;++i)printf("%c",content[i]);
 
   int incol = -1;
   for (int i=(last+1);i < fs;++i){
@@ -182,7 +181,7 @@ void getvalue(char *content, char *key,...){
     }
   }
   
-  if (incol == -1)return;
+  if (incol == -1)return NULL;
   
   int ka = incol, kb = -1, kc = -1;
   int findex = -1;
@@ -263,45 +262,38 @@ void getvalue(char *content, char *key,...){
       findex = (ka+1);
       lindex = (kc -1);
       for (int i=(ka+1); i < kc ; ++i){
-	printf("%c",content[i]);
+	//printf("%c",content[i]);
       }
     }
   }
   int narg = 1;
-  printf("\n");
+  //printf("\n");
   //first value found we contniue with second one
   //for (int i=findex; i <= lindex ; ++i){
   //	printf("%c",content[i]);
   //}
 
-  printf("narg is %d and key is %s\n",narg,key);
-  printf("value is \n");
-  for (int i=findex; i <= lindex ; ++i){
-    printf("%c",content[i]);
-  }
+  //printf("narg is %d and key is %s\n",narg,key);
+  //printf("value is \n");
+  //for (int i=findex; i <= lindex ; ++i){
+  //  printf("%c",content[i]);
+  //}
    
-  printf("\n");
-  typevalue(content,findex,lindex);
+  //printf("\n");
+  //typevalue(content,findex,lindex);
 
   // we find the second value first value would a key now
   tmp = content;
   char *keyt = NULL;
+  keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
+  int ncount = 0;
+  for (int i=findex; i <= lindex ; ++i){
+    keyt[ncount]=tmp[i];
+    ncount++;
+  }
+  keyt[ncount] = '\0';
   
   while((key=va_arg(vs,char *)) != NULL){
-    keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
-    int ncount = 0;
-    for (int i=findex; i <= lindex ; ++i){
-      keyt[ncount]=tmp[i];
-      //printf("%c\t%c\n",tmp[i],keyt[ncount]);
-      ncount++;
-    }
-    //ncount++;
-    keyt[ncount] = '\0';
-    for (int i=0; i < ncount;++i){
-      //printf("%c",keyt[i]);
-    }
-    if ((narg > 1) && (tmp != NULL)) free(tmp);
-    
     if ( checkforquote(key) ) {
       quotekey = addquote(key);
     }
@@ -312,12 +304,9 @@ void getvalue(char *content, char *key,...){
     find(quotekey,keyt,&first,&last);
     fs = (lindex-findex+1+1);
     
-    //printf("%d\n",first);
-    //printf("%d\n",last);
-
     if ( first == (-1) || last == (-1)){
       printf("%s does not exist in the file \n",quotekey);
-      return;
+      return NULL;
     }
 
     //printf("key=>");
@@ -330,7 +319,7 @@ void getvalue(char *content, char *key,...){
 	break;
       }
     }
-    if (incol == -1)return;
+    if (incol == -1)return NULL;
   
     ka = incol, kb = -1, kc = -1;
     findex = -1;
@@ -412,26 +401,35 @@ void getvalue(char *content, char *key,...){
       findex = (ka+1);
       lindex = (kc -1);
       for (int i=(ka+1); i < kc ; ++i){
-	printf("%c",keyt[i]);
+	//printf("%c",keyt[i]);
       }
     }
   }
-    printf("\n");
+    //printf("\n");
     
     narg++;
-    printf("narg is %d and key is %s\n",narg,key);
-    printf("value is \n");
-    for (int i=findex; i <= lindex ; ++i){
-      printf("%c",keyt[i]);
-    }
-    printf("\n");
-    typevalue(keyt,findex,lindex);
+    //printf("narg is %d and key is %s\n",narg,key);
+    //printf("value is \n");
+    //for (int i=findex; i <= lindex ; ++i){
+    //  printf("%c",keyt[i]);
+    //}
+    //printf("\n");
+    //typevalue(keyt,findex,lindex);
     tmp = keyt;
-    
+    if ( narg > 1 ){
+      keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
+      ncount = 0;
+      for (int i=findex; i <= lindex ; ++i){
+	keyt[ncount]=tmp[i];
+	ncount++;
+      }
+      keyt[ncount] = '\0';
+    }
+    if ((narg > 1) && (tmp != NULL)) free(tmp);
   }
-  if (keyt != NULL) free(keyt);
+  //if (keyt != NULL) free(keyt);
   
-  return ;
+  return keyt;
 }
 
 #if 0
