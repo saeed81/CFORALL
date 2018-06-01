@@ -4,10 +4,12 @@
 #include<stdarg.h>
 
 int getLen(char *str){
-
   int len = 0;
-  while(*str++){
-    len += 1;
+  if (str != NULL){
+    while(*str != '\0'){
+      len += 1;
+      str++;
+    }
   }
   return len;
 }
