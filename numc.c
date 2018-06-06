@@ -26,6 +26,7 @@ vector *zero(type type, int nd, ...){
   vector *vec = NULL;
   vec = (vector *)malloc(sizeof(vector));
   if (vec == NULL) return NULL;
+  vec->ar =NULL;
   
   int nx   = 1;
   int ny   = 1;
@@ -63,26 +64,6 @@ vector *zero(type type, int nd, ...){
   (void)printf("number of t elements   %d\n",nt);
   (void)printf("number of ni           %d\n",ni);
 
-  
-  int numel = size;
-
-  switch (type){
-  case INT:{
-    vec->ar = (void *) malloc( numel *sizeof(int));
-  }break;
-  case DBL:{ 
-    vec->ar = (void *) malloc(numel *sizeof(double));
-  }break;
-  case FLT:{ 
-    vec->ar = (void *) malloc(numel *sizeof(float));
-  }break;
-  case CHAR:{ 
-    vec->ar = (void *) malloc(numel *sizeof(char));
-  }break;
-  default:{
-    vec->ar = NULL;
-  }break;
-  }
   vec->nx   = nx;
   vec->ny   = ny;
   vec->nz   = nz ;
@@ -90,6 +71,25 @@ vector *zero(type type, int nd, ...){
   vec->size = size;
   vec->dim  = dim;
   vec->type = type;
+  vec->ar   = NULL;
+  
+  switch (type){
+  case INT:{
+    vec->ar = (void *) malloc(size *sizeof(int));
+  }break;
+  case DBL:{ 
+    vec->ar = (void *) malloc(size *sizeof(double));
+  }break;
+  case FLT:{ 
+    vec->ar = (void *) malloc(size *sizeof(float));
+  }break;
+  case CHAR:{ 
+    vec->ar = (void *) malloc(size *sizeof(char));
+  }break;
+  default:{
+    vec->ar = NULL;
+  }break;
+  }
     
   return vec;
 
@@ -151,13 +151,13 @@ void del(vector **vec){
 int main(void){
 
   int   inivali = 10;
-  vector *veci = zero(INT,200,300,0);
+  vector *veci = zero(INT,2,3,0);
   fill(veci,&inivali);
   dump(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zero(FLT,20,30,40,0);
+  vector *vecf = zero(FLT,2,3,4,0);
   fill(vecf,&inivalf);
   dump(vecf);
   del(&vecf);
