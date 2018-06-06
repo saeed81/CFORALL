@@ -108,6 +108,17 @@ void fill(vector *vec, void *value){
 	*((float *)vec->ar+i) = *((float *) value);
       }
     }
+    if (vec->type == DBL) {
+      for (int i=0; i < vec->size;++i){
+	*((double *)vec->ar+i) = *((double *) value);
+      }
+    }
+    if (vec->type == CHAR) {
+      for (int i=0; i < vec->size;++i){
+	*((char *)vec->ar+i) = *((char *) value);
+      }
+    }
+
   }
 }
 
@@ -126,6 +137,17 @@ void dump(vector *vec){
 	(void)printf("element %03d is %f\n",i,*((float*)vec->ar+i));
       }
     }
+    if (vec->type == DBL) {
+      for (int i=0; i < vec->size;++i){
+	(void)printf("element %03d is %f\n",i,*((double*)vec->ar+i));
+      }
+    }
+    if (vec->type == CHAR) {
+      for (int i=0; i < vec->size;++i){
+	(void)printf("element %03d is %c\n",i,*((char*)vec->ar+i));
+      }
+    }
+    
   }
 }
 
@@ -170,6 +192,12 @@ int main(void){
   fill(vecf,&inivalf);
   dump(vecf);
   del(&vecf);
-  
+
+  char inivalc = 'A';
+  vector *vecc = zero(CHAR,2,3,5,0);
+  fill(vecc,&inivalc);
+  dump(vecc);
+  del(&vecc);
+    
   return 0;
 }
