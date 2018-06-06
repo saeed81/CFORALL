@@ -7,6 +7,7 @@ typedef enum type{
 }type;
 
 
+#pragma pack(push,1)
 typedef struct vector {
   int  nx;
   int  ny;
@@ -17,7 +18,7 @@ typedef struct vector {
   type type;
   void *ar;
 }vector;
-
+#pragma pack(pop)
 
 vector *zero(type type, int nd, ...){
 
@@ -25,7 +26,9 @@ vector *zero(type type, int nd, ...){
   
   vector *vec = NULL;
   vec = (vector *)malloc(sizeof(vector));
+
   if (vec == NULL) return NULL;
+
   vec->ar =NULL;
   
   int nx   = 1;
@@ -55,15 +58,7 @@ vector *zero(type type, int nd, ...){
   }
 
   va_end(va);
-
-  (void)printf("number of the elements %d\n",size);
-  (void)printf("number of dimensions   %d\n",dim);
-  (void)printf("number of x elements   %d\n",nx);
-  (void)printf("number of y elements   %d\n",ny);
-  (void)printf("number of z elements   %d\n",nz);
-  (void)printf("number of t elements   %d\n",nt);
-  (void)printf("number of ni           %d\n",ni);
-
+  
   vec->nx   = nx;
   vec->ny   = ny;
   vec->nz   = nz ;
@@ -100,24 +95,21 @@ void fill(vector *vec, void *value){
   if (vec == NULL) return;
   if (vec->ar == NULL) return;
   if (value == NULL) return;
-  
-  
   if (vec == NULL) return;
 
   if (vec->ar != NULL){
-  if (vec->type == INT) {
-    for (int i=0; i < vec->size;++i){
-      *((int *)vec->ar+i) = *((int *) value);
+    if (vec->type == INT) {
+      for (int i=0; i < vec->size;++i){
+	*((int *)vec->ar+i) = *((int *) value);
+      }
     }
-  }
-  if (vec->type == FLT) {
-    for (int i=0; i < vec->size;++i){
-      *((float *)vec->ar+i) = *((float *) value);
+    if (vec->type == FLT) {
+      for (int i=0; i < vec->size;++i){
+	*((float *)vec->ar+i) = *((float *) value);
+      }
     }
-  }
   }
 }
-
 
 void dump(vector *vec){
   if (vec == NULL) return;
@@ -125,19 +117,37 @@ void dump(vector *vec){
   
   if (vec->ar != NULL){
     if (vec->type == INT) {
-    for (int i=0; i < vec->size;++i){
-      (void)printf("element %03d is %d\n",i,*((int*)vec->ar+i));
+      for (int i=0; i < vec->size;++i){
+	(void)printf("element %03d is %d\n",i,*((int*)vec->ar+i));
+      }
     }
-  }
-  if (vec->type == FLT) {
-    for (int i=0; i < vec->size;++i){
-      (void)printf("element %03d is %f\n",i,*((float*)vec->ar+i));
+    if (vec->type == FLT) {
+      for (int i=0; i < vec->size;++i){
+	(void)printf("element %03d is %f\n",i,*((float*)vec->ar+i));
+      }
     }
-  }
   }
 }
-  
+
+
+void showel(vector *vec){
+
+  if (vec == NULL) return;
+
+  (void)printf("number of   elements   %d\n",vec->size);
+  (void)printf("number of   dimensions %d\n",vec->dim);
+  (void)printf("number of x elements   %d\n",vec->nx);
+  (void)printf("number of y elements   %d\n",vec->ny);
+  (void)printf("number of z elements   %d\n",vec->nz);
+  (void)printf("number of t elements   %d\n",vec->nt);
+
+  return;
+}
+
+
 void del(vector **vec){
+
+  if (*vec == NULL)return;
   if ((*vec)->ar != NULL){
     free((*vec)->ar);
     (*vec)->ar = NULL;
@@ -145,7 +155,6 @@ void del(vector **vec){
   free(*vec);
   *vec = NULL;
   return;
-    
 }
   
 int main(void){
@@ -157,7 +166,7 @@ int main(void){
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zero(FLT,2,3,4,0);
+  vector *vecf = zero(FLT,10,11,12,0);
   fill(vecf,&inivalf);
   dump(vecf);
   del(&vecf);
