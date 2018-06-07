@@ -3,11 +3,10 @@
 #include<stdarg.h>
 
 typedef enum type{
-  DBL, FLT, INT, CHAR,
+  DBL, FLT, INT, CHAR
 }type;
 
-
-#pragma pack(push,1)
+//#pragma pack(push,1)
 typedef struct vector {
   int  nx;
   int  ny;
@@ -18,7 +17,7 @@ typedef struct vector {
   type type;
   void *ar;
 }vector;
-#pragma pack(pop)
+//#pragma pack(pop)
 
 vector *zero(type type, int nd, ...){
 
@@ -29,8 +28,6 @@ vector *zero(type type, int nd, ...){
 
   if (vec == NULL) return NULL;
 
-  vec->ar =NULL;
-  
   int nx   = 1;
   int ny   = 1;
   int nz   = 1;
@@ -44,7 +41,7 @@ vector *zero(type type, int nd, ...){
   nx     = nd;
   size   = nd;
   dim    =  1;
-  int ni = 1;
+  int ni =  1;
   
   while((nd=va_arg(va,int)) != 0){
     if (nd < 0) break;
@@ -56,7 +53,6 @@ vector *zero(type type, int nd, ...){
     if (ni == 4) nt = nd;
     if (ni == 4) break;
   }
-
   va_end(va);
   
   vec->nx   = nx;
@@ -92,10 +88,10 @@ vector *zero(type type, int nd, ...){
 
 void fill(vector *vec, void *value){
   
-  if (vec == NULL) return;
-  if (vec->ar == NULL) return;
-  if (value == NULL) return;
-  if (vec == NULL) return;
+  if (vec    == NULL) return;
+  if (vec->ar== NULL) return;
+  if (value  == NULL) return;
+  if (vec    == NULL) return;
 
   if (vec->ar != NULL){
     if (vec->type == INT) {
@@ -123,7 +119,7 @@ void fill(vector *vec, void *value){
 }
 
 void dump(vector *vec){
-  if (vec == NULL) return;
+  if (vec     == NULL) return;
   if (vec->ar == NULL) return;
   
   if (vec->ar != NULL){
@@ -152,16 +148,16 @@ void dump(vector *vec){
 }
 
 
-void showel(vector *vec){
+void showinfomembers(vector *vec){
 
   if (vec == NULL) return;
 
   (void)printf("number of   elements   %d\n",vec->size);
-  (void)printf("number of   dimensions %d\n",vec->dim);
-  (void)printf("number of x elements   %d\n",vec->nx);
-  (void)printf("number of y elements   %d\n",vec->ny);
-  (void)printf("number of z elements   %d\n",vec->nz);
-  (void)printf("number of t elements   %d\n",vec->nt);
+  (void)printf("number of   dimensions %d\n",vec->dim );
+  (void)printf("number of x elements   %d\n",vec->nx  );
+  (void)printf("number of y elements   %d\n",vec->ny  );
+  (void)printf("number of z elements   %d\n",vec->nz  );
+  (void)printf("number of t elements   %d\n",vec->nt  );
 
   return;
 }
@@ -183,18 +179,21 @@ int main(void){
 
   int   inivali = 10;
   vector *veci = zero(INT,2,3,0);
+  showinfomembers(veci);
   fill(veci,&inivali);
   dump(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zero(FLT,10,11,12,0);
+  vector *vecf = zero(FLT,10,0);
+  showinfomembers(vecf);
   fill(vecf,&inivalf);
   dump(vecf);
   del(&vecf);
 
   char inivalc = 'A';
   vector *vecc = zero(CHAR,2,3,5,0);
+  showinfomembers(vecc);
   fill(vecc,&inivalc);
   dump(vecc);
   del(&vecc);
