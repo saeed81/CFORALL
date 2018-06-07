@@ -12,7 +12,6 @@ int power10(int n){
   return a;
 }
 
-
 void fun(char *c){
   char *tmp = c;
   int len = 0;
@@ -37,13 +36,106 @@ void fun(char *c){
   if (index > 0) printf("%d\n",a[index]);
 }
 
+void array_explode(char *st){
+  int len   = 0;
+  char *tmp = st;
+  if (st == NULL) return;
+  while(*tmp != '\0'){
+    len++;
+    tmp++;
+  }
+  len++;
+  char type = '\0';
+  int dicel = 0;
+  if (st[0] == '['){
+    printf("this is array\n");
+    type = 'a';
+  }
+  int j = -1;
+  if (type == 'a'){
+    for (int i=1; i < len; ++i){
+      if (st[i] == '{'){
+	j = i;
+	break;
+      }
+    }
+  }
+  if (j > 0){
+    dicel = 1;
+    for (int i=(j-1); i>0;--i){
+      if ((st[i] != ' ') || (st[i] != '\t') || (st[i] != '\r') || (st[i] != '\n') ){
+	//printf("there is something between { and [ and is %c\n",st[i]);
+	dicel = 0;
+	break;
+      }
+    }
+  }
+  int index = -1;
+  int icol  = -1;
+  int nel   = 0;
+  if (dicel == 1){
+    while( j < len){
+      icol = 0;
+      match(&st[j], 1, '{', &index);
+      //printf("j is %d and index is \t %c \n",j,st[j+index]);
+      for (int i=j;i<=(j+index);++i){
+	printf("%c",st[i]);
+      }
+      printf("\n");
+      nel++;
+      for (int i=(j+index+1);i < len;++i){
+	if (st[i] == ','){
+	  j = i;
+	  icol = 1;
+	  break;
+	}
+      }
+      if (icol == 0) break;
+      for (int i=(j+1);i < len;++i){
+	if (st[i] == '{'){
+	  j = i;
+	  break;
+	}
+      }
+    }
+    printf("number of elements is %d\n",nel);
+  }
+  
+  index = -1;
+  icol  = -1;
+  nel   = 0;
+  j = 1;
+  if (dicel == 0 ){
+    while( j < len){
+      icol = 0;
+      nel++;
+      for (int i=j;i < len;++i){
+	if (st[i] == ','){
+	  j = (i+1);
+	  icol = 1;
+	  break;
+	}
+      }
+      printf("j is %d\n",j);
+      if (icol == 0) break;
+    }
+    printf("number of elements is %d\n",nel);
+  }
+  //fun("10");
+  //printf("%d\n",power10(5));
+  
+}
 
 int main(void){
+  char c[]  = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
+  char cd[] = "[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]";
+  array_explode(c);
+  array_explode(cd);
+  
+  return 1;
 
-  char c[] = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
-  char cd[] = "[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]";
-  int len  = sizeof(c) / sizeof(c[0]);
-  int lend = sizeof(cd) / sizeof(cd[0]);
+  int len   = sizeof(c)  / sizeof(c[0]);
+  int lend  = sizeof(cd) / sizeof(cd[0]);
   char type = '\0';
   int dicel = 0;
 
@@ -75,7 +167,7 @@ int main(void){
   int index = -1;
   int icol  = -1;
   int nel = 0;
-  if (dicel){
+  if (dicel==1){
     while( j < len){
       icol = 0;
       match(&c[j], 1, '{', &index);
@@ -103,54 +195,12 @@ int main(void){
     printf("this is array\n");
     type = 'a';
   }
-
-  j = -1;
-  if (type == 'a'){
-    for (int i=1; i < lend; ++i){
-      if (cd[i] == '{'){
-	j = i;
-	break;
-      }
-    }
-  }
+  
   dicel = 0;
-  if (j > 0){
-    dicel = 1;
-    for (int i=(j-1); i>0;--i){
-      if ((cd[i] != ' ') || (cd[i] != '\t') || (cd[i] != '\r') || (cd[i] != '\n') ){
-	printf("there is something between { and [ and is %c\n",cd[i]);
-	dicel = 0;
-	break;
-      }
-    }
-  }
+  j = 1;
   index = -1;
   icol  = -1;
   nel = 0;
-  if (dicel){
-    while( j < lend){
-      icol = 0;
-      match(&c[j], 1, '{', &index);
-      printf("j is %d and index is \t %c \n",j,c[j+index]);
-      nel++;
-      for (int i=(j+index+1);i < len;++i){
-	if (c[i] == ','){
-	  j = i;
-	  icol = 1;
-	  break;
-	}
-      }
-      if (icol == 0) break;
-      for (int i=(j+1);i < len;++i){
-	if (c[i] == '{'){
-	  j = i;
-	  break;
-	}
-      }
-    }
-  }
-
-  j = 1;
   if (dicel == 0 ){
     while( j < lend){
       icol = 0;
@@ -166,7 +216,6 @@ int main(void){
       if (icol == 0) break;
     }
   }
-
   //fun("10");
 
   //printf("%d\n",power10(5));
