@@ -145,15 +145,13 @@ void dump(vector *vec){
   }
 }
 
+void *get(vector *v, int i, int j, int k, int l){
 
-
-void *get(vector *v, int i, int j, int k){
-
-  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1))) return (void *)0;
-  if (v->type == FLT)  return &(((float *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
-  if (v->type == INT)  return &(((int *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
-  if (v->type == DBL)  return &(((double *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
-  if (v->type == CHAR) return &(((char *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
+  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1)) || ( l> (v->nt -1))) return (void *)0;
+  if (v->type == FLT )  return &(((float *)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
+  if (v->type == INT )  return &(((int *  )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
+  if (v->type == DBL )  return &(((double*)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
+  if (v->type == CHAR)  return &(((char * )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
 
   return (void *)0;
 }
@@ -189,6 +187,7 @@ void del(vector **vec){
   
 int main(void){
 
+  
   int   inivali = 10;
   vector *veci = zeros(INT,2,3,5);
   showinfomembers(veci);
@@ -200,14 +199,14 @@ int main(void){
   vector *vecf = zeros(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
-  float *valf = get(vecf,1,2,3);
+  float *valf = get(vecf,1,2,3,0);
   printf("%f\n",*valf);
   dump(vecf);
   del(&vecf);
-
-  int nx = 20;
-  int ny = 30;
-  int nz = 10;
+   
+  int nx = 10;
+  int ny = 10;
+  int nz = 2;
   
   
   char inivalc = 'A';
@@ -218,13 +217,13 @@ int main(void){
   for (int i=0; i < nx;i++){
     for (int j=0; j < ny;j++){
       for (int k=0; k < nz;k++){
-	valc = get(vecc,i,j,k);
+	valc = get(vecc,i,j,k,0);
 	printf("valc is %c\n",*valc);
       }
     }
   }
   
-  //dump(vecc);
+  dump(vecc);
   del(&vecc);
     
   return 0;
