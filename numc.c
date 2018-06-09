@@ -146,6 +146,20 @@ void dump(vector *vec){
 }
 
 
+
+void *get(vector *v, int i, int j, int k){
+
+  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1))) return (void *)0;
+  if (v->type == FLT)  return &(((float *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
+  if (v->type == INT)  return &(((int *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
+  if (v->type == DBL)  return &(((double *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
+  if (v->type == CHAR) return &(((char *)v->ar)[k+v->nz*j+i*(v->ny*v->nz)]);
+
+  return (void *)0;
+}
+
+
+
 void showinfomembers(vector *vec){
 
   if (vec == NULL) return;
@@ -183,17 +197,34 @@ int main(void){
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zeros(FLT,1,10);
+  vector *vecf = zeros(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
+  float *valf = get(vecf,1,2,3);
+  printf("%f\n",*valf);
   dump(vecf);
   del(&vecf);
 
+  int nx = 20;
+  int ny = 30;
+  int nz = 10;
+  
+  
   char inivalc = 'A';
-  vector *vecc = zeros(CHAR,3,10,20,2);
+  vector *vecc = zeros(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
-  dump(vecc);
+  char *valc = NULL; 
+  for (int i=0; i < nx;i++){
+    for (int j=0; j < ny;j++){
+      for (int k=0; k < nz;k++){
+	valc = get(vecc,i,j,k);
+	printf("valc is %c\n",*valc);
+      }
+    }
+  }
+  
+  //dump(vecc);
   del(&vecc);
     
   return 0;
