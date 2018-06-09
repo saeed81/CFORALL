@@ -19,9 +19,9 @@ typedef struct vector {
 }vector;
 //#pragma pack(pop)
 
-vector *zero(type type, int nd, ...){
+vector *zeros(type type, int nd, ...){
 
-  if ((nd == 0) || (nd < 0)) return NULL;
+  if ((nd == 0) || (nd < 0) || (nd > 4)) return NULL;
   
   vector *vec = NULL;
   vec = (vector *)malloc(sizeof(vector));
@@ -33,25 +33,23 @@ vector *zero(type type, int nd, ...){
   int nz   = 1;
   int nt   = 1;
   int size = 1;
-  int dim  = 1;
+  int dim  = nd;
     
   va_list va;
   va_start(va,nd);
 
-  nx     = nd;
-  size   = nd;
-  dim    =  1;
-  int ni =  1;
+  int ni =  0;
+  int ncount = 0;
   
-  while((nd=va_arg(va,int)) != 0){
-    if (nd < 0) break;
-    size *= nd;
-    dim  += 1;
-    ni++;
-    if (ni == 2) ny = nd;
-    if (ni == 3) nz = nd;
-    if (ni == 4) nt = nd;
-    if (ni == 4) break;
+  while( nd--){
+    ni=va_arg(va,int);
+    if (ni <= 0 ) break;
+    size *= ni;
+    if (ncount == 0) nx = ni;
+    if (ncount == 1) ny = ni;
+    if (ncount == 2) nz = ni;
+    if (ncount == 3) nt = ni;
+    ncount++;
   }
   va_end(va);
   
@@ -178,21 +176,21 @@ void del(vector **vec){
 int main(void){
 
   int   inivali = 10;
-  vector *veci = zero(INT,2,3,0);
+  vector *veci = zeros(INT,2,3,5);
   showinfomembers(veci);
   fill(veci,&inivali);
   dump(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zero(FLT,10,0);
+  vector *vecf = zeros(FLT,1,10);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
   dump(vecf);
   del(&vecf);
 
   char inivalc = 'A';
-  vector *vecc = zero(CHAR,2,3,5,0);
+  vector *vecc = zeros(CHAR,3,10,20,2);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
   dump(vecc);
