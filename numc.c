@@ -331,7 +331,7 @@ int main(void){
   dumponscreen(vecc);
   del(&vecc);
 
-  nx = 11, ny = 11, nz = 2;
+  nx = 401, ny = 401, nz = 2;
   inivalf = 0.250f;
   vecf = zeros(FLT,3,nx,ny,nz);
   showinfomembers(vecf);
