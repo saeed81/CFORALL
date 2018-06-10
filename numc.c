@@ -144,19 +144,6 @@ void dump(vector *vec){
     
   }
 }
-#if 0
-void *get(vector *v, int i, int j, int k, int l){
-
-  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1)) || ( l> (v->nt -1))) return (void *)0;
-  if (v->type == FLT )  return &(((float *)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == INT )  return &(((int *  )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == DBL )  return &(((double*)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == CHAR)  return &(((char * )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-
-  return (void *)0;
-}
-#endif
-
 void *get(vector *v, int i, ...){
 
   if (i < 0 ) return (void *)0;
@@ -183,6 +170,38 @@ void *get(vector *v, int i, ...){
 
   return (void *)0;
 }
+
+
+void set(vector *v, void *value, int i, ...){
+
+  if (i < 0 ) return;
+  va_list va;
+  va_start(va,i);
+  int ncount = 1;
+  int j =0, k =0, l= 0, ii=0;
+  int dim = v->dim;
+  while(--dim){
+    ii=va_arg(va,int);
+    if (ncount == 1) j = ii;
+    if (ncount == 2) k = ii;
+    if (ncount == 3) l = ii;
+    ncount++;
+  }
+  va_end(va);
+
+  if ((j < 0) || (k < 0) || (l < 0)) return;
+  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1)) || ( l> (v->nt -1))) return;
+  if (v->type == FLT )  ((float *)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(float *)value; 
+  if (v->type == INT )  ((int *  )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(int *)value; 
+  if (v->type == DBL )  ((double*)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(double *)value;
+  if (v->type == CHAR)  ((char * )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(char *)value;
+
+  return;
+}
+
+
+
+
 
 void showinfomembers(vector *vec){
 
@@ -212,7 +231,6 @@ void del(vector **vec){
 }
   
 int main(void){
-
   
   int   inivali = 10;
   vector *veci = zeros(INT,2,3,5);
@@ -230,11 +248,9 @@ int main(void){
   dump(vecf);
   del(&vecf);
    
-  int nx = 20;
-  int ny = 10;
-  int nz = 2;
-  
-  
+  int nx = 2;
+  int ny = 3;
+  int nz = 4;
   char inivalc = 'C';
   vector *vecc = zeros(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
@@ -248,7 +264,17 @@ int main(void){
       }
     }
   }
-  
+
+  inivalc = 'X';
+  set(vecc,&inivalc,1,1,1);
+  valc = get(vecc,1,1,1);
+  printf("valc is %c\n",*valc);
+
+  inivalc = 'Y';
+  set(vecc,&inivalc,1,2,3);
+  valc = get(vecc,1,2,3);
+  printf("valc is %c\n",*valc);
+    
   dump(vecc);
   del(&vecc);
     
