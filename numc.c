@@ -116,7 +116,7 @@ void fill(vector *vec, void *value){
   }
 }
 
-void dump(vector *vec){
+void dumponscreen(vector *vec){
   if (vec     == NULL) return;
   if (vec->ar == NULL) return;
   
@@ -200,7 +200,60 @@ void set(vector *v, void *value, int i, ...){
 }
 
 
+void seriealize(vector *vec, char *filename){
 
+  if (vec      == NULL) return;
+  if (vec->ar  == NULL) return;
+  if (filename == NULL) return;
+  FILE *file = NULL;
+  file = fopen(filename,"w+");
+  if (file == NULL) return;
+  fprintf(file,"{");
+
+  int nx  = vec->size;
+  int nxn = nx -1;
+  if (vec->type == INT) {
+    for (int i=0; i <nxn; ++i){
+      (void)fprintf(file,"%d,",*((int*)vec->ar+i));
+    }
+  }
+  if (vec->type == FLT) {
+    for (int i=0; i < nxn;++i){
+      (void)fprintf(file,"%f,",*((float*)vec->ar+i));
+    }
+  }
+  if (vec->type == DBL) {
+    for (int i=0; i < nxn;++i){
+      (void)fprintf(file,"%f,",*((double*)vec->ar+i));
+    }
+  }
+  if (vec->type == CHAR) {
+    for (int i=0; i < nxn;++i){
+      (void)fprintf(file,"%c,",*((char*)vec->ar+i));
+    }
+  }
+  int i = nxn;
+
+  if (vec->type == INT) {
+    (void)fprintf(file,"%d}",*((int*)vec->ar+i));
+  }
+  if (vec->type == FLT) {
+         (void)fprintf(file,"%f}",*((float*)vec->ar+i));
+  }
+  if (vec->type == DBL) {
+    (void)fprintf(file,"%f}",*((double*)vec->ar+i));
+  }
+  if (vec->type == CHAR) {
+    (void)fprintf(file,"%c}",*((char*)vec->ar+i));
+  }
+
+  fclose(file);
+  
+  return;    
+}  
+  
+
+  
 
 
 void showinfomembers(vector *vec){
@@ -236,7 +289,7 @@ int main(void){
   vector *veci = zeros(INT,2,3,5);
   showinfomembers(veci);
   fill(veci,&inivali);
-  dump(veci);
+  dumponscreen(veci);
   del(&veci);
     
   float inivalf = 0.250f;
@@ -245,7 +298,7 @@ int main(void){
   fill(vecf,&inivalf);
   float *valf = get(vecf,1,2,3,0);
   printf("%f\n",*valf);
-  dump(vecf);
+  dumponscreen(vecf);
   del(&vecf);
    
   int nx = 2;
@@ -259,7 +312,7 @@ int main(void){
   for (int i=0; i < nx;i++){
     for (int j=0; j < ny;j++){
       for (int k=0; k < nz;k++){
-	valc = get(vecc,i,j,k);
+	valc =get(vecc,i,j,k);
 	printf("valc is %c\n",*valc);
       }
     }
@@ -275,8 +328,40 @@ int main(void){
   valc = get(vecc,1,2,3);
   printf("valc is %c\n",*valc);
     
-  dump(vecc);
+  dumponscreen(vecc);
   del(&vecc);
-    
+
+  nx = 11, ny = 11, nz = 2;
+  inivalf = 0.250f;
+  vecf = zeros(FLT,3,nx,ny,nz);
+  showinfomembers(vecf);
+  fill(vecf,&inivalf);
+
+  for (int i=0; i < nx;i++){
+    for (int j=0; j < ny;j++){
+      for (int k=0; k < nz;k++){
+	inivalf = (float)(i*j*k);
+	set(vecf,&inivalf,i,j,k);
+      }
+    }
+  }
+  
+  for (int i=0; i < nx;i++){
+    for (int j=0; j < ny;j++){
+      for (int k=0; k < nz;k++){
+	valf = get(vecf,i,j,k);
+	printf("(%d,%d,%d)\t%-12.6f\n",i,j,k,*valf);
+      }
+    }
+  }
+
+  dumponscreen(vecf);
+
+  seriealize(vecf,"MYARRAY.dat");
+  
+  del(&vecf);
+  
+
+  
   return 0;
 }
