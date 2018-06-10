@@ -119,26 +119,29 @@ void fill(vector *vec, void *value){
 void dumponscreen(vector *vec){
   if (vec     == NULL) return;
   if (vec->ar == NULL) return;
+
+  void *tmp = vec->ar;
+  int size = vec->size;
   
   if (vec->ar != NULL){
     if (vec->type == INT) {
-      for (int i=0; i < vec->size;++i){
-	(void)printf("element %03d is %d\n",i,*((int*)vec->ar+i));
+      for (int i=0; i < size;++i){
+	(void)printf("element %03d is %d\n",i,*((int*)tmp+i));
       }
     }
     if (vec->type == FLT) {
-      for (int i=0; i < vec->size;++i){
-	(void)printf("element %03d is %f\n",i,*((float*)vec->ar+i));
+      for (int i=0; i < size;++i){
+	(void)printf("element %03d is %f\n",i,*((float*)tmp+i));
       }
     }
     if (vec->type == DBL) {
-      for (int i=0; i < vec->size;++i){
-	(void)printf("element %03d is %f\n",i,*((double*)vec->ar+i));
+      for (int i=0; i < size;++i){
+	(void)printf("element %03d is %f\n",i,*((double*)tmp+i));
       }
     }
     if (vec->type == CHAR) {
-      for (int i=0; i < vec->size;++i){
-	(void)printf("element %03d is %c\n",i,*((char*)vec->ar+i));
+      for (int i=0; i < size;++i){
+	(void)printf("element %03d is %c\n",i,*((char*)tmp+i));
       }
     }
     
@@ -152,6 +155,11 @@ void *get(vector *v, int i, ...){
   int ncount = 1;
   int j =0, k =0, l= 0, ii=0;
   int dim = v->dim;
+  int nx  = v->nx;
+  int ny  = v->ny;
+  int nz  = v->nz;
+  int nt  = v->nt;
+  void *tmp = v->ar;
   while(--dim){
     ii=va_arg(va,int);
     if (ncount == 1) j = ii;
@@ -162,11 +170,11 @@ void *get(vector *v, int i, ...){
   va_end(va);
 
   if ((j < 0) || (k < 0) || (l < 0)) return (void *)0;
-  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1)) || ( l> (v->nt -1))) return (void *)0;
-  if (v->type == FLT )  return &(((float *)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == INT )  return &(((int *  )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == DBL )  return &(((double*)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
-  if (v->type == CHAR)  return &(((char * )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny]);
+  if ((i > (nx -1)) || (j > (ny -1)) || (k > (nz -1)) || ( l> (nt -1))) return (void *)0;
+  if (v->type == FLT )  return &(((float *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny]);
+  if (v->type == INT )  return &(((int   *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny]);
+  if (v->type == DBL )  return &(((double*)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny]);
+  if (v->type == CHAR)  return &(((char  *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny]);
 
   return (void *)0;
 }
@@ -180,6 +188,11 @@ void set(vector *v, void *value, int i, ...){
   int ncount = 1;
   int j =0, k =0, l= 0, ii=0;
   int dim = v->dim;
+  int nx  = v->nx;
+  int ny  = v->ny;
+  int nz  = v->nz;
+  int nt  = v->nt;
+  void *tmp  = v->ar;
   while(--dim){
     ii=va_arg(va,int);
     if (ncount == 1) j = ii;
@@ -190,11 +203,11 @@ void set(vector *v, void *value, int i, ...){
   va_end(va);
 
   if ((j < 0) || (k < 0) || (l < 0)) return;
-  if ((i > (v->nx -1)) || (j > (v->ny -1)) || (k > (v->nz -1)) || ( l> (v->nt -1))) return;
-  if (v->type == FLT )  ((float *)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(float *)value; 
-  if (v->type == INT )  ((int *  )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(int *)value; 
-  if (v->type == DBL )  ((double*)v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(double *)value;
-  if (v->type == CHAR)  ((char * )v->ar)[l+k*v->nt+j*v->nt*v->nz+i*v->nt*v->nz*v->ny] = *(char *)value;
+  if ((i > (nx -1)) || (j > (ny -1)) || (k > (nz -1)) || ( l> (nt -1))) return;
+  if (v->type == FLT )  ((float *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny] = *(float *)value; 
+  if (v->type == INT )  ((int   *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny] = *(int   *)value; 
+  if (v->type == DBL )  ((double*)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny] = *(double*)value;
+  if (v->type == CHAR)  ((char  *)tmp)[l+k*nt+j*nt*nz+i*nt*nz*ny] = *(char  *)value;
 
   return;
 }
@@ -355,7 +368,7 @@ int main(void){
     }
   }
 
-  dumponscreen(vecf);
+  //dumponscreen(vecf);
 
   seriealize(vecf,"MYARRAY.dat");
   
