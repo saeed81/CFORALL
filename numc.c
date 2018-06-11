@@ -19,7 +19,7 @@ typedef struct vector {
 }vector;
 //#pragma pack(pop)
 
-vector *zeros(type type, int nd, ...){
+vector *array(type type, int nd, ...){
 
   if ((nd == 0) || (nd < 0) || (nd > 4)) return NULL;
   
@@ -299,17 +299,17 @@ void del(vector **vec){
 int main(void){
   
   int   inivali = 10;
-  vector *veci = zeros(INT,2,3,5);
+  vector *veci = array(INT,2,3,5);
   showinfomembers(veci);
   fill(veci,&inivali);
   dumponscreen(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = zeros(FLT,3,2,3,4);
+  vector *vecf = array(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
-  float *valf = get(vecf,1,2,3,0);
+  float *valf = get(vecf,1,2,3);
   printf("%f\n",*valf);
   dumponscreen(vecf);
   del(&vecf);
@@ -318,7 +318,7 @@ int main(void){
   int ny = 3;
   int nz = 4;
   char inivalc = 'C';
-  vector *vecc = zeros(CHAR,3,nx,ny,nz);
+  vector *vecc = array(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
   char *valc = NULL; 
@@ -344,9 +344,9 @@ int main(void){
   dumponscreen(vecc);
   del(&vecc);
 
-  nx = 401, ny = 401, nz = 2;
+  nx = 101, ny = 101, nz = 1;
   inivalf = 0.250f;
-  vecf = zeros(FLT,3,nx,ny,nz);
+  vecf = array(FLT,3,nx,ny,nz);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
 
@@ -358,12 +358,12 @@ int main(void){
       }
     }
   }
-  
+  #if 1
   for (int i=0; i < nx;i++){
     for (int j=0; j < ny;j++){
       for (int k=0; k < nz;k++){
 	valf = get(vecf,i,j,k);
-	printf("(%d,%d,%d)\t%-12.6f\n",i,j,k,*valf);
+	printf("(%d,%d,%d)\t%p\n",i,j,k,(void *)valf);
       }
     }
   }
@@ -371,7 +371,7 @@ int main(void){
   //dumponscreen(vecf);
 
   seriealize(vecf,"MYARRAY.dat");
-  
+  #endif
   del(&vecf);
   
 
