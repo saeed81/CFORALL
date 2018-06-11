@@ -10,7 +10,7 @@ int power10(int n){
   return a;
 }
 
-void fun(char *c){
+int fun(char *c){
   char *tmp = c;
   int len = 0;
   while (*tmp != '\0'){
@@ -25,14 +25,17 @@ void fun(char *c){
     index += (c[i]-'0') * power10(ncount);
     ncount++; 
   }
-  if ( c[0] >= '0' && c[0] <= '9'){
-    printf("input character is digint\n");
-    index = (c[0] - '0');
-  }
+  //if ( c[0] >= '0' && c[0] <= '9'){
+  //  printf("input character is digint\n");
+  //  index = (c[0] - '0');
+  //}
+  //printf("index is %d\n",index);
+
+  return index;
   //if (index > 0) printf("%d\n",a[index]);
 }
 
-void array_value(char *st, int ind){
+void array_value(char *st, char *cind){
   int len   = 0;
   char *tmp = st;
   if (st == NULL) return;
@@ -68,23 +71,30 @@ void array_value(char *st, int ind){
   int index = -1;
   int icol  = -1;
   int nel   = 0;
+  int first = 1;
+  int last  = 1;
+  int stop = 1;
   if (dicel == 1){
-    while( j < len){
+    while( j < len && stop){
       icol = 0;
       match(&st[j], 1, '{', &index);
       //printf("j is %d and index is \t %c \n",j,st[j+index]);
-      for (int i=j;i<=(j+index);++i){
-	printf("%c",st[i]);
+      if (nel == fun(cind)){
+	for (int i=j;i<=(j+index);++i){
+	  printf("%c",st[i]);
+	}
       }
       printf("\n");
-      nel++;
       for (int i=(j+index+1);i < len;++i){
 	if (st[i] == ','){
-	  j = i;
+	  first = j;
+	  last = i;
+      	  j = i;
 	  icol = 1;
 	  break;
 	}
       }
+      nel++;
       if (icol == 0) break;
       for (int i=(j+1);i < len;++i){
 	if (st[i] == '{'){
@@ -99,9 +109,9 @@ void array_value(char *st, int ind){
   icol  = -1;
   nel   = 0;
   j = 1;
-  int first = 1;
-  int last  = 1;
-  int stop = 1;
+  first = 1;
+  last  = 1;
+  stop = 1;
   if (dicel == 0 ){
     while( (j < len) && stop){
       icol = 0;
@@ -109,7 +119,7 @@ void array_value(char *st, int ind){
 	if (st[i] == ','){
 	  first = j;
 	  last = i;
-	  if (nel == ind){
+	  if (nel == fun(cind)){
 	    for (int k=first;k < last;++k) printf("%c",st[k]);
 	    printf("\n");
 	    stop = 1;
@@ -216,7 +226,7 @@ void array_explode(char *st){
   //printf("%d\n",power10(5));
 }
 
-#if 1
+#if 0
 int main(void){
   
   char c[]  = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
@@ -224,8 +234,8 @@ int main(void){
   
   //array_explode(c);
   //array_explode(cd);
-  array_value(cd,10);
-  
+  array_value(cd,"11");
+  fun("256");
   
   return 0;
 
