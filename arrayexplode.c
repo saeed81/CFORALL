@@ -35,10 +35,10 @@ int fun(char *c){
   //if (index > 0) printf("%d\n",a[index]);
 }
 
-void array_value(char *st, char *cind){
+char *array_value(char *st, char *cind){
   int len   = 0;
   char *tmp = st;
-  if (st == NULL) return;
+  if (st == NULL) return NULL;
   while(*tmp != '\0'){
     len++;
     tmp++;
@@ -80,9 +80,16 @@ void array_value(char *st, char *cind){
       match(&st[j], 1, '{', &index);
       //printf("j is %d and index is \t %c \n",j,st[j+index]);
       if (nel == fun(cind)){
+	char *cout = NULL;
+	int ncount = 0;
+	cout = (char *)malloc(index+2);
 	for (int i=j;i<=(j+index);++i){
 	  printf("%c",st[i]);
+	  cout[ncount] = st[i];
+	  ncount++;
 	}
+	cout[index+1] = '\0';
+	return cout;
       }
       printf("\n");
       for (int i=(j+index+1);i < len;++i){
@@ -120,7 +127,16 @@ void array_value(char *st, char *cind){
 	  first = j;
 	  last = i;
 	  if (nel == fun(cind)){
-	    for (int k=first;k < last;++k) printf("%c",st[k]);
+	    char *cout = NULL;
+	    int ncount = 0;
+	    cout = (char *)malloc(last-first+1);
+	    for (int k=first;k < last;++k){
+	      printf("%c",st[k]);
+	      cout[ncount] = st[k];
+	      ncount++;
+	    }
+	    cout[ncount] = '\0';
+	    return cout;
 	    printf("\n");
 	    stop = 1;
 	  }
@@ -135,6 +151,8 @@ void array_value(char *st, char *cind){
     }
     printf("number of elements is %d\n",nel);
   }
+
+  return NULL;
   //fun("10");
   //printf("%d\n",power10(5));
 }
