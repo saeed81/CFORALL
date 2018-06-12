@@ -52,7 +52,7 @@ char *array_value(char *st, char *cind){
     type = 'a';
   }
   match(&st[0], 1, '[', &rb);
-  printf("rb %d\n",rb);
+  //printf("rb %d\n",rb);
   
   int j = -1;
   if (type == 'a'){
@@ -138,7 +138,7 @@ char *array_value(char *st, char *cind){
       }
       if (icol == 0 && nel == 0){
 	if (nel == fun(cind)){
-	  printf("rb is %d",rb);
+	  //printf("rb is %d",rb);
 	  int ncount = 0;
 	  last = rb -1;
 	  cout = (char *)malloc(last-first+2);
@@ -156,7 +156,7 @@ char *array_value(char *st, char *cind){
       if (icol == 0 && nel > 0){
 	first = last +1;
 	last = rb -1;
-	printf("here2 %d\t %d\n",last,first);
+	//printf("here2 %d\t %d\n",last,first);
 	if (nel == fun(cind)){
 	  int ncount = 0;
 	  cout = (char *)malloc(last-first+2);
@@ -172,7 +172,7 @@ char *array_value(char *st, char *cind){
       }
 
       if (icol == 1){
-	printf("here3 %d\t %d\n",last,first);
+	//printf("here3 %d\t %d\n",last,first);
 	if (nel == fun(cind)){
 	  int ncount = 0;
 	  cout = (char *)malloc(last-first+1);
@@ -284,15 +284,15 @@ void array_explode(char *st){
   //printf("%d\n",power10(5));
 }
 
-#if 1
+#if 0
 int main(void){
   
   char c[]  = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
-  char cd[] = "[1,2]";
+  char cd[] = "[10,20,30,40,50]";
   
   //array_explode(c);
   //array_explode(cd);
-  printf("%s\n",array_value(cd,"1"));
+  printf("%s\n",array_value(cd,"3"));
     
   return 0;
 
