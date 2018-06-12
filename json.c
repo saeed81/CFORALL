@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include"matching.h"
+#include"arrayexplode.c"
 #include<stdarg.h>
 
 int getLen(char *str){
@@ -22,7 +23,7 @@ void writeonscreen(char *st){
       st++;
     }
   }
-  //printf("\n");
+  printf("\n");
 }
 
 int iswhitespace(char c){
@@ -311,6 +312,15 @@ char *getvalue(char *content, char *key,...){
   keyt[ncount] = '\0';
   
   while((key=va_arg(vs,char *)) != NULL){
+    //printf("%c\n",type);
+    if (type == 'a'){
+      //printf("%s\n",key);
+      keyt = array_value(keyt,key);
+      findex = 0;
+      lindex = getLen(keyt);
+      //printf("%s\n",keyt); 
+    }
+    else{
     if ( checkforquote(key) ) {
       quotekey = addquote(key);
     }
@@ -322,7 +332,8 @@ char *getvalue(char *content, char *key,...){
     fs = (lindex-findex+1+1);
     
     if ( first == (-1) || last == (-1)){
-      printf("%s does not exist in the file \n",quotekey);
+      //printf("%s does not exist in the file \n",quotekey);
+      printf("does not exist in the file \n");
       return NULL;
     }
 
@@ -423,8 +434,8 @@ char *getvalue(char *content, char *key,...){
     }
   }
     //printf("\n");
-    
-    narg++;
+    }
+     narg++;
     //printf("narg is %d and key is %s\n",narg,key);
     //printf("value is \n");
     //for (int i=findex; i <= lindex ; ++i){
@@ -432,6 +443,7 @@ char *getvalue(char *content, char *key,...){
     //}
     //printf("\n");
     type = typevalue(keyt,findex,lindex);
+    //printf("type is %c\n",type);
     tmp = keyt;
     if ( narg > 1 ){
       keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
@@ -443,6 +455,7 @@ char *getvalue(char *content, char *key,...){
       keyt[ncount] = '\0';
     }
     if ((narg > 1) && (tmp != NULL)) free(tmp);
+   
   }
   //if (keyt != NULL) free(keyt);
   
