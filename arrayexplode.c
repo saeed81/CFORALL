@@ -47,7 +47,7 @@ char *array_value(char *st, char *cind){
   char type = '\0';
   int dicel = 0;
   if (st[0] == '['){
-    printf("this is array\n");
+    //printf("this is array\n");
     type = 'a';
   }
   int j = -1;
@@ -84,14 +84,14 @@ char *array_value(char *st, char *cind){
 	int ncount = 0;
 	cout = (char *)malloc(index+2);
 	for (int i=j;i<=(j+index);++i){
-	  printf("%c",st[i]);
+	  //printf("%c",st[i]);
 	  cout[ncount] = st[i];
 	  ncount++;
 	}
 	cout[index+1] = '\0';
 	return cout;
       }
-      printf("\n");
+      //printf("\n");
       for (int i=(j+index+1);i < len;++i){
 	if (st[i] == ','){
 	  first = j;
@@ -110,7 +110,7 @@ char *array_value(char *st, char *cind){
 	}
       }
     }
-    printf("number of elements is %d\n",nel);
+    //printf("number of elements is %d\n",nel);
   }
   index = -1;
   icol  = -1;
@@ -131,13 +131,13 @@ char *array_value(char *st, char *cind){
 	    int ncount = 0;
 	    cout = (char *)malloc(last-first+1);
 	    for (int k=first;k < last;++k){
-	      printf("%c",st[k]);
+	      //printf("%c",st[k]);
 	      cout[ncount] = st[k];
 	      ncount++;
 	    }
 	    cout[ncount] = '\0';
 	    return cout;
-	    printf("\n");
+	    //printf("\n");
 	    stop = 1;
 	  }
 	  j = (i+1);
@@ -149,7 +149,7 @@ char *array_value(char *st, char *cind){
       //printf("j is %d\n",j);
       if (icol == 0) break;
     }
-    printf("number of elements is %d\n",nel);
+    //printf("number of elements is %d\n",nel);
   }
 
   return NULL;

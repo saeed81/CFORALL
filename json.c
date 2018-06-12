@@ -14,6 +14,17 @@ int getLen(char *str){
   return len;
 }
 
+
+void writeonscreen(char *st){
+  if (st != NULL ){
+    while (*st != '\0'){
+      printf("%c",*st);
+      st++;
+    }
+  }
+  //printf("\n");
+}
+
 int iswhitespace(char c){
   if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\r')){
     return 1;
@@ -27,15 +38,15 @@ char typevalue(char *ar, int findex, int lindex){
   char type = '\0';
 
   if (ar[findex] == '[' && ar[lindex] == ']'){
-    printf("value is array\n");
+    //printf("value is array\n");
     type = 'a';
   }
   else if (ar[findex] == '{' && ar[lindex] == '}'){
-    printf("value is dictionary\n");
+    //printf("value is dictionary\n");
     type = 'd';
   }
   else{
-    printf("value is either string or float");
+    //printf("value is either string or float");
     type = 's';
   }
   
@@ -285,7 +296,7 @@ char *getvalue(char *content, char *key,...){
   //  printf("%c",content[i]);
   //}
   char type = '\0'; 
-  printf("\n");
+  //printf("\n");
   type = typevalue(content,findex,lindex);
 
   // we find the second value first value would a key now
@@ -419,7 +430,7 @@ char *getvalue(char *content, char *key,...){
     //for (int i=findex; i <= lindex ; ++i){
     //  printf("%c",keyt[i]);
     //}
-    printf("\n");
+    //printf("\n");
     type = typevalue(keyt,findex,lindex);
     tmp = keyt;
     if ( narg > 1 ){
@@ -520,7 +531,7 @@ int main(int argc, char *argv[]){
 	  break;
 	}
       }
-      printf("block 1 value=>\n");
+      //printf("block 1 value=>\n");
       findex = (ka+1);
       lindex = (kc-1);
       for (int i=(ka+1); i < (kc) ; ++i){
@@ -537,7 +548,7 @@ int main(int argc, char *argv[]){
       if (content[kb] == '{')match(tmp, 1, '{', &index);
       if (content[kb] == '[')match(tmp, 1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
-      printf("block 2 value=>\n");
+      //printf("block 2 value=>\n");
       findex = kb;
       lindex = (kb+index);
       for (int i=(kb); i <= (kb+index) ; ++i){
