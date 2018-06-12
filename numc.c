@@ -19,6 +19,8 @@ typedef struct vector {
 }vector;
 //#pragma pack(pop)
 
+typedef vector * arr;
+
 vector *array(type type, int nd, ...){
 
   if ((nd == 0) || (nd < 0) || (nd > 4)) return NULL;
@@ -299,14 +301,14 @@ void del(vector **vec){
 int main(void){
   
   int   inivali = 10;
-  vector *veci = array(INT,2,3,5);
+  arr veci = array(INT,2,3,5);
   showinfomembers(veci);
   fill(veci,&inivali);
   dumponscreen(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  vector *vecf = array(FLT,3,2,3,4);
+  arr vecf = array(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
   float *valf = get(vecf,1,2,3);
@@ -318,7 +320,7 @@ int main(void){
   int ny = 3;
   int nz = 4;
   char inivalc = 'C';
-  vector *vecc = array(CHAR,3,nx,ny,nz);
+  arr vecc = array(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
   char *valc = NULL; 
