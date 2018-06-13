@@ -15,12 +15,44 @@ int getLen(char *str){
   return len;
 }
 
+void removewhitespace(char *str){
 
-void writeonscreen(char *st){
-  if (st != NULL ){
-    while (*st != '\0'){
-      printf("%c",*st);
-      st++;
+  if (str == NULL)return;
+  char *tmp = str;
+  int ne =0;
+  while(*str != '\0'){
+    if (*str != ' '){
+      *(tmp+ne) = *str;
+      ne++;
+    }
+    str++;
+  }
+
+  *(tmp+ne) = '\0';
+
+  str = tmp;
+}
+
+void quotetowhitespace(char *str){
+  char *tmp = str;
+  if (str != NULL){
+    while(*tmp != '\0'){
+      if (*tmp == '\"'){
+        *tmp = ' ';
+      }
+      tmp++;
+    }
+  }
+}
+
+void writeonscreen(char *str){
+  if (str == NULL)return;
+  quotetowhitespace(str);
+  removewhitespace(str);
+  if (str != NULL ){
+    while (*str != '\0'){
+      printf("%c",*str);
+      str++;
     }
   }
   printf("\n");
@@ -315,7 +347,12 @@ char *getvalue(char *content, char *key,...){
     //printf("%c\n",type);
     if (type == 'a'){
       //printf("%s\n",key);
-      keyt = array_value(keyt,key);
+      char *keyt1 = array_value(keyt,key);
+      if (keyt1 == NULL){
+	free(keyt);
+	return NULL;
+      }
+      keyt = keyt1; 
       findex = 0;
       lindex = getLen(keyt);
       //printf("%s\n",keyt); 

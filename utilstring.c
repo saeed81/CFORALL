@@ -2,7 +2,7 @@
 #include<stdlib.h>
 
 
-void fulltrim(char *str){
+void removewhitespace(char *str){
 
   char *tmp = str;
 
@@ -21,6 +21,18 @@ void fulltrim(char *str){
   printf("trimmed string %s\n",tmp);
   
   str = tmp;
+}
+
+void quotetowhitespace(char *str){
+  char *tmp = str;
+  if (str != NULL){
+    while(*tmp != '\0'){
+      if (*tmp == '\"'){
+	*tmp = ' ';
+      }
+      tmp++;
+    }
+  }
 }
 
 char *trimStr(char *str){
@@ -74,7 +86,7 @@ int main(void){
 
   char name[] = " s a e ";
 
-  fulltrim(name);
+  removewhitespace(name);
 
   printf("%s\n",name);
   
