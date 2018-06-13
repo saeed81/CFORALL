@@ -213,13 +213,36 @@ char *getvalue(char *content, char *key,...){
   }
   
   int first = -1, last = -1;
-  find(quotekey,content,&first,&last);
 
+  find(quotekey,content,&first,&last);
+     
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
     return NULL;
   }
+  printf("%d \t %d \n",first, last);
+  int ffirst = first;
+  int llast  =  last;
+  int ii     = first;
+  int jj     = last;
+  printf("fs is %ld\n",fs);
+  while(istoplevelkey(&content[1],&content[ii]) == 0){
+    printf("we are here \n");
+    find(quotekey,&content[jj+1],&ffirst,&llast);
+    if ( ffirst == (-1) || llast == (-1)){
+      printf("%s does not exist in the file \n",quotekey);
+      return NULL;
+    }
+    printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
+    ii = jj + ffirst + 1;
+    jj = jj + llast +  1;
+    //printf("%c \t %d \n",content[ii], ii);
+  }
 
+  printf("%d \t %d \n",ffirst, llast);
+  printf("%d \t %d \t %c \t %c\n",ii, jj,content[ii+1],content[jj-1]);
+  first = ii;
+  last  = jj;
   //printf("key=>");
   //for (int i=first;i<=last;++i)printf("%c",content[i]);
 
