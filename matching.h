@@ -1,7 +1,7 @@
 #ifndef MATCHING_H
 #define MATCHING_H
 
-int isfirstkey(char *beg, char *end){
+int istoplevelkey(char *beg, char *end){
 
   char *tmp = beg;
 
@@ -13,7 +13,7 @@ int isfirstkey(char *beg, char *end){
  
   for (int i=0; i < 3 ; ++i){
     tmp = beg;
-    while (tmp <= end){
+    while (tmp < end){
       if (*tmp == lsymbols[i]){
 	nl[i] += 1 ;
       }
@@ -23,7 +23,7 @@ int isfirstkey(char *beg, char *end){
   
   for (int i=0; i < 3 ; ++i){
     tmp = beg;
-    while (tmp <= end){
+    while (tmp < end){
       if (*tmp == rsymbols[i]){
 	nr[i] += 1 ;
       }
