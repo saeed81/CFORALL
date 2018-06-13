@@ -348,6 +348,7 @@ char *getvalue(char *content, char *key,...){
     if (type == 'a'){
       //printf("%s\n",key);
       keyt = array_value(keyt,key);
+      if (keyt == NULL) return NULL;
       findex = 0;
       lindex = getLen(keyt);
       //printf("%s\n",keyt); 
