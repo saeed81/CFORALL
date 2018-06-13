@@ -51,7 +51,7 @@ char *array_value(char *st, char *cind){
     //printf("this is array\n");
     type = 'a';
   }
-  match(&st[0], 1, '[', &rb);
+  match(&st[0], '[', &rb);
   //printf("rb %d\n",rb);
   
   int j = -1;
@@ -82,7 +82,7 @@ char *array_value(char *st, char *cind){
   if (dicel == 1){
     while( j < len && stop){
       icol = 0;
-      match(&st[j], 1, '{', &index);
+      match(&st[j], '{', &index);
       //printf("j is %d and index is \t %c \n",j,st[j+index]);
       if (nel == fun(cind)){
 	cout = NULL;
@@ -236,7 +236,7 @@ void array_explode(char *st){
   if (dicel == 1){
     while( j < len){
       icol = 0;
-      match(&st[j], 1, '{', &index);
+      match(&st[j], '{', &index);
       //printf("j is %d and index is \t %c \n",j,st[j+index]);
       for (int i=j;i<=(j+index);++i){
 	printf("%c",st[i]);
@@ -285,14 +285,16 @@ void array_explode(char *st){
 }
 
 #if 0
+
 int main(void){
   
-  char c[]  = "[{[{}]},{[{}]},{[{}]},{[{}]},{[{}]},{[{}]}]";
-  char cd[] = "[10,20,30,40,50]";
+  char c[]  = "[{[{}]},{[{}]}]";
+  char cd[] = "[10,20]";
   
   //array_explode(c);
   //array_explode(cd);
-  printf("%s\n",array_value(cd,"3"));
+  printf("%s\n",array_value(c,"2"));
+  printf("%s\n",array_value(cd,"2"));
     
   return 0;
 

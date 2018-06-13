@@ -246,8 +246,8 @@ char *getvalue(char *content, char *key,...){
     else{
       char *tmp1 = &content[kb];
       int index = -1;
-      if (content[kb] == '{')match(tmp1, 1, '{', &index);
-      if (content[kb] == '[')match(tmp1, 1, '[', &index);
+      if (content[kb] == '{')match(tmp1,  '{', &index);
+      if (content[kb] == '[')match(tmp1,  '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       //printf("block 2 value=>\n");
       findex = kb;
@@ -395,8 +395,8 @@ char *getvalue(char *content, char *key,...){
     else{
       char *tmp1 = &keyt[kb];
       int index = -1;
-      if (keyt[kb] == '{')match(tmp1, 1,'{', &index);
-      if (keyt[kb] == '[')match(tmp1, 1,'[', &index);
+      if (keyt[kb] == '{')match(tmp1, '{', &index);
+      if (keyt[kb] == '[')match(tmp1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       //printf("block 2 value=>\n");
       findex = kb;

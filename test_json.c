@@ -1,16 +1,9 @@
 #include"json.c"
 
 int main(void){
-  char *con  = json_load("goteborg.json");
-  char *val1 = getvalue(con,"2017040611",NULL);
-  char *st1  = val1;
-  if (st1 != NULL ){
-    while (*st1 != '\0'){
-      printf("%c",*st1);
-      st1++;
-    }
-  }
-  printf("\n");
+  char *con  = json_load("animals-1.json");
+  char *val1 = getvalue(con,"content","2","foods","likes","0",NULL);
+  writeonscreen(val1);
   if (val1 != NULL)free(val1);
   if (con  != NULL)free(con);
   

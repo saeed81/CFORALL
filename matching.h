@@ -99,10 +99,10 @@ char *addquote(char *str){
   return reg;
 }
 
-void match(char *str, int element, char lsymbol, int *index){
+void match(char *str, char lsymbol, int *index){
 
   char rsymbol = '0';
-
+  int element  = 1;
   switch (lsymbol){
   case '{':
     rsymbol = '}';
