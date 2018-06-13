@@ -15,12 +15,44 @@ int getLen(char *str){
   return len;
 }
 
+void removewhitespace(char *str){
 
-void writeonscreen(char *st){
-  if (st != NULL ){
-    while (*st != '\0'){
-      printf("%c",*st);
-      st++;
+  if (str == NULL)return;
+  char *tmp = str;
+  int ne =0;
+  while(*str != '\0'){
+    if (*str != ' '){
+      *(tmp+ne) = *str;
+      ne++;
+    }
+    str++;
+  }
+
+  *(tmp+ne) = '\0';
+
+  str = tmp;
+}
+
+void quotetowhitespace(char *str){
+  char *tmp = str;
+  if (str != NULL){
+    while(*tmp != '\0'){
+      if (*tmp == '\"'){
+        *tmp = ' ';
+      }
+      tmp++;
+    }
+  }
+}
+
+void writeonscreen(char *str){
+  if (str == NULL)return;
+  quotetowhitespace(str);
+  removewhitespace(str);
+  if (str != NULL ){
+    while (*str != '\0'){
+      printf("%c",*str);
+      str++;
     }
   }
   printf("\n");
