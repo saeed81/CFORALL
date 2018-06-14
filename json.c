@@ -21,7 +21,7 @@ void removewhitespace(char *str){
   char *tmp = str;
   int ne =0;
   while(*str != '\0'){
-    if (*str != ' '){
+    if ((*str != ' ') && (*str != '\n') && (*str != '\r') && (*str != '\t')){
       *(tmp+ne) = *str;
       ne++;
     }
@@ -181,6 +181,10 @@ char *json_load(char *filename){
   content[fs] = '\0';
 
   removewhitespace(content);
+
+  //FILE *file = fopen("clean.json","w");
+  //fprintf(file,"%s",content);
+  //fclose(file);
 
   if (checksymbolbeforeparse(content) != 0){
     free(content);
