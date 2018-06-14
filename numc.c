@@ -19,9 +19,9 @@ typedef struct vector {
 }vector;
 //#pragma pack(pop)
 
-typedef vector * arr;
+typedef vector * mtr;
 
-vector *array(type type, int nd, ...){
+vector *matrix(type type, int nd, ...){
 
   if ((nd == 0) || (nd < 0) || (nd > 4)) return NULL;
   
@@ -301,14 +301,14 @@ void del(vector **vec){
 int main(void){
   
   int   inivali = 10;
-  arr veci = array(INT,2,3,5);
+  mtr veci = matrix(INT,2,3,5);
   showinfomembers(veci);
   fill(veci,&inivali);
   dumponscreen(veci);
   del(&veci);
     
   float inivalf = 0.250f;
-  arr vecf = array(FLT,3,2,3,4);
+  mtr vecf = matrix(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
   float *valf = get(vecf,1,2,3);
@@ -320,7 +320,7 @@ int main(void){
   int ny = 3;
   int nz = 4;
   char inivalc = 'C';
-  arr vecc = array(CHAR,3,nx,ny,nz);
+  mtr vecc = matrix(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
   char *valc = NULL; 
@@ -348,7 +348,7 @@ int main(void){
 
   nx = 101, ny = 101, nz = 1;
   inivalf = 0.250f;
-  vecf = array(FLT,3,nx,ny,nz);
+  vecf = matrix(FLT,3,nx,ny,nz);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
 
@@ -372,7 +372,7 @@ int main(void){
 
   //dumponscreen(vecf);
 
-  seriealize(vecf,"MYARRAY.dat");
+  seriealize(vecf,"MYMATRIX.dat");
   #endif
   del(&vecf);
   
