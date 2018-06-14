@@ -179,7 +179,9 @@ char *json_load(char *filename){
   fclose(inp);
 
   content[fs] = '\0';
-  
+
+  removewhitespace(content);
+
   if (checksymbolbeforeparse(content) != 0){
     free(content);
     content = NULL;
