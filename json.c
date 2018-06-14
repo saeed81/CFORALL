@@ -396,9 +396,34 @@ char *getvalue(char *content, char *key,...){
       printf("does not exist in the file \n");
       return NULL;
     }
-
-    //printf("key=>");
-    //for (int i=first;i<=last;++i)printf("%c",keyt[i]);
+    ffirst = -1;
+    llast  = -1;
+    ii     = first;
+    jj     = last;
+    
+    if (type == 'd'){
+      //printf("fs is %ld\n",fs);
+      while(istoplevelkey(&keyt[1],&keyt[ii]) == 0){
+	//printf("we are here \n");
+	find(quotekey,&keyt[jj+1],&ffirst,&llast);
+	if ( ffirst == (-1) || llast == (-1)){
+	  printf("%s is not the top level key and it is inside of another dictionary check the hierarchy of keys again \n",quotekey);
+	  return NULL;
+	}
+    //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
+	ii = jj + ffirst + 1;
+	jj = jj + llast  +  1;
+	ffirst = -1;
+	llast  = -1;
+      }
+    }
+  //printf("%d \t %d \n",ffirst, llast);
+  //printf("%d \t %d \t %c \t %c\n",ii, jj,content[ii+1],content[jj-1]);
+  first = ii;
+  last  = jj;
+  
+  //printf("key=>");
+  //for (int i=first;i<=last;++i)printf("%c",keyt[i]);
 
     incol = -1;
     for (int i=(last+1);i < fs;++i){
