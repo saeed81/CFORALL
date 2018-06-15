@@ -19,7 +19,7 @@ typedef struct vector {
 }vector;
 //#pragma pack(pop)
 
-typedef vector * mtr;
+typedef vector * mat;
 
 vector *matrix(type type, int nd, ...){
 
@@ -150,6 +150,8 @@ void dumponscreen(vector *vec){
   }
 }
 void *get(vector *v, int i, ...){
+  if (v     == NULL ) return (void *)0;
+  if (v->ar == NULL ) return (void *)0;
 
   if (i < 0 ) return (void *)0;
   va_list va;
@@ -185,6 +187,8 @@ void *get(vector *v, int i, ...){
 void set(vector *v, void *value, int i, ...){
 
   if (i < 0 ) return;
+  if (v == NULL ) return;
+  if (v->ar == NULL) return;
   va_list va;
   va_start(va,i);
   int ncount = 1;
@@ -222,27 +226,32 @@ void seriealize(vector *vec, char *filename){
   if (filename == NULL) return;
   FILE *file = NULL;
   file = fopen(filename,"w+");
-  if (file == NULL) return;
-  fprintf(file,"{");
-
+  if (file == NULL){
+    printf("problem in opening the file %s\n",filename);
+    return;
+  }
   int nx  = vec->size;
   int nxn = nx -1;
   if (vec->type == INT) {
+    fprintf(file,"int array[%d]={",vec->size);
     for (int i=0; i <nxn; ++i){
       (void)fprintf(file,"%d,",*((int*)vec->ar+i));
     }
   }
   if (vec->type == FLT) {
+    fprintf(file,"float array[%d]={",vec->size);
     for (int i=0; i < nxn;++i){
       (void)fprintf(file,"%f,",*((float*)vec->ar+i));
     }
   }
   if (vec->type == DBL) {
+    fprintf(file,"double array[%d]={",vec->size);
     for (int i=0; i < nxn;++i){
       (void)fprintf(file,"%f,",*((double*)vec->ar+i));
     }
   }
-  if (vec->type == CHAR) {
+  if (vec->type == CHAR){
+    fprintf(file,"char array[%d]={",vec->size);
     for (int i=0; i < nxn;++i){
       (void)fprintf(file,"%c,",*((char*)vec->ar+i));
     }
@@ -250,16 +259,16 @@ void seriealize(vector *vec, char *filename){
   int i = nxn;
 
   if (vec->type == INT) {
-    (void)fprintf(file,"%d}",*((int*)vec->ar+i));
+    (void)fprintf(file,"%d};",*((int*)vec->ar+i));
   }
   if (vec->type == FLT) {
-         (void)fprintf(file,"%f}",*((float*)vec->ar+i));
+         (void)fprintf(file,"%f};",*((float*)vec->ar+i));
   }
   if (vec->type == DBL) {
-    (void)fprintf(file,"%f}",*((double*)vec->ar+i));
+    (void)fprintf(file,"%f};",*((double*)vec->ar+i));
   }
   if (vec->type == CHAR) {
-    (void)fprintf(file,"%c}",*((char*)vec->ar+i));
+    (void)fprintf(file,"%c};",*((char*)vec->ar+i));
   }
 
   fclose(file);
@@ -273,8 +282,8 @@ void seriealize(vector *vec, char *filename){
 
 void showinfomembers(vector *vec){
 
-  if (vec == NULL) return;
-
+  if (vec == NULL)     return;
+  if (vec->ar == NULL) return;
   (void)printf("number of   elements   %d\n",vec->size);
   (void)printf("number of   dimensions %d\n",vec->dim );
   (void)printf("number of x elements   %d\n",vec->nx  );
@@ -300,15 +309,23 @@ void del(vector **vec){
   
 int main(void){
   
-  int   inivali = 10;
-  mtr veci = matrix(INT,2,3,5);
+  int   inivali = 0;
+  mat veci = matrix(INT,2,1024,1024);
   showinfomembers(veci);
   fill(veci,&inivali);
   dumponscreen(veci);
+  for (int i=0; i < 1024;i++){
+    for (int j=0; j < 1024;j++){
+      inivali = i * j;
+      set(veci,&inivali,i,j);
+    }
+  }
+  seriealize(veci,"array.dat");
   del(&veci);
-    
+  return 1;
+  
   float inivalf = 0.250f;
-  mtr vecf = matrix(FLT,3,2,3,4);
+  mat vecf = matrix(FLT,3,2,3,4);
   showinfomembers(vecf);
   fill(vecf,&inivalf);
   float *valf = get(vecf,1,2,3);
@@ -320,7 +337,7 @@ int main(void){
   int ny = 3;
   int nz = 4;
   char inivalc = 'C';
-  mtr vecc = matrix(CHAR,3,nx,ny,nz);
+  mat vecc = matrix(CHAR,3,nx,ny,nz);
   showinfomembers(vecc);
   fill(vecc,&inivalc);
   char *valc = NULL; 
@@ -346,7 +363,7 @@ int main(void){
   dumponscreen(vecc);
   del(&vecc);
 
-  nx = 101, ny = 101, nz = 1;
+  nx = 1001, ny = 1001, nz = 1;
   inivalf = 0.250f;
   vecf = matrix(FLT,3,nx,ny,nz);
   showinfomembers(vecf);
