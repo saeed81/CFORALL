@@ -2,12 +2,12 @@
 #include<stdlib.h>
 #include<stdarg.h>
 
-typedef enum type{
+typedef enum ttype{
   DBL, FLT, INT, CHAR
 }type;
 
 //#pragma pack(push,1)
-typedef struct vector {
+typedef struct tvector {
   int  nx;
   int  ny;
   int  nz;
