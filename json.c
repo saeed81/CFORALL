@@ -21,15 +21,13 @@ void removewhitespace(char *str){
   char *tmp = str;
   int ne =0;
   while(*str != '\0'){
-    if ((*str != ' ') && (*str != '\n') && (*str != '\r') && (*str != '\t')){
+    if ((*str != ' ') && (*str != '\n') && (*str != '\r') && (*str != '\t') && (*str != '\v') && (*str != '\f')){
       *(tmp+ne) = *str;
       ne++;
     }
     str++;
   }
-
   *(tmp+ne) = '\0';
-
   str = tmp;
 }
 
@@ -47,8 +45,8 @@ void quotetowhitespace(char *str){
 
 void writeonscreen(char *str){
   if (str == NULL)return;
-  quotetowhitespace(str);
-  removewhitespace(str);
+  //quotetowhitespace(str);
+  //removewhitespace(str);
   if (str != NULL ){
     while (*str != '\0'){
       printf("%c",*str);
