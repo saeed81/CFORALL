@@ -27,6 +27,47 @@ int getLen(char *str){
   return len;
 }
 
+void findpt(char *reg, int lnr, char *beg, char *end){
+  int k = 0;
+  int i = 0;
+  int ncount = 0;
+  int ip = 0;
+  //int lnr = getLen(reg);
+  //char *itp = beg;
+  //for (int j=0; j < lns; ++j){
+  int j = 0;
+  j = -1;
+  for (char *itp =beg; itp <= end; ++itp){
+    i = 0;
+    j++;
+    if (*itp == reg[i]){
+      //printf("we found the first instance of the first character at j %d\n",j);
+      //printf("we need to find the other characters\n");
+      k  = j;
+      char *next = (itp+1);
+      ip = i + 1; 
+      ncount = 1;
+      while((*next == reg[ip]) && (reg[ip] != '\0') ){
+	next++;
+	ip++;
+	ncount++;
+	k++;
+      }
+      //printf("ncount is %d\n",ncount);
+      if (ncount == lnr){
+	printf("we found the first instance\n");
+	printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
+	printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	break;
+      }
+      else{
+	printf("no instance found we continue searching\n");
+      }
+    }
+  }
+  return;
+}
+
 int find(char *reg, char *str){
 
   int  lnr = getLen(reg);
