@@ -62,7 +62,7 @@ void String_dump(String *vv){
   return;
 }
 
-void string_concat_var(String *vec,char *str, ...){
+void String_concat_var(String *vec,char *str, ...){
   String_init(vec);
   if (str == NULL) return ;
   unsigned int len =0;
@@ -86,7 +86,7 @@ void string_concat_var(String *vec,char *str, ...){
   return ;
 }
 
-char *string_concat(char *str1, char *str2){
+char *String_concat(char *str1, char *str2){
  
   if ((str1 == NULL)|| (str2 == NULL) ) return NULL;
   unsigned int len1 =0, len2 = 0, len12 = 0;
@@ -129,11 +129,11 @@ char *string_concat(char *str1, char *str2){
 int main(int argc,char *argv[]){
  
   char *name = NULL;
-  name = string_concat(argv[1],argv[2]);
+  name = String_concat(argv[1],argv[2]);
   printf("%s\n",name);
   if (name != NULL) free(name);
   String str;
-  string_concat_var(&str,"a","b","c","d","e","f","g","e","h",NULL);
+  String_concat_var(&str,"a","b","c","d","e","f","g","e","h",NULL);
   String_dump(&str);
   String_free(&str);
   return 0;
