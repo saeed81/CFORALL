@@ -2,20 +2,20 @@
 #include<stdlib.h>
 #include<stdarg.h>
 
-typedef struct vector{
+typedef struct String{
   char *aa;
   int size;
   int counter;
-}vector; 
+}String; 
 
 
-void vector_init(vector *vv){
+void String_init(String *vv){
   vv->size = 0;
   vv->counter = 0;
   vv->aa = NULL;
   return;
 }
-void vector_add(vector *vv, char b){
+void String_add(String *vv, char b){
   if (vv->aa == NULL){
     vv->size = 2;
     vv->aa = (char *)malloc(vv->size * sizeof(char));
@@ -40,18 +40,18 @@ void vector_add(vector *vv, char b){
   }
 }
 
-void vector_free(vector *vv){
+void String_free(String *vv){
   if (vv->aa != NULL)free(vv->aa);
   vv->aa = NULL;
   return;
 }
 
 
-void vector_dump(vector *vv){
+void String_dump(String *vv){
   printf("=============================================\n");
-  printf("vector_size = %-8d vector_counter = %-8d\n", vv->size, vv->counter);
+  printf("String_size = %-8d String_counter = %-8d\n", vv->size, vv->counter);
   if(vv->aa == NULL){
-    printf("input vector is empty\n");
+    printf("input String is empty\n");
     printf("=============================================\n");
   }else{
     for(int ii=0; ii < vv->counter; ++ii){
@@ -62,21 +62,21 @@ void vector_dump(vector *vv){
   return;
 }
 
-void string_concat_var(vector *vec,char *str, ...){
-  vector_init(vec);
+void string_concat_var(String *vec,char *str, ...){
+  String_init(vec);
   if (str == NULL) return ;
   unsigned int len =0;
   va_list vv;
   va_start(vv,str);
   char *tmp = str;
   while(*tmp != '\0'){
-    vector_add(vec,*tmp);
+    String_add(vec,*tmp);
     len++;
     tmp++;
   }
   while ((tmp=va_arg(vv,char *)) != NULL){
     while(*tmp != '\0'){
-      vector_add(vec,*tmp);
+      String_add(vec,*tmp);
       len++;
       tmp++;
     }
@@ -132,9 +132,9 @@ int main(int argc,char *argv[]){
   name = string_concat(argv[1],argv[2]);
   printf("%s\n",name);
   if (name != NULL) free(name);
-  vector vec;
-  string_concat_var(&vec,"a","b","c","d","e","f","g","e","h",NULL);
-  vector_dump(&vec);
-  vector_free(&vec);
+  String str;
+  string_concat_var(&str,"a","b","c","d","e","f","g","e","h",NULL);
+  String_dump(&str);
+  String_free(&str);
   return 0;
 }
