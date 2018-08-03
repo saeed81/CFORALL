@@ -49,7 +49,7 @@ char **splitstr(char *str,char delim, int *NF){
 }
   
 int main(void){
-  char *str = "80:70:60:50:40:30:20:10:00:wwwww:ssssss:777777:********";
+  char *str = "80:70:60:50:40:30:20:10:00:wwwww:ssssss:777777:*****";
   int NF = 0;
   char **cout = splitstr(str,':', &NF);
   for (int i=0; i <= NF;++i){
