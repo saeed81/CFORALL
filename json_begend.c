@@ -8,7 +8,7 @@ int getLen(char *str){
   int len = 0;
   if (str != NULL){
     while(*str != '\0'){
-      len += 1;
+      len++;
       str++;
     }
   }
@@ -84,6 +84,50 @@ char typevalue(char *ar, int findex, int lindex){
   return type;
 }
 
+void findpt(char *reg, int lnr, char *beg, char *end, int *ibeg, int *iend){
+  int k = 0;
+  int i = 0;
+  int ncount = 0;
+  int ip = 0;
+  //int lnr = getLen(reg);                            
+  //char *itp = beg;                                                                                                                                                                                             
+  //for (int j=0; j < lns; ++j){                                                                                                                                                                                
+  int j = 0;
+  j = -1;
+  *ibeg = -1;
+  *iend = -1;
+  for (char *itp =beg; itp <= end; ++itp){
+    i = 0;
+    j++;
+    if (*itp == reg[i]){
+      //printf("we found the first instance of the first character at j %d\n",j);
+      //printf("we need to find the other characters\n");                                                                                                                                                        
+      k  = j;
+      char *next = (itp+1);
+      ip = i + 1;
+      ncount = 1;
+      while((*next == reg[ip]) && (reg[ip] != '\0') ){
+        next++;
+        ip++;
+        ncount++;
+        k++;
+      }
+      //printf("ncount is %d\n",ncount);                                                                                                                                                                         
+      if (ncount == lnr){
+        printf("we found the first instance\n");
+        printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
+        printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	*ibeg = j;
+	*iend = k;
+	break;
+      }
+      else{
+        printf("no instance found we continue searching\n");
+      }
+    }
+  }
+  return;
+}
 
 int find(char *reg, char *str, int *first, int *last){
 
@@ -202,7 +246,7 @@ char *getvalue(char *content, char *key,...){
     fs++;
     str++;
   }
-  fs++;
+  //fs++;
   va_list vs;
   va_start(vs,key);
 
@@ -219,7 +263,7 @@ char *getvalue(char *content, char *key,...){
   
   int first = -1, last = -1;
 
-  find(quotekey,content,&first,&last);
+  findpt(quotekey,getLen(quotekey),&content[0],&content[fs],&first,&last);
      
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
@@ -233,7 +277,7 @@ char *getvalue(char *content, char *key,...){
   //printf("fs is %ld\n",fs);
   while(istoplevelkey(&content[1],&content[ii]) == 0){
     //printf("we are here \n");
-    find(quotekey,&content[jj+1],&ffirst,&llast);
+    findpt(quotekey,getLen(quotekey),&content[jj+1],&content[fs],&ffirst,&llast);
     if ( ffirst == (-1) || llast == (-1)){
       printf("%s does not exist in the file \n",quotekey);
       return NULL;

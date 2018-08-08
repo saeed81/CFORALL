@@ -5,6 +5,7 @@ int find(char *, char *);
 int nfind(char *, char *);
 int getLen(char *);
 
+#if 0
 int main(void){
 
   char *reg = "name";
@@ -15,7 +16,7 @@ int main(void){
 
   return 0;
 }
-
+#endif
 int getLen(char *str){
 
   int len = 0;
@@ -27,19 +28,23 @@ int getLen(char *str){
   return len;
 }
 
-void findpt(char *reg, int lnr, char *beg, char *end){
+void findpt(char *reg, int lnr, char *beg, char *end, int *ibeg, int *iend){
   int k = 0;
   int i = 0;
   int ncount = 0;
   int ip = 0;
+  //printf("hej hej\n");
   //int lnr = getLen(reg);
   //char *itp = beg;
   //for (int j=0; j < lns; ++j){
   int j = 0;
   j = -1;
+  *ibeg = -1;
+  *iend = -1;
   for (char *itp =beg; itp <= end; ++itp){
     i = 0;
     j++;
+    //printf("%c\n",*itp);
     if (*itp == reg[i]){
       //printf("we found the first instance of the first character at j %d\n",j);
       //printf("we need to find the other characters\n");
@@ -55,13 +60,15 @@ void findpt(char *reg, int lnr, char *beg, char *end){
       }
       //printf("ncount is %d\n",ncount);
       if (ncount == lnr){
-	printf("we found the first instance\n");
-	printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
-	printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	//printf("we found the first instance\n");
+	//printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
+	//printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	*ibeg = j;
+	*iend = k;
 	break;
       }
       else{
-	printf("no instance found we continue searching\n");
+	//printf("no instance found we continue searching\n");
       }
     }
   }
