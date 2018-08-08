@@ -37,7 +37,6 @@ int main(void){
   struct tm *info  = NULL;
   tbegin.tm_isdst = -1;
   tend.tm_isdst   = -1;
-
   time_t t1 = mktime(&tbegin);
   time_t t2 = mktime(&tend);
   time_t tt = t1; 
@@ -48,7 +47,6 @@ int main(void){
     SHOWT(info);
     tt += incr;
   }
-
   advancedays(&tbegin,28);
   advanceweeks(&tbegin,-1);
   
