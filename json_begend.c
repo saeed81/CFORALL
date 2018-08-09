@@ -4,6 +4,11 @@
 #include"arrayexplode.c"
 #include<stdarg.h>
 
+typedef struct tString{
+  char *beg;
+  char *end;
+}String;
+
 int getLen(char *str){
   int len = 0;
   if (str != NULL){
@@ -117,6 +122,8 @@ void findpt(char *reg, int lnr, char *beg, char *end, int *ibeg, int *iend){
         printf("we found the first instance\n");
         printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
         printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	for (char *it = (beg+j); it <= (beg+k);++it) printf("%c",*it);
+	printf("\n");
 	*ibeg = j;
 	*iend = k;
 	break;
@@ -236,10 +243,10 @@ char *json_load(char *filename){
   return content;
 }
 
-char *getvalue(char *content, char *key,...){
-
-  if (content == NULL) return NULL;
-  if (key == NULL) return NULL; 
+String getvalue(char *content, char *key,...){
+  String rst = {NULL, NULL};
+  if (content == NULL) return rst;
+  if (key == NULL) return rst; 
   char *str = content;
   long int fs = 0L;
   while(*str != '\0'){
@@ -267,7 +274,7 @@ char *getvalue(char *content, char *key,...){
      
   if ( first == (-1) || last == (-1)){
     printf("%s does not exist in the file \n",quotekey);
-    return NULL;
+    return rst;
   }
   //printf("%d \t %d \n",first, last);
   int ffirst = first;
@@ -280,7 +287,7 @@ char *getvalue(char *content, char *key,...){
     findpt(quotekey,getLen(quotekey),&content[jj+1],&content[fs],&ffirst,&llast);
     if ( ffirst == (-1) || llast == (-1)){
       printf("%s does not exist in the file \n",quotekey);
-      return NULL;
+      return rst;
     }
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
     ii = jj + ffirst + 1;
@@ -303,7 +310,7 @@ char *getvalue(char *content, char *key,...){
     }
   }
   
-  if (incol == -1)return NULL;
+  if (incol == -1)return rst;
   
   int ka = incol, kb = -1, kc = -1;
   int findex = -1;
@@ -405,6 +412,8 @@ char *getvalue(char *content, char *key,...){
   type = typevalue(content,findex,lindex);
 
   // we find the second value first value would a key now
+  char *keyt = &content[findex];
+  #if 0
   tmp = content;
   char *keyt = NULL;
   keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
@@ -414,6 +423,7 @@ char *getvalue(char *content, char *key,...){
     ncount++;
   }
   keyt[ncount] = '\0';
+  #endif
   if (dynamic == 1) free(quotekey);
   
   while((key=va_arg(vs,char *)) != NULL){
@@ -426,7 +436,7 @@ char *getvalue(char *content, char *key,...){
       keyt= NULL;
       if (keyt1 == NULL){
 	//free(keyt);
-	return NULL;
+	return rst;
       }
       keyt = keyt1; 
       findex = 0;
@@ -444,13 +454,14 @@ char *getvalue(char *content, char *key,...){
     first = -1, last = -1;
     findpt(quotekey,getLen(quotekey),&content[findex],&content[lindex],&first,&last);
     //find(quotekey,keyt,&first,&last);
-    fs = (lindex-findex+1+1);
+    fs = (lindex-findex+1);
+    fs = lindex + 1;
     
     if ( first == (-1) || last == (-1)){
       //printf("%s does not exist in the file \n",quotekey);
       printf("does not exist in the file \n");
       if (dynamic == 1)free(quotekey);
-      return NULL;
+      return rst;
     }
     ffirst = -1;
     llast  = -1;
@@ -466,7 +477,7 @@ char *getvalue(char *content, char *key,...){
 	if ( ffirst == (-1) || llast == (-1)){
 	  if (dynamic == 1) free(quotekey);
 	  printf("%s is not the top level key and it is inside of another dictionary check the hierarchy of keys again \n",quotekey);
-	  return NULL;
+	  return rst;
 	}
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
 	ii = jj + ffirst + 1;
@@ -485,12 +496,12 @@ char *getvalue(char *content, char *key,...){
 
     incol = -1;
     for (int i=(last+1);i < fs;++i){
-      if (keyt[i] == ':'){
+      if (content[i] == ':'){
 	incol = i;
 	break;
       }
     }
-    if (incol == -1)return NULL;
+    if (incol == -1)return rst;
   
     ka = incol, kb = -1, kc = -1;
     findex = -1;
@@ -498,7 +509,7 @@ char *getvalue(char *content, char *key,...){
   
     if (ka >= 0){
       for (int i=(ka+1); i < fs; ++i){
-	if (keyt[i] == '{' || keyt[i] == '['){
+	if (content[i] == '{' || content[i] == '['){
 	  kb =  i;
 	  break;
 	}
@@ -510,7 +521,7 @@ char *getvalue(char *content, char *key,...){
     if (kb >= 0 ){
       int stop = 0; 
       for (int i=(kb-1); i >(ka) ; --i){
-	if (iswhitespace(keyt[i]) == 0){
+	if (iswhitespace(content[i]) == 0){
 	//printf("there is something before {. Now we search for ,\n");
 	stop = 1;
 	break;
@@ -518,7 +529,7 @@ char *getvalue(char *content, char *key,...){
     }
     if (stop){
       for (int i=(ka+1); i < (kb) ; ++i){
-	if (keyt[i] == ','){
+	if (content[i] == ','){
 	  //printf("we found ,\n");
 	  kc = i;
 	  break;
@@ -528,7 +539,7 @@ char *getvalue(char *content, char *key,...){
       findex = (ka+1);
       lindex = (kc-1);
       for (int i=(ka+1); i < (kc) ; ++i){
-	if (keyt[i] == '}'){
+	if (content[i] == '}'){
 	  //printf("%c",content[i]);
 	  lindex = (i-1);
 	  break;
@@ -536,10 +547,10 @@ char *getvalue(char *content, char *key,...){
       }
     }
     else{
-      char *tmp1 = &keyt[kb];
+      char *tmp1 = &content[kb];
       int index = -1;
-      if (keyt[kb] == '{')match(tmp1, '{', &index);
-      if (keyt[kb] == '[')match(tmp1, '[', &index);
+      if (content[kb] == '{')match(tmp1, '{', &index);
+      if (content[kb] == '[')match(tmp1, '[', &index);
       //printf("match { is at index %d and kb + index %d\n",index, kb +index);
       //printf("block 2 value=>\n");
       findex = kb;
@@ -551,7 +562,7 @@ char *getvalue(char *content, char *key,...){
   }
   else{
     for (int i=(ka+1); i < fs; ++i){
-      if (keyt[i] == ','){
+      if (content[i] == ','){
 	kc =  i;
 	break;
       }
@@ -561,7 +572,7 @@ char *getvalue(char *content, char *key,...){
       findex = (ka+1);
       lindex = (fs-1-1);
       for (int i=(ka+1); i < (fs-1) ; ++i){
-	if (keyt[i] == '}'){
+	if (content[i] == '}'){
 	  lindex = (i-1);
 	  break;
 	}
@@ -585,8 +596,9 @@ char *getvalue(char *content, char *key,...){
     //  printf("%c",keyt[i]);
     //}
     //printf("\n");
-    type = typevalue(keyt,findex,lindex);
+    type = typevalue(content,findex,lindex);
     //printf("type is %c\n",type);
+    #if 0
     tmp = keyt;
     if ( narg > 1 ){
       keyt = (char *)malloc((lindex-findex+1+1)*sizeof(char));
@@ -598,11 +610,15 @@ char *getvalue(char *content, char *key,...){
       keyt[ncount] = '\0';
     }
     if ((narg > 1) && (tmp != NULL)) free(tmp);
+    #endif
    
   }
 
   va_end(vs);
   //if (keyt != NULL) free(keyt);
   
-  return keyt;
+  rst.beg = &content[findex];
+  rst.end = &content[lindex];
+  
+  return rst;
 }
