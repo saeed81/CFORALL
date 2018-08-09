@@ -291,7 +291,7 @@ String getvalue(char *content, char *key,...){
     }
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
     ii = jj + ffirst + 1;
-    jj = jj + llast;
+    jj = jj + llast +  1;
     ffirst = -1;
     llast  = -1;
   }
@@ -433,7 +433,7 @@ String getvalue(char *content, char *key,...){
       //printf("%s\n",key);
       Index index = array_value_pt(&content[findex],&content[lindex],key);
       findex = index.findex;
-      lindex = lndex.findex;
+      lindex = index.lindex;
       if ((findex == -1) && (lindex == -1)){
 	rst.beg = NULL;
 	rst.end = NULL;
@@ -488,7 +488,7 @@ String getvalue(char *content, char *key,...){
 	}
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
 	ii = jj + ffirst + 1;
-	jj = jj + llast ;
+	jj = jj + llast  + 1;
 	ffirst = -1;
 	llast  = -1;
       }
