@@ -7,6 +7,7 @@
 typedef struct tString{
   char *beg;
   char *end;
+  char type;
 }String;
 
 int getLen(char *str){
@@ -21,7 +22,6 @@ int getLen(char *str){
 }
 
 void removewhitespace(char *str){
-
   if (str == NULL)return;
   char *tmp = str;
   int ne =0;
@@ -119,17 +119,17 @@ void findpt(char *reg, int lnr, char *beg, char *end, int *ibeg, int *iend){
       }
       //printf("ncount is %d\n",ncount);                                                                                                                                                                         
       if (ncount == lnr){
-        printf("we found the first instance\n");
-        printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
-        printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
-	for (char *it = (beg+j); it <= (beg+k);++it) printf("%c",*it);
-	printf("\n");
+        //printf("we found the first instance\n");
+        //printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
+        //printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
+	//for (char *it = (beg+j); it <= (beg+k);++it) printf("%c",*it);
+	//printf("\n");
 	*ibeg = j;
 	*iend = k;
 	break;
       }
       else{
-        printf("no instance found we continue searching\n");
+        //printf("no instance found we continue searching\n");
       }
     }
   }
@@ -244,7 +244,7 @@ char *json_load(char *filename){
 }
 
 String getvalue(char *content, char *key,...){
-  String rst = {NULL, NULL};
+  String rst = {NULL, NULL,' '};
   if (content == NULL) return rst;
   if (key == NULL) return rst; 
   char *str = content;
@@ -291,7 +291,7 @@ String getvalue(char *content, char *key,...){
     }
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
     ii = jj + ffirst + 1;
-    jj = jj + llast  +  1;
+    jj = jj + llast;
     ffirst = -1;
     llast  = -1;
   }
@@ -431,16 +431,23 @@ String getvalue(char *content, char *key,...){
     //printf("%c\n",type);
     if (type == 'a'){
       //printf("%s\n",key);
-      char *keyt1 = array_value(keyt,key);
-      if (keyt != NULL) free(keyt);
-      keyt= NULL;
-      if (keyt1 == NULL){
-	//free(keyt);
+      Index index = array_value_pt(&content[findex],&content[lindex],key);
+      findex = index.findex;
+      lindex = lndex.findex;
+      if ((findex == -1) && (lindex == -1)){
+	rst.beg = NULL;
+	rst.end = NULL;
 	return rst;
       }
-      keyt = keyt1; 
-      findex = 0;
-      lindex = getLen(keyt);
+       //if (keyt != NULL) free(keyt);
+      //keyt= NULL;
+      //if (keyt == NULL){
+	//free(keyt);
+	//return rst;
+      //}
+      //keyt = keyt1; 
+      //findex = 0;
+      //lindex = getLen(keyt);
       //printf("%s\n",keyt); 
     }
     else{
@@ -459,7 +466,7 @@ String getvalue(char *content, char *key,...){
     
     if ( first == (-1) || last == (-1)){
       //printf("%s does not exist in the file \n",quotekey);
-      printf("does not exist in the file \n");
+      printf("%s does not exist in the file \n",quotekey);
       if (dynamic == 1)free(quotekey);
       return rst;
     }
@@ -481,7 +488,7 @@ String getvalue(char *content, char *key,...){
 	}
     //printf("%d\t%d\t%d\t%c \t %c \t %c \n",jj+1,ffirst,llast,content[jj+1], content[jj+1+ffirst], content[jj+1+llast]);
 	ii = jj + ffirst + 1;
-	jj = jj + llast  +  1;
+	jj = jj + llast ;
 	ffirst = -1;
 	llast  = -1;
       }
@@ -619,6 +626,6 @@ String getvalue(char *content, char *key,...){
   
   rst.beg = &content[findex];
   rst.end = &content[lindex];
-  
+  rst.type = type;
   return rst;
 }

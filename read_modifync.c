@@ -49,16 +49,16 @@ int main(void){
   for (int k=0; k< nt;++k){
   for (int j=0; j< ny;++j){
   for (int i=0; i<nx ;++i){
-  inbat[0] = 0;
+  inbat[0] = k;
   inbat[1] = j;
   inbat[2] = i;
-      nc_get_var1(ncid, ibth, inbat, &valbat);
-      if ( (i >= i1) && (i <= i2) && (j >= j1) && (j <= j2)){
-	valbat = -20;
-	nc_put_var1(ncid, ibth, inbat,&valbat);
-      }
+  if ( (i >= i1) && (i <= i2) && (j >= j1) && (j <= j2)){
+    nc_get_var1(ncid, ibth, inbat, &valbat);
+    valbat = -100;
+    nc_put_var1(ncid, ibth, inbat,&valbat);
+  }
 	//printf("%d \t %d \t%f\n",j,i,(float)valbat);
-    }
+  }
   }
 }
   #if 0
