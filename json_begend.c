@@ -57,7 +57,7 @@ void writeonscreen(char *str){
 }
 
 int iswhitespace(char c){
-  if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\r')){
+  if ( (c == ' ') || (c == '\t') || ( c == '\n') || (c == '\r') || (c == '\t') || (c == '\v') || (c == '\f')){
     return 1;
   }
   
@@ -442,7 +442,8 @@ char *getvalue(char *content, char *key,...){
       quotekey = key;
     }
     first = -1, last = -1;
-    find(quotekey,keyt,&first,&last);
+    findpt(quotekey,getLen(quotekey),&content[findex],&content[lindex],&first,&last);
+    //find(quotekey,keyt,&first,&last);
     fs = (lindex-findex+1+1);
     
     if ( first == (-1) || last == (-1)){
@@ -453,14 +454,15 @@ char *getvalue(char *content, char *key,...){
     }
     ffirst = -1;
     llast  = -1;
-    ii     = first;
-    jj     = last;
+    ii     = findex + first;
+    jj     = findex + last;
     
     if (type == 'd'){
       //printf("fs is %ld\n",fs);
-      while(istoplevelkey(&keyt[1],&keyt[ii]) == 0){
+      while(istoplevelkey(&content[findex+1],&content[ii]) == 0){
 	//printf("we are here \n");
-	find(quotekey,&keyt[jj+1],&ffirst,&llast);
+	//find(quotekey,&keyt[jj+1],&ffirst,&llast);
+	findpt(quotekey,getLen(quotekey),&content[jj+1],&content[lindex],&first,&last);
 	if ( ffirst == (-1) || llast == (-1)){
 	  if (dynamic == 1) free(quotekey);
 	  printf("%s is not the top level key and it is inside of another dictionary check the hierarchy of keys again \n",quotekey);
