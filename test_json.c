@@ -1,5 +1,6 @@
 #include"json_begend.c"
 
+
 void dumpstring(String *str){
   if ((str->beg != NULL) && (str->end != NULL)){
     printf("TYPE is %c\n",str->type);
@@ -9,15 +10,13 @@ void dumpstring(String *str){
   printf("\n");
 }
 
-
 int main(void){
-  char *con   = json_load("sshconfig.json");
-
-  String sout = getvalue(con,"\"experiment\"","\"NS01_GEBCO\"","\"desig\"",NULL);
- 
-  dumpstring(&sout);
-
-  if (con  != NULL)free(con);
+  char *con   = json_load("complex.json");
+  String sout = getvalue(con,"\"medications\"","0","\"aceInhibitors\"","0","\"dose\"",NULL);
+dumpstring(&sout);
+//writeonscreen(sout);
+if (con  != NULL)free(con);
+//if (sout  != NULL)free(sout);
   
   return 0;
 }

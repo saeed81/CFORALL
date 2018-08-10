@@ -432,14 +432,14 @@ String getvalue(char *content, char *key,...){
     if (type == 'a'){
       //printf("%s\n",key);
       Index index = array_value_pt(&content[findex],&content[lindex],key);
-      findex = index.findex;
-      lindex = index.lindex;
-      if ((findex == -1) && (lindex == -1)){
+      if ((index.findex == -1) || (index.lindex == -1)){
 	rst.beg = NULL;
 	rst.end = NULL;
 	return rst;
       }
-       //if (keyt != NULL) free(keyt);
+      lindex = findex + index.lindex;
+      findex = findex + index.findex;
+      //if (keyt != NULL) free(keyt);
       //keyt= NULL;
       //if (keyt == NULL){
 	//free(keyt);
@@ -623,7 +623,6 @@ String getvalue(char *content, char *key,...){
 
   va_end(vs);
   //if (keyt != NULL) free(keyt);
-  
   rst.beg = &content[findex];
   rst.end = &content[lindex];
   rst.type = type;

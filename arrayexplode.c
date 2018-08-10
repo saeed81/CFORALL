@@ -9,7 +9,7 @@ typedef struct tIndex{
 }Index;
 
 int power10(int n){
-  int a = 1;
+ int a = 1;
   while(n--){
     a *= 10;
   }
@@ -214,11 +214,11 @@ Index array_value_pt(char *beg, char *end, char *cind){
   int dicel  = 0;
   int rb     = 0;
   if (*beg == '['){
-    //printf("this is array\n");
+    printf("this is array\n");
     type = 'a';
   }
   match(beg, '[', &rb);
-  //printf("rb %d\n",rb);
+  printf("rb %d\n",rb);
   int j = -1, i = 1;
   if (type == 'a'){
     for (char *it = (beg+1); it < end; ++it){
@@ -231,7 +231,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
   }
   if (j > 0){
     dicel = 1;
-    for (char *it=(end-1); it> beg;--it){
+    for (char *it=(beg+j-1); it> beg;--it){
       if ((*it != ' ') || (*it != '\t') || (*it!= '\r') || (*it != '\n') ){
 	dicel = 0;
 	break;
@@ -260,6 +260,10 @@ Index array_value_pt(char *beg, char *end, char *cind){
 	//  ncount++;
 	//}
 	//cout[index+1] = '\0';
+	indout.findex = j;
+	indout.lindex = j + index;
+	printf("first index %c\n",*(beg+j));
+	printf("last index %c\n",*(beg+j + index));
 	stop = 0;
       }
       //printf("\n");
@@ -293,7 +297,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
   if (dicel == 0 ){
     while( (j < (len-1)) && stop){
       icol = 0;
-      for (int i=j;i < len;++i){
+      for (int i=j;i < (len-1);++i){
 	if (*(beg+i) == ','){
 	  first = j;
 	  last = i;
@@ -304,17 +308,8 @@ Index array_value_pt(char *beg, char *end, char *cind){
       }
       if (icol == 0 && nel == 0){
 	if (nel == fun(cind)){
-	  //printf("rb is %d",rb);
-	  //int ncount = 0;
-	  //last = rb -1;
-	  //cout = (char *)malloc(last-first+2);
-	  //for (int k=first;k <=last;++k){
-	    //printf("%c",st[k]);
-	    //cout[ncount] = st[k];
-	  //ncount++;
-	  //}
-	  //cout[ncount] = '\0';
-	  //printf("\n");
+	  indout.findex = first;
+	  indout.lindex = last;
 	  stop = 0;
 	}
       }
@@ -324,15 +319,8 @@ Index array_value_pt(char *beg, char *end, char *cind){
 	last = rb -1;
 	//printf("here2 %d\t %d\n",last,first);
 	if (nel == fun(cind)){
-	  int ncount = 0;
-	  cout = (char *)malloc(last-first+2);
-	  for (int k=first;k <= last;++k){
-	    //printf("%c",st[k]);
-	    cout[ncount] = st[k];
-	    ncount++;
-	  }
-	  cout[ncount] = '\0';
-	    //printf("\n");
+	  indout.findex = first;
+	  indout.lindex = last;
 	  stop = 0;
 	}
       }
@@ -340,25 +328,17 @@ Index array_value_pt(char *beg, char *end, char *cind){
       if (icol == 1){
 	//printf("here3 %d\t %d\n",last,first);
 	if (nel == fun(cind)){
-	  int ncount = 0;
-	  cout = (char *)malloc(last-first+1);
-	  for (int k=first;k < last;++k){
-	    //printf("%c",st[k]);
-	    cout[ncount] = st[k];
-	    ncount++;
-	  }
-	  cout[ncount] = '\0';
-	  //printf("\n");
-	  stop = 0;
+	  indout.findex = first;
+	  indout.lindex = last -1;
 	}
+	stop = 0;
       }
+    }
       nel++;
       //printf("j is %d\n",j);
-    }
-    //printf("number of elements is %d\n",nel);
   }
-
-  return cout;
+    //printf("number of elements is %d\n",nel);
+  return indout;
   //fun("10");
   //printf("%d\n",power10(5));
 }
