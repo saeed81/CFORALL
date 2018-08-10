@@ -214,11 +214,11 @@ Index array_value_pt(char *beg, char *end, char *cind){
   int dicel  = 0;
   int rb     = 0;
   if (*beg == '['){
-    printf("this is array\n");
+    //printf("this is array\n");
     type = 'a';
   }
   match(beg, '[', &rb);
-  printf("rb %d\n",rb);
+  //printf("rb %d\n",rb);
   int j = -1, i = 1;
   if (type == 'a'){
     for (char *it = (beg+1); it < end; ++it){
@@ -262,8 +262,8 @@ Index array_value_pt(char *beg, char *end, char *cind){
 	//cout[index+1] = '\0';
 	indout.findex = j;
 	indout.lindex = j + index;
-	printf("first index %c\n",*(beg+j));
-	printf("last index %c\n",*(beg+j + index));
+	//printf("first index %c\n",*(beg+j));
+	//printf("last index %c\n",*(beg+j + index));
 	stop = 0;
       }
       //printf("\n");
