@@ -212,14 +212,8 @@ int fun(char *c){
     index += (c[i]-'0') * power10(ncount);
     ncount++; 
   }
-  //if ( c[0] >= '0' && c[0] <= '9'){
-  //  printf("input character is digint\n");
-  //  index = (c[0] - '0');
-  //}
-  //printf("index is %d\n",index);
 
   return index;
-  //if (index > 0) printf("%d\n",a[index]);
 }
 
 char *array_value(char *st, char *cind){
@@ -380,8 +374,7 @@ char *array_value(char *st, char *cind){
   }
 
   return cout;
-  //fun("10");
-  //printf("%d\n",power10(5));
+
 }
 
 Index array_value_pt(char *beg, char *end, char *cind){
@@ -432,19 +425,8 @@ Index array_value_pt(char *beg, char *end, char *cind){
       match(beg+j, '{', &index);
       //printf("j is %d and index is \t %c \n",j,st[j+index]);
       if (nel == fun(cind)){
-	//cout = NULL;
-	//int ncount = 0;
-	//cout = (char *)malloc(index+2);
-	//for (int i=j;i<=(j+index);++i){
-	  //printf("%c",st[i]);
-	//  cout[ncount] = st[i];
-	//  ncount++;
-	//}
-	//cout[index+1] = '\0';
 	indout.findex = j;
 	indout.lindex = j + index;
-	//printf("first index %c\n",*(beg+j));
-	//printf("last index %c\n",*(beg+j + index));
 	stop = 0;
       }
       //printf("\n");
@@ -520,8 +502,6 @@ Index array_value_pt(char *beg, char *end, char *cind){
   }
     //printf("number of elements is %d\n",nel);
   return indout;
-  //fun("10");
-  //printf("%d\n",power10(5));
 }
 
 
@@ -620,8 +600,8 @@ typedef struct tString{
 
 void dumpstring(String *str){
   if ((str->beg != NULL) && (str->end != NULL)){
-    printf("TYPE is %c\n",str->type);
-    printf("Value is = \t");
+    //printf("TYPE is %c\n",str->type);
+    //printf("Value is = \t");
     for (char *it =str->beg; it <= str->end;++it)printf("%c",*it);
   }
   printf("\n");
