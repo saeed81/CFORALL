@@ -618,6 +618,15 @@ typedef struct tString{
   char type;
 }String;
 
+void dumpstring(String *str){
+  if ((str->beg != NULL) && (str->end != NULL)){
+    printf("TYPE is %c\n",str->type);
+    printf("Value is = \t");
+    for (char *it =str->beg; it <= str->end;++it)printf("%c",*it);
+  }
+  printf("\n");
+}
+
 int getLen(char *str){
   int len = 0;
   if (str != NULL){
