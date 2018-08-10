@@ -112,7 +112,6 @@ char *addquote(char *str){
   char *reg = NULL;
   int n = 0;
 
-  //printf("string  %s with the length of %d has no quote character. We will add to it \n",str, len);
   reg = (char *)malloc(len+1+2);
   char *trg = reg;
   *reg = '\"';
@@ -124,21 +123,18 @@ char *addquote(char *str){
     tmp++;
     reg++;
   }
-  //printf("n is %d \n",n);
   *reg = '\"';
   reg++;
   *reg='\0';
   reg = trg;
-  //printf("reg is %s \n",reg);
-  
+    
   trg = reg;
   len = 0;
   while (*trg != '\0'){
     trg++;
     len++;
   }
-  //printf("string  %s with the length of %d has quote character. We will add to it \n",str, len);
-  
+    
   return reg;
 }
 
@@ -175,7 +171,6 @@ void match(char *str, char lsymbol, int *index){
     if (counter == 0) break;
   }
   
-  //printf("closePos is %d\n", closePose);
 
   *index = closePose;
 
@@ -264,7 +259,6 @@ char *array_value(char *st, char *cind){
     while( j < len && stop){
       icol = 0;
       match(&st[j], '{', &index);
-      //printf("j is %d and index is \t %c \n",j,st[j+index]);
       if (nel == fun(cind)){
 	cout = NULL;
 	int ncount = 0;
@@ -337,7 +331,6 @@ char *array_value(char *st, char *cind){
       if (icol == 0 && nel > 0){
 	first = last +1;
 	last = rb -1;
-	//printf("here2 %d\t %d\n",last,first);
 	if (nel == fun(cind)){
 	  int ncount = 0;
 	  cout = (char *)malloc(last-first+2);
@@ -370,7 +363,6 @@ char *array_value(char *st, char *cind){
       nel++;
       //printf("j is %d\n",j);
     }
-    //printf("number of elements is %d\n",nel);
   }
 
   return cout;
@@ -719,8 +711,6 @@ void findpt(char *reg, int lnr, char *beg, char *end, int *ibeg, int *iend){
         //printf("we found the first instance\n");
         //printf("first index is at distance %d fron beg pointer and  %c\n",j,*(beg+j));
         //printf("last  index is at distance %d fron beg pointer and  %c\n",k,*(beg+k));
-	//for (char *it = (beg+j); it <= (beg+k);++it) printf("%c",*it);
-	//printf("\n");
 	*ibeg = j;
 	*iend = k;
 	break;
@@ -828,9 +818,6 @@ char *json_load(char *filename){
 
   removewhitespace(content);
 
-  //FILE *file = fopen("clean.json","w");
-  //fprintf(file,"%s",content);
-  //fclose(file);
 
   if (checksymbolbeforeparse(content) != 0){
     free(content);
@@ -992,17 +979,6 @@ String getvalue(char *content, char *key,...){
     }
   }
   int narg = 1;
-  //printf("\n");
-  //first value found we contniue with second one
-  //for (int i=findex; i <= lindex ; ++i){
-  //	printf("%c",content[i]);
-  //}
-
-  //printf("narg is %d and key is %s\n",narg,key);
-  //printf("value is \n");
-  //for (int i=findex; i <= lindex ; ++i){
-  //  printf("%c",content[i]);
-  //}
   char type = '\0'; 
   //printf("\n");
   type = typevalue(content,findex,lindex);
@@ -1023,16 +999,6 @@ String getvalue(char *content, char *key,...){
       }
       lindex = findex + index.lindex;
       findex = findex + index.findex;
-      //if (keyt != NULL) free(keyt);
-      //keyt= NULL;
-      //if (keyt == NULL){
-	//free(keyt);
-	//return rst;
-      //}
-      //keyt = keyt1; 
-      //findex = 0;
-      //lindex = getLen(keyt);
-      //printf("%s\n",keyt); 
     }
     else{
     if ( checkforquote(key) ) {
@@ -1181,18 +1147,10 @@ String getvalue(char *content, char *key,...){
     //printf("\n");
     }
      narg++;
-    //printf("narg is %d and key is %s\n",narg,key);
-    //printf("value is \n");
-    //for (int i=findex; i <= lindex ; ++i){
-    //  printf("%c",keyt[i]);
-    //}
-    //printf("\n");
     type = typevalue(content,findex,lindex);
-    //printf("type is %c\n",type);
   }
   
   va_end(vs);
-  //if (keyt != NULL) free(keyt);
   rst.beg = &content[findex];
   rst.end = &content[lindex];
   rst.type = type;
