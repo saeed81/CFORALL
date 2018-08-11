@@ -475,6 +475,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
       if (icol == 0 && nel > 0){
 	first = last +1;
 	last = rb -1;
+	if (first > last) break;
 	//printf("here2 (icol == 0 && nel > 0) last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
@@ -496,6 +497,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
     //printf("j is %d\n",j);
   }
   //printf("number of elements is %d\n",nel);
+  //printf("indout  %d %d \n",indout.findex,indout.lindex);
   return indout;
 }
 
