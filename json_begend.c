@@ -596,12 +596,25 @@ typedef struct tString{
 void dumpstring(String *str, int extrainfo){
   if ((str->beg != NULL) && (str->end != NULL)){
     if (extrainfo ){
-      printf("TYPE is %c\n",str->type);
+      switch(str->type){
+      case 'a': {
+	printf("TYPE is array\n");
+      }break;
+      case 'd':{
+	printf("TYPE is object\n");
+      }break;
+      case 's':{
+	printf("TYPE is either string, float or int.\n");
+      }break;
+      default:{
+	printf("TYPE is unknown.\n");
+      }break;
+      }
       printf("Value is = \t");
     }
     for (char *it =str->beg; it <= str->end;++it)printf("%c",*it);
   }
-  printf("\n");
+    printf("\n");
 }
 
 int getLen(char *str){
