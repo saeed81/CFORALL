@@ -384,7 +384,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
     type = 'a';
   }
   match(beg, '[', &rb);
-  printf("rb %d\n",rb);
+  //printf("rb %d\n",rb);
   int j = -1, i = 1;
   if (type == 'a'){
     for (char *it = (beg+1); it < end; ++it){
@@ -450,7 +450,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
   last  = 1;
   stop = 1;
   if (dicel == 0 ){
-    printf("we are here dicel =0 len %d \n",len);
+    //printf("we are here dicel =0 len %d \n",len);
     while( (j < (len-1)) && stop){
       icol = 0;
       for (int i=j;i < (len-1);++i){
@@ -459,12 +459,12 @@ Index array_value_pt(char *beg, char *end, char *cind){
 	  last = i;
 	  j = (i+1);
 	  icol = 1;
-	  printf("before break \n");
+	  //printf("before break \n");
 	  break;
 	}
       }
       if (icol == 0 && nel == 0){
-	printf("here1 (icol == 0 && nel == 0) last %d\t first %d\n",last,first);
+	//printf("here1 (icol == 0 && nel == 0) last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last;
@@ -475,7 +475,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
       if (icol == 0 && nel > 0){
 	first = last +1;
 	last = rb -1;
-	printf("here2 (icol == 0 && nel > 0) last %d\t first %d\n",last,first);
+	//printf("here2 (icol == 0 && nel > 0) last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last;
@@ -484,7 +484,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
       }
 
       if (icol == 1){
-	printf("here3 last %d\t first %d\n",last,first);
+	//printf("here3 last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last -1;
@@ -493,9 +493,9 @@ Index array_value_pt(char *beg, char *end, char *cind){
       }
       nel++;
     }
-    printf("j is %d\n",j);
+    //printf("j is %d\n",j);
   }
-  printf("number of elements is %d\n",nel);
+  //printf("number of elements is %d\n",nel);
   return indout;
 }
 
@@ -578,10 +578,10 @@ void array_explode(char *st){
 	  break;
 	}
       }
-      printf("j is %d\n",j);
+      //printf("j is %d\n",j);
       if (icol == 0) break;
     }
-    printf("number of elements is %d\n",nel);
+    //printf("number of elements is %d\n",nel);
   }
   //fun("10");
   //printf("%d\n",power10(5));
@@ -593,10 +593,12 @@ typedef struct tString{
   char type;
 }String;
 
-void dumpstring(String *str){
+void dumpstring(String *str, int extrainfo){
   if ((str->beg != NULL) && (str->end != NULL)){
-    //printf("TYPE is %c\n",str->type);
-    //printf("Value is = \t");
+    if (extrainfo ){
+      printf("TYPE is %c\n",str->type);
+      printf("Value is = \t");
+    }
     for (char *it =str->beg; it <= str->end;++it)printf("%c",*it);
   }
   printf("\n");
