@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<stdarg.h>
 
-/* matching.h file is here now *****/
+/* matching.h file is here now */
 int istoplevelkey(char *beg, char *end){
 
   char *tmp = beg;
@@ -384,7 +384,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
     type = 'a';
   }
   match(beg, '[', &rb);
-  //printf("rb %d\n",rb);
+  printf("rb %d\n",rb);
   int j = -1, i = 1;
   if (type == 'a'){
     for (char *it = (beg+1); it < end; ++it){
@@ -450,6 +450,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
   last  = 1;
   stop = 1;
   if (dicel == 0 ){
+    printf("we are here dicel =0 len %d \n",len);
     while( (j < (len-1)) && stop){
       icol = 0;
       for (int i=j;i < (len-1);++i){
@@ -458,10 +459,12 @@ Index array_value_pt(char *beg, char *end, char *cind){
 	  last = i;
 	  j = (i+1);
 	  icol = 1;
+	  printf("before break \n");
 	  break;
 	}
       }
       if (icol == 0 && nel == 0){
+	printf("here1 (icol == 0 && nel == 0) last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last;
@@ -472,7 +475,7 @@ Index array_value_pt(char *beg, char *end, char *cind){
       if (icol == 0 && nel > 0){
 	first = last +1;
 	last = rb -1;
-	//printf("here2 %d\t %d\n",last,first);
+	printf("here2 (icol == 0 && nel > 0) last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last;
@@ -481,18 +484,18 @@ Index array_value_pt(char *beg, char *end, char *cind){
       }
 
       if (icol == 1){
-	//printf("here3 %d\t %d\n",last,first);
+	printf("here3 last %d\t first %d\n",last,first);
 	if (nel == fun(cind)){
 	  indout.findex = first;
 	  indout.lindex = last -1;
+	  stop = 0;
 	}
-	stop = 0;
       }
-    }
       nel++;
-      //printf("j is %d\n",j);
+    }
+    printf("j is %d\n",j);
   }
-    //printf("number of elements is %d\n",nel);
+  printf("number of elements is %d\n",nel);
   return indout;
 }
 
