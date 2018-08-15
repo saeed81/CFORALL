@@ -13,8 +13,9 @@ int main(void){
   char *filename  =  "bfr_coef_abborre_omkorning.nc";
   char *filenameo =  "bfr_coef_smooth.nc";
   char *varname   =  "bfr_coef";
-  size_t inbat[3] = {0};
-  
+  size_t inbat[3] = {0,0,0};
+  int   ireduce  = 1;
+  float vreduce  = 0.50;
   nc_open(filename  , NC_NOWRITE,&ncid);
   nc_open(filenameo , NC_WRITE ,&ncio);
   nc_inq_varid(ncid, varname, &ibth);
@@ -41,7 +42,6 @@ int main(void){
 	  inbat[0] = k;
 	  inbat[1] = j;
 	  inbat[2] = i;
-	
 	  //if (iter == 0) nc_get_var1(ncid, ibth, inbat, &v0);
 	  if (iter >= 0 ) nc_get_var1(ncio, ibth, inbat, &v0);
 	  
@@ -87,6 +87,7 @@ int main(void){
 	    }
 	    sum += v0; 
 	    if (ncount > 0) v0 = sum / (float)(ncount+1);
+	    
 	  }
 	  inbat[0] = k;
 	  inbat[1] = j;
@@ -96,6 +97,25 @@ int main(void){
       }
     }
   }
+
+  if (ireduce){
+    printf("we are doing reduction now \n");
+    for (int k=0; k< nt;++k){
+      for (int j=1; j< (ny-1);++j){
+	for (int i=1; i<(nx-1) ;++i){
+	  inbat[0] = k;
+	  inbat[1] = j;
+	  inbat[2] = i;
+	  nc_get_var1(ncio, ibth, inbat, &v0);
+	  if (v0 != -127.0){
+	    v0 = (1-vreduce) * v0;
+	    nc_put_var1(ncio, ibf, inbat,&v0);
+	  }
+	}
+      }
+    }
+  }
+
   nc_close(ncid);
   nc_close(ncio);
 
