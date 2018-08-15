@@ -6,7 +6,7 @@ typedef enum ttype{
   DBL, FLT, INT, CHAR
 }type;
 
-//#pragma pack(push,1)
+#pragma pack(push,1)
 typedef struct tvector {
   int  nx;
   int  ny;
@@ -17,7 +17,7 @@ typedef struct tvector {
   type type;
   void *ar;
 }vector;
-//#pragma pack(pop)
+#pragma pack(pop)
 
 typedef vector * mat;
 
@@ -276,6 +276,79 @@ void seriealize(vector *vec, char *filename){
   return;    
 }  
   
+void seriealize_binary(vector *vec, char *filename){
+
+  if (vec      == NULL) return;
+  if (vec->ar  == NULL) return;
+  if (filename == NULL) return;
+  FILE *file = NULL;
+  file = fopen(filename,"wb+");
+  if (file == NULL){
+    printf("problem in opening the file %s\n",filename);
+    return;
+  }
+  fwrite(&(vec->nx),sizeof(int),1,file);
+  fwrite(&(vec->ny),sizeof(int),1,file);
+  fwrite(&(vec->nz),sizeof(int),1,file);
+  fwrite(&(vec->nt),sizeof(int),1,file );
+  fwrite(&(vec->size),sizeof(int),1,file);
+  fwrite(&(vec->dim),sizeof(int),1,file);
+  fwrite(&(vec->type),sizeof(type),1,file);
+  
+  if (vec->type == INT) {
+    fwrite((int*)vec->ar,sizeof(int),vec->size,file);
+  }
+  if (vec->type == FLT) {
+    fwrite((float*)vec->ar,sizeof(float),vec->size,file);
+  }
+  if (vec->type == DBL) {
+    fwrite((double*)vec->ar,sizeof(double),vec->size,file);
+  }
+  if (vec->type == CHAR){
+    fwrite((char*)vec->ar,sizeof(char),vec->size,file);
+  }
+  
+  fclose(file);
+  
+  return;    
+}  
+
+void deseriealize_binary(vector *vec, char *filename){
+
+  if (vec      == NULL) return;
+  if (vec->ar  == NULL) return;
+  if (filename == NULL) return;
+  FILE *file = NULL;
+  file = fopen(filename,"rb");
+  if (file == NULL){
+    printf("problem in opening the file %s\n",filename);
+    return;
+  }
+  fread(&(vec->nx),sizeof(int),1,file);
+  fread(&(vec->ny),sizeof(int),1,file);
+  fread(&(vec->nz),sizeof(int),1,file);
+  fread(&(vec->nt),sizeof(int),1,file );
+  fread(&(vec->size),sizeof(int),1,file);
+  fread(&(vec->dim),sizeof(int),1,file);
+  fread(&(vec->type),sizeof(type),1,file);
+  
+  if (vec->type == INT) {
+    fread((int*)vec->ar,sizeof(int),vec->size,file);
+  }
+  if (vec->type == FLT) {
+    fread((float*)vec->ar,sizeof(float),vec->size,file);
+  }
+  if (vec->type == DBL) {
+    fread((double*)vec->ar,sizeof(double),vec->size,file);
+  }
+  if (vec->type == CHAR){
+    fread((char*)vec->ar,sizeof(char),vec->size,file);
+  }
+  
+  fclose(file);
+  
+  return;    
+}  
 
   
 
@@ -308,22 +381,36 @@ void del(vector **vec){
 }
   
 int main(void){
-  
+  int nx = 4, ny =5;
   int   inivali = 0;
-  mat veci = matrix(INT,2,1024,1024);
+  mat veci = matrix(INT,2,nx,ny);
   showinfomembers(veci);
   fill(veci,&inivali);
   dumponscreen(veci);
-  for (int i=0; i < 1024;i++){
-    for (int j=0; j < 1024;j++){
+  printf("\n");
+  for (int i=0; i < nx;i++){
+    for (int j=0; j < ny;j++){
       inivali = i * j;
       set(veci,&inivali,i,j);
     }
   }
-  seriealize(veci,"array.dat");
+  dumponscreen(veci);
+  printf("\n");
+  seriealize_binary(veci, "array.bin");
+  for (int i=0; i < nx;i++){
+    for (int j=0; j < ny;j++){
+      inivali = 0;
+      set(veci,&inivali,i,j);
+    }
+  }
+  dumponscreen(veci);
+  printf("\n");
+  deseriealize_binary(veci,"array.bin");
+  dumponscreen(veci);
   del(&veci);
+
   return 1;
-  
+  #if 0
   float inivalf = 0.250f;
   mat vecf = matrix(FLT,3,2,3,4);
   showinfomembers(vecf);
@@ -392,8 +479,8 @@ int main(void){
   seriealize(vecf,"MYMATRIX.dat");
   #endif
   del(&vecf);
+  #endif
   
-
   
   return 0;
 }
