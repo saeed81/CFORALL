@@ -363,7 +363,24 @@ void showinfomembers(vector *vec){
   (void)printf("number of y elements   %d\n",vec->ny  );
   (void)printf("number of z elements   %d\n",vec->nz  );
   (void)printf("number of t elements   %d\n",vec->nt  );
-
+  switch(vec->type){
+  case INT:{
+    (void)printf("elements are of integer type\n");
+  }break;
+  case DBL:{
+    (void)printf("elements are of double type\n");
+  }break;
+  case FLT:{
+    (void)printf("elements are of float type\n");
+  }break;
+  case CHAR:{
+    (void)printf("elements are of char type\n");
+  }break;
+  default:{
+    (void)printf("elements are of no  type\n");
+  }break;
+  }
+    
   return;
 }
 
@@ -381,7 +398,7 @@ void del(vector **vec){
 }
   
 int main(void){
-  int nx = 4, ny =5;
+  int nx = 2, ny =3;
   int   inivali = 0;
   mat veci = matrix(INT,2,nx,ny);
   showinfomembers(veci);
@@ -405,7 +422,15 @@ int main(void){
   }
   dumponscreen(veci);
   printf("\n");
+  veci->nx   = 0;
+  veci->ny   = 0;
+  veci->nz   = 0;
+  veci->nt   = 0;
+  veci->size = 0;
+  veci->dim  = 0;
+  veci->type = CHAR;
   deseriealize_binary(veci,"array.bin");
+  showinfomembers(veci);
   dumponscreen(veci);
   del(&veci);
 
