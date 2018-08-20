@@ -21,8 +21,8 @@ int  main(void){
   int width = 500;
   int height= 500;
   XColor color;
-  color.red   = 0xFF;
-  color.green = 0;
+  color.red   = 0xffff;
+  color.green = 0x0011;
   color.blue  = 0;
   color.flags = DoGreen | DoRed | DoBlue;
   XColor black_col,white_col,red_col,green_col,blue_col,yellow_col,magenta_col,cyan_col;
@@ -45,7 +45,7 @@ int  main(void){
   XParseColor(dsp, colormap, yellow_bits, &yellow_col);XAllocColor(dsp, colormap, &yellow_col);
   XParseColor(dsp, colormap, magenta_bits, &magenta_col);XAllocColor(dsp, colormap, &magenta_col);
   XParseColor(dsp, colormap, cyan_bits, &cyan_col);XAllocColor(dsp, colormap, &cyan_col);
-  XAllocColor(dsp, colormap,&color);
+  //XAllocColor(dsp, colormap,&color);
   window = XCreateSimpleWindow(dsp,RootWindow(dsp,screen_num),0,0,width,height,2,WhitePixel(dsp,screen_num),WhitePixel(dsp,screen_num));
   XSelectInput(dsp, window, ExposureMask | StructureNotifyMask | KeyPressMask);        // We want to get MapNotify events
   XMapWindow(dsp, window);         // "Map" the window (that is, make it appear on the screen)
@@ -60,8 +60,9 @@ int  main(void){
   int line_style = LineSolid;           /* style for lines drawing and  */
   int cap_style = CapButt;              /* style of the line's edje and */
   int join_style = JoinBevel;           /*  joined lines.               */
-  XSetForeground(dsp, gc, green_col.pixel);
-  //XSetForeground(dsp, gc, color.pixel);
+  color.pixel = 0x00ffff00;
+  XSetForeground(dsp, gc, blue_col.pixel);
+  XSetForeground(dsp, gc, color.pixel);
   //XDrawLine(dsp, window, gc, 10, 70, 180, 30);      // Draw theline
 
   //XSetForeground(dsp, gc, green_col.pixel);  // Tell the GC we draw using the GREEN color
@@ -78,54 +79,79 @@ int  main(void){
   /* define the style of lines that will be drawn using this GC. */
   XSetLineAttributes(dsp, gc,line_width, line_style, cap_style, join_style);
   XFillRectangle(dsp, window, gc, 20, 250, 50,50);
+  XSetStandardProperties(dsp,window,"My First Game","HI!",None,NULL,0,NULL);
   KeySym keysym;
-  char BUFFER[80] = {'\0'};
+  char BUFFER[256] = {'\0'};
   int ncount = 0;
   int xr = 0;
   int xu = 0;
   int radius = 50;
+  char text[256] = "X is FUN!";
+  char *tmp = (char *)&text[0];
+  int len=0;
+  while(*tmp != '\0'){
+    len++;
+    tmp++;
+  }
+  printf("len is %d\n",len);
+  //XSetForeground(dis,gc,rand()%event.xbutton.x%255);
+  XDrawString(dsp,window,gc,20,250, text, len);
   for (;;) {
     XEvent e;
     XNextEvent (dsp, & e);
     if (e.type == KeyPress) {
       XClearWindow(dsp, window);
-      //XMapRaised(dsp, window);
-      //XSetForeground(dsp, gc, red_col.pixel);
+      XMapRaised(dsp, window);
+      XSetForeground(dsp, gc, color.pixel);
       //XSetBackground(dsp, gc, red_col.pixel);
-      printf("we are pressing keyboard\n");
+      //printf("we are pressing keyboard\n");
       ncount = XLookupString (&e.xkey,BUFFER,sizeof(BUFFER)-1, &keysym, NULL);
       BUFFER[ncount] = 0;  /* add terminal '\0' */
       //printf("%s %s  %d\n",XKeysymToString(keysym),BUFFER,(int)keysym);
       if (keysym == XK_Right){
-	printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
+	//printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
 	xr += 20;
-	//radius += 0; 
+	radius -= 0;
+	if ((xr + 20) >= 500 ) xr = 0;
+	if ((xu + 250) >= 500 ) xu = 250;
 	//XSetForeground(dsp, gc, green_col.pixel);
 	XFillRectangle(dsp, window, gc, 20+xr, 250+xu, radius, radius);
+	XDrawString(dsp,window,gc,20+xr, 250+xu, text, len);
 	//usleep(1);
       }
       if (keysym == XK_Left){
-	printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
+	//printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
 	xr -= 20;
-	//radius += 0; 
+	radius += 0;
+	if ((xr + 20) < 0 ) xr = 480;
+	if ((xu + 250) >= 500 )  xu = 250;
+	
 	//XSetForeground(dsp, gc, green_col.pixel);
 	XFillRectangle(dsp, window, gc, 20+xr, 250+xu, radius, radius);
+	XDrawString(dsp,window,gc,20+xr, 250+xu, text, len);
 	//usleep(1);
       }
       if (keysym == XK_Up){
-	printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
+	//printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
 	xu -= 20;
-	//radius += 0; 
+	radius += 0;
+	if ((xr + 20) >= 500 ) xr = 480;
+	if ((xu + 250)< 0 ) xu = 250;
+	
 	//XSetForeground(dsp, gc, green_col.pixel);
 	XFillRectangle(dsp, window, gc, 20+xr, 250+xu, radius, radius);
+	XDrawString(dsp,window,gc,20+xr, 250+xu,text, len);
 	//usleep(1);
       }
       if (keysym == XK_Down){
-	printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
+	//printf("inside of if %s %d\n",XKeysymToString(keysym),(int)keysym);
 	xu += 20;  
-	//radius += 0; 
+	radius -= 0; 
 	//XSetForeground(dsp, gc, green_col.pixel);
+	if ((xr + 20) >= 500 ) xr = 480;
+	if ((xu + 250) >= 500 ) xu = 250;
 	XFillRectangle(dsp, window, gc, 20+xr, 250+xu, radius, radius);
+	XDrawString(dsp,window,gc,20+xr, 250+xu,text, len);
 	//usleep(1);
       }
     }
