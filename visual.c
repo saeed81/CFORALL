@@ -3,7 +3,7 @@
 #include<X11/Xlib.h>
 #include<unistd.h>
 #include<math.h>
-#include"sflib.h"
+//#include"sflib.h"
 #include <string.h>
 
 long int numberoflines(FILE *file){

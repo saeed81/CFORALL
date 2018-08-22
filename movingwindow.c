@@ -60,7 +60,7 @@ int  main(void){
   int line_style = LineSolid;           /* style for lines drawing and  */
   int cap_style = CapButt;              /* style of the line's edje and */
   int join_style = JoinBevel;           /*  joined lines.               */
-  color.pixel = 0x00ffff00;
+  color.pixel = 0x00ff00ff;
   XSetForeground(dsp, gc, blue_col.pixel);
   XSetForeground(dsp, gc, color.pixel);
   //XDrawLine(dsp, window, gc, 10, 70, 180, 30);      // Draw theline
@@ -154,6 +154,12 @@ int  main(void){
 	XDrawString(dsp,window,gc,20+xr, 250+xu,text, len);
 	//usleep(1);
       }
+
+      if (BUFFER[0] == 'q'){
+	return 1;
+	
+      }
+
     }
   }
 
