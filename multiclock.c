@@ -56,6 +56,7 @@ void *myThreadFun(void *vargp){
   float angle = 0, x1 = 0, y1 = 0;
   float mpi = 4.0*atan(1.0);
   for(;;){
+    printf("thread 1 and angle is %f\n",angle);
     angle += 1.0;
     XClearWindow(xd->dsp, xd->win);
     char sangle[64] = {'\0'};
@@ -66,10 +67,10 @@ void *myThreadFun(void *vargp){
       length++;
       tmp++;
     }
-    x1= 50.0 * sin(angle* (mpi / 180.0));
-    y1= 50.0 * cos(angle* (mpi / 180.0));
+    x1= 50.0 * cos(-angle* (mpi / 180.0));
+    y1= 50.0 * sin(-angle* (mpi / 180.0));
     XDrawLine(xd->dsp, xd->win, xd->gc, 150, 150, 150+2*(int)x1 , 150+2*(int)y1);
-    XDrawString(xd->dsp, xd->win, xd->gc, 150+2*(int)x1 + 5 ,  150+2*(int)y1 + 5, sangle, length);
+    XDrawString(xd->dsp, xd->win, xd->gc, 150+2*(int)x1 + 8 ,  150+2*(int)y1 + 8, sangle, length);
     if (angle > 360.0) angle = 0.0;
     XFlush(xd->dsp); // Tell the graphics server to show us the results now. 
     usleep(100000);  // Wait for 100000 micro seconds                    
@@ -79,7 +80,13 @@ void *myThreadFun(void *vargp){
 }
 
 int main(void){
-  
+
+  struct tm tbegin = {0,0,0,1,1,118};
+  struct tm *info  = NULL;
+  tbegin.tm_isdst = -1;
+  time_t t1 = mktime(&tbegin);
+  time_t tt = t1;
+  time_t incr = 3600;
   int nx = 10, ny = 10;
   Display *dsp, *dsp1;
   Window win, win1;
@@ -107,6 +114,12 @@ int main(void){
   XSetForeground(dsp, gc, 0x000000ff);
   XSetForeground(dsp1, gc1, 0x000000ff);
   
+  unsigned int line_width = 4;          /* line width for the GC.       */
+  int line_style = LineSolid;           /* style for lines drawing and  */
+  int cap_style = CapButt;              /* style of the line's edje and */
+  int join_style = JoinBevel;           /*  joined lines.               */
+  XSetLineAttributes(dsp1, gc1,line_width, line_style, cap_style, join_style);
+  XSetLineAttributes(dsp, gc,line_width, line_style, cap_style, join_style);
   struct xdata xdthread = {dsp1,screen_num1,win1,gc1};
   int xorig = -100, yorig = -100; 
   int i1 = xorig + 444, j1 =  yorig + 486;
@@ -125,6 +138,7 @@ int main(void){
   pthread_create(&thread_id, NULL, myThreadFun, (void *)&xdthread);
   printf("After Thread\n");
   for(;;){
+    printf("thread 0 and angle is %f\n",angle);
     angle += 1.0;
     XClearWindow(dsp, win);
     char sangle[64] = {'\0'};
@@ -135,14 +149,45 @@ int main(void){
       length++;
       tmp++;
     }
+    info = localtime(&tt);
+    int hour = info->tm_hour, min = info->tm_min, sec = info->tm_sec;
+    printf("%d %d %d\n",hour, min, sec);
     x1= 100.0 * cos(angle* (mpi / 180.0));
     y1= 100.0 * sin(angle* (mpi / 180.0));
     XDrawLine(dsp, win,  gc, i1 +ip, j1 + ip, i1 + 2*(int)x1 + ip, j1 + 2*(int)y1 + ip);
-    XDrawString(dsp, win, gc, i1+ 2*(int)x1 + 5 , j1 + 2*(int)y1 + 5, sangle, length);
+    XDrawString(dsp, win, gc, i1+ 2*(int)x1 + 8 , j1 + 2*(int)y1 + 8, sangle, length);
+    char stime[64] = {'\0'};
+    intostr(sec, stime);
+    length = 0;
+    tmp = (char *)stime; 
+    while(*tmp != '\0' ){
+      length++;
+      tmp++;
+    }
+    XDrawString(dsp, win, gc, i1+ 2*(int)x1 + 25 , j1 + 2*(int)y1 + 25, stime, length);
+    char stime1[64] = {'\0'};
+    intostr(min, stime1);
+    length = 0;
+    tmp = (char *)stime1; 
+    while(*tmp != '\0' ){
+      length++;
+      tmp++;
+    }
+    XDrawString(dsp, win, gc, i1+ 2*(int)x1 + 45 , j1 + 2*(int)y1 + 45, stime1, length);
+    char stime2[64] = {'\0'};
+    intostr(hour, stime2);
+    length = 0;
+    tmp = (char *)stime2; 
+    while(*tmp != '\0' ){
+      length++;
+      tmp++;
+    }
+    XDrawString(dsp, win, gc, i1+ 2*(int)x1 + 65 , j1 + 2*(int)y1 + 65, stime2, length);
     //XDrawLine(dsp, win, gc, i1+ip, j1+ip, i4+ip, j4 +ip);
     //XDrawLine(dsp, win, gc, i2+ip, j2+ip, i3+ip, j3+ip);
     //XDrawLine(dsp, win, gc, i3+ip, j3+ip, i4+ip, j4+ip);
     ip += 0;
+    tt += 1;
     if (angle > 360.0) angle = 0.0;
     //if (ip > 400) ip = -100;
     XFlush(dsp); // Tell the graphics server to show us the results now. 
