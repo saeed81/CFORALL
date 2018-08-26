@@ -1,10 +1,11 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<math.h>
 
 char Str[32]  = {'\0'};
 char RStr[32] = {'\0'};
 
-void reverse(char *s, char *t){
+void reverse(char *s, char *t, int sign, int npadzero){
   
   char *tmp = s;
   int len = 0;
@@ -13,6 +14,15 @@ void reverse(char *s, char *t){
     len++;
   }
   tmp--;
+  while(npadzero--){
+    *t = '0';
+    t++;
+  }
+  
+  if (sign < 0){
+    *t = '-';
+    t++;
+  }
   while (len >0 ){
     *t = *tmp;
     tmp--;
@@ -23,7 +33,11 @@ void reverse(char *s, char *t){
 }
 
 void intostr(int a, char *st){
-  
+  int sign = 1;
+  if (a < 0){
+    sign = -1;
+    a = (-a);
+  }
   int index = 0;
   int r = -1 ;
   int q = 0;
@@ -38,25 +52,39 @@ void intostr(int a, char *st){
   
   *(cl+index) = '\0';
 
-  reverse(cl,st);
+  reverse(cl,st,sign,0);
   
 }
 
 
 void floatostr(float a, char *str, int nafterdecimalpoint){
-  
+  int sign = 1;
   int ia = (int) (a);
+  if (a < 0) {
+    //printf("we are here\n");
+    sign = -1;
+    a = (-a);
+    ia = (int) (a);
+  }
+  int npadzero = 0;
   long long int n = 1;
-  float b = a - ia;
+  float b = a - (float)ia;
+  float bt = b;
+  //printf("b is %f\n",b);
   for(int i=0; i < nafterdecimalpoint;++i){
     n *= 10L;
+    bt *= 10;
+    if ((int)bt == 0 ) npadzero++;
+    bt = bt - (int)bt;
   }
   b *= n;
   int ifrac = (int) b;
-  printf("a is %f\n",a);
-  printf("ia is %d\n",ia);
-  printf("b is %f\n",b);
-  printf("ifrac is %d\n",ifrac);
+  //printf("=======================\n");
+  //printf("a is %f\n",a);
+  //printf("ia is %d\n",ia);
+  //printf("b is %f\n",b);
+  //printf("ifrac is %d\n",ifrac);
+  //printf("=======================\n");
   int index = 0;
   int r = -1 ;
   int q = 0;
@@ -71,7 +99,7 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   }while(ia >0);
 
   *(cl+index) = '\0';
-  reverse(cl,ctmp);
+  reverse(cl,ctmp,sign,0);
 
   char ck[64]    = {'\0'};
   char ctmp1[64] = {'\0'};
@@ -88,7 +116,11 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   }while(ifrac >0);
 
   *(ck+index) = '\0';
-  reverse(ck,ctmp1);
+  if (sign > 0){
+    reverse(ck,ctmp1,sign,npadzero);
+  }else{
+    reverse(ck,ctmp1,-sign,npadzero);
+  }
 
   char *tmp = ctmp;
   while(*tmp != '\0'){
@@ -109,9 +141,6 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   
   return;
 }
-
-  
-
 
 int main(void){
   #if 0
@@ -137,11 +166,22 @@ int main(void){
   printf("%s\n",Str);
   printf("%s\n",RStr);
   #endif
-  float fa = 1233.87523687;
+  float fa = -12233.25;
   char cf[64] = {'\0'};
   floatostr(fa,cf,2);
   printf("%s\n",cf);
-  
+  fa = -0.0026;
+  char cf1[64] = {'\0'};
+  floatostr(fa,cf1,4);
+  printf("%s\n",cf1);
+  float dx = (2.0 * 3.145) / (1000);
+  for (int i=0; i < 1000; ++i){
+    char cf[64] = {'\0'};
+    floatostr(5.0*sin(i * dx),cf,4);
+    printf("%s\t\t%f\n",cf,5.0*sin(i * dx));
+    if ((i %10) == 0 )printf("\n");
+  }
+  printf("\n");
   return 0;
 }
 
