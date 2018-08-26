@@ -73,7 +73,7 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   float b = a - (float)ia;
   float bt = b;
   int hitnonzero = 0;
-  printf("b is %f\n",b);
+  //printf("b is %f\n",b);
   for(int i=0; i < nafterdecimalpoint;++i){
     n *= 10L;
     bt *= 10L;
@@ -178,11 +178,11 @@ int main(void){
   char cf1[64] = {'\0'};
   floatostr(fa,cf1,4);
   printf("%s\n",cf1);
-  float dx = (2.0 * 3.145) / (1000);
-  for (int i=0; i < 0; ++i){
+  float dx = (2.0 * 3.145) / (100000);
+  for (int i=0; i < 100000; ++i){
     char cf[64] = {'\0'};
-    floatostr(5.0*sin(i * dx),cf,4);
-    printf("%s\t\t%f\n",cf,5.0*sin(i * dx));
+    floatostr(5.0*sin(i * dx) *cos(i * dx) ,cf,4);
+    printf("%s\t\t%f\n",cf,5.0*sin(i * dx)*cos(i * dx));
     if ((i %10) == 0 )printf("\n");
   }
   printf("\n");
