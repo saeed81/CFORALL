@@ -54,7 +54,7 @@ void intostr(int a, char *st){
   
   *(cl+index) = '\0';
 
-  reverse(cl,st,sign,5);
+  reverse(cl,st,sign,0);
   
 }
 
@@ -72,11 +72,13 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   long long int n = 1;
   float b = a - (float)ia;
   float bt = b;
-  //printf("b is %f\n",b);
+  int hitnonzero = 0;
+  printf("b is %f\n",b);
   for(int i=0; i < nafterdecimalpoint;++i){
     n *= 10L;
-    bt *= 10;
-    if ((int)bt == 0 ) npadzero++;
+    bt *= 10L;
+    if (((int)bt == 0) && (hitnonzero == 0)) npadzero++;
+    if ((int)bt != 0 ) hitnonzero = 1;
     bt = bt - (int)bt;
   }
   b *= n;
@@ -168,15 +170,11 @@ int main(void){
   printf("%s\n",Str);
   printf("%s\n",RStr);
   #endif
-  char st[64] = {'\0'};
-  int kk = 89;
-  intostr(kk, st);
-  printf("%s\n",st);
   float fa = -12233.25;
   char cf[64] = {'\0'};
   floatostr(fa,cf,2);
   printf("%s\n",cf);
-  fa = -0.0026;
+  fa = 10.13074;
   char cf1[64] = {'\0'};
   floatostr(fa,cf1,4);
   printf("%s\n",cf1);
