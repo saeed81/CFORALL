@@ -14,15 +14,17 @@ void reverse(char *s, char *t, int sign, int npadzero){
     len++;
   }
   tmp--;
+
+  if (sign < 0){
+    *t = '-';
+    t++;
+  }
+
   while(npadzero--){
     *t = '0';
     t++;
   }
   
-  if (sign < 0){
-    *t = '-';
-    t++;
-  }
   while (len >0 ){
     *t = *tmp;
     tmp--;
@@ -52,7 +54,7 @@ void intostr(int a, char *st){
   
   *(cl+index) = '\0';
 
-  reverse(cl,st,sign,0);
+  reverse(cl,st,sign,5);
   
 }
 
@@ -166,6 +168,10 @@ int main(void){
   printf("%s\n",Str);
   printf("%s\n",RStr);
   #endif
+  char st[64] = {'\0'};
+  int kk = 89;
+  intostr(kk, st);
+  printf("%s\n",st);
   float fa = -12233.25;
   char cf[64] = {'\0'};
   floatostr(fa,cf,2);
@@ -175,7 +181,7 @@ int main(void){
   floatostr(fa,cf1,4);
   printf("%s\n",cf1);
   float dx = (2.0 * 3.145) / (1000);
-  for (int i=0; i < 1000; ++i){
+  for (int i=0; i < 0; ++i){
     char cf[64] = {'\0'};
     floatostr(5.0*sin(i * dx),cf,4);
     printf("%s\t\t%f\n",cf,5.0*sin(i * dx));
