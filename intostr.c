@@ -81,6 +81,8 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
     if ((int)bt != 0 ) hitnonzero = 1;
     bt = bt - (int)bt;
   }
+  if (nafterdecimalpoint == 1) npadzero = 0;
+
   b *= n;
   int ifrac = (int) b;
   //printf("=======================\n");
@@ -181,7 +183,7 @@ int main(void){
   float dx = (2.0 * 3.145) / (100000);
   for (int i=0; i < 100000; ++i){
     char cf[64] = {'\0'};
-    floatostr(5.0*sin(i * dx) *cos(i * dx) ,cf,4);
+    floatostr(5.0*sin(i * dx) *cos(i * dx) ,cf,1);
     printf("%s\t\t%f\n",cf,5.0*sin(i * dx)*cos(i * dx));
     if ((i %10) == 0 )printf("\n");
   }
