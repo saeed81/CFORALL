@@ -61,12 +61,12 @@ void intostr(int a, char *st){
 
 void floatostr(float a, char *str, int nafterdecimalpoint){
   int sign = 1;
-  int ia = (int) (a);
+  long long int ia = (long long int) (a);
   if (a < 0) {
     //printf("we are here\n");
     sign = -1;
     a = (-a);
-    ia = (int) (a);
+    ia = (long long int) (a);
   }
   int npadzero = 0;
   long long int n = 1;
@@ -77,14 +77,14 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   for(int i=0; i < nafterdecimalpoint;++i){
     n *= 10L;
     bt *= 10L;
-    if (((int)bt == 0) && (hitnonzero == 0)) npadzero++;
-    if ((int)bt != 0 ) hitnonzero = 1;
-    bt = bt - (int)bt;
+    if (((long long int)bt == 0) && (hitnonzero == 0)) npadzero++;
+    if ((long long int)bt != 0 ) hitnonzero = 1;
+    bt = bt - (long long int)bt;
   }
   if (nafterdecimalpoint == 1) npadzero = 0;
 
   b *= n;
-  int ifrac = (int) b;
+  long long int ifrac = (long long int) b;
   //printf("=======================\n");
   //printf("a is %f\n",a);
   //printf("ia is %d\n",ia);
@@ -92,8 +92,8 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   //printf("ifrac is %d\n",ifrac);
   //printf("=======================\n");
   int index = 0;
-  int r = -1 ;
-  int q = 0;
+  long long int r = -1 ;
+  long long int q = 0;
   char cl[64] = {'\0'};
   char ctmp[64] = {'\0'};
   do {
@@ -149,7 +149,13 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
 }
 
 int main(void){
-  #if 0
+
+  float aa = 12.1234567890;
+  char cf1[64] = {'\0'};
+  floatostr(aa,cf1,7);
+  printf("%0.8f\t\t%s\n",aa,cf1);
+  
+#if 0
   char st[64] = {'\0'};
   int kk = 123456789;
   intostr(kk, st);
@@ -171,7 +177,7 @@ int main(void){
   reverse(Str,RStr);
   printf("%s\n",Str);
   printf("%s\n",RStr);
-  #endif
+
   float fa = -12233.25;
   char cf[64] = {'\0'};
   floatostr(fa,cf,2);
@@ -187,6 +193,7 @@ int main(void){
     printf("%s\t\t%f\n",cf,5.0*sin(i * dx)*cos(i * dx));
     if ((i %10) == 0 )printf("\n");
   }
+#endif
   printf("\n");
   return 0;
 }
