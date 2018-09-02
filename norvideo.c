@@ -26,6 +26,25 @@ struct Colort{
   int ncol;
 };
 
+struct xdata {
+  Display *dsp;
+  int screen_num;
+  Window win;
+  GC gc;                                  
+};
+
+
+
+uint32 lenstring(char *str){
+  if (str == NULL) return 0U;
+  uint32 len = 0U;
+  while (*str != '\0'){
+    len++;
+    str++;
+  }
+  return len;
+}
+
 float minval(float *a, int n ){
   float mv = a[0];
   for (int i=1; i < n;++i){
@@ -148,7 +167,7 @@ void fillcolor(uint32 **pcolor, int *ncol){
   *ncol = ncount;
 }
 
-XImage *CreateTrueColorImage(Display *display, Visual *visual, uint8 *image, int width, int height)
+XImage *CreateTrueColorImage(Display *display, Visual *visual, int width, int height)
 {
   int i, j;
   char *p=image32;
@@ -189,12 +208,6 @@ void processEvent(Display *display, Window window, XImage *ximage, int width, in
     }
 }
 
-struct xdata {
-  Display *dsp;
-  int screen_num;
-  Window win;
-  GC gc;                                  
-};
 
 void reverse(char *s, char *t){
   
@@ -302,6 +315,12 @@ int main(void){
   XImage *ximage = NULL;
   uint32 *pimage = NULL;
 
+  char *title = "NEMO_NORDIC_NS02";
+  XSetForeground(dsp, gc, 0x0); // red
+  XDrawString(dsp, win, gc, 150, 150, title, lenstring(title));
+  XFlush(dsp);
+
+  
   for(;;){
     for (int k=0; k < NT;++k){
       //XClearWindow(dsp,win);
@@ -329,7 +348,10 @@ int main(void){
 	}
       }
       ximage = XCreateImage(dsp, visual, 24, ZPixmap, 0, image32, NX, NY, 32, 0);
-      XPutImage(dsp, win, DefaultGC(dsp, 0), ximage, 0, 0, 0, 0, NX, NY);
+      XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x000000ff); // red
+      XDrawString(dsp, win, gc, 150, 150, title, lenstring(title));
       XFlush(dsp);
       usleep(1000*10);
     }
