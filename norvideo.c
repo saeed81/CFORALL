@@ -3,10 +3,12 @@
 #include<X11/Xlib.h>
 #include<math.h>
 #include<unistd.h>
-#include <pthread.h>
-#include <netcdf.h>
-#include "colormaps_jet.h" 
-#include "colormaps_bright.h" 
+#include<pthread.h>
+#include<netcdf.h>
+#include"colormaps_jet.h" 
+#include"colormaps_bright.h" 
+#include"colormaps_detail.h"
+#include"colormaps_ssec.h"
 
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
 #define NX (619)
@@ -19,7 +21,7 @@ typedef unsigned char uint8;
 float  SSH[NX*NY]    = {0.0};
 uint8  image32[NX*NY*4] = {0};
 
-enum CLMAP {JET, BRIGHT, RED_BLUE,};
+enum CLMAP {JET, BRIGHT, RED_BLUE,DETAIL,SSEC,};
 
 struct Colort{
   float red, green, blue, alpha;
@@ -79,7 +81,9 @@ struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
   uint32 nt = 0;
   if (CLM == JET)    nt = ArrayCount(cmap_jet);
   if (CLM == BRIGHT) nt = ArrayCount(cmap_bright);
-  
+  if (CLM == DETAIL) nt = ArrayCount(cmap_detail);
+  if (CLM == SSEC)   nt = ArrayCount(cmap_ssec);
+  if (nt == 0) return NULL;
   struct Colort *scolor = NULL;
   scolor = (struct Colort *)malloc(sizeof(struct Colort)*nt);
   if (scolor == NULL){
@@ -101,6 +105,24 @@ struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
       scolor[ncount].red   = (float)(cmap_bright[i]) / 255.0;
       scolor[ncount].green = (float)(cmap_bright[i+1]) / 255.0;
       scolor[ncount].blue  = (float)(cmap_bright[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+  if (CLM == DETAIL){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_detail[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_detail[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_detail[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+  if (CLM == SSEC){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_ssec[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_ssec[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_ssec[i+2]) / 255.0;
       scolor[ncount].alpha  = 0.0;
       ncount++;
     }
@@ -307,11 +329,11 @@ int main(void){
   float value =0.0f;
 
   int ncolor = 0;
-  struct Colort *scolor = getcolorfromcolormap(BRIGHT,&ncolor);
+  struct Colort *scolor = getcolorfromcolormap(SSEC,&ncolor);
   
   if (scolor == NULL) return 1;
-  minv = -0.2;
-  maxv = 0.7;
+  minv = 0.0;
+  maxv = 0.0;
   XImage *ximage = NULL;
   uint32 *pimage = NULL;
 
@@ -337,6 +359,8 @@ int main(void){
 	  if (SSH[j*NX+i] == 1.e+20f) SSH[j*NX+i] = 0.0;
 	}
       }
+      if (k==0) minv = minvall(SSH, NX *NY);
+      if (k==0) maxv = maxvall(SSH, NX *NY);
       for (int j=0; j < NY; ++j){
 	for (int i=0; i < NX; ++i){
 	  value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
@@ -351,9 +375,9 @@ int main(void){
       XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x000000ff); // red
-      XDrawString(dsp, win, gc, 150, 150, title, lenstring(title));
+      XDrawString(dsp, win, gc, 10 + 8 *k, 100 , title, lenstring(title));
       XFlush(dsp);
-      usleep(1000*10);
+      //usleep(1000*200);
     }
   }
   nc_close(ncid);
