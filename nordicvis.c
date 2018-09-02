@@ -6,7 +6,10 @@
 #include <pthread.h>
 #include <netcdf.h>
 #include "colormaps_jet.h" 
-#include "colormaps_bright.h" 
+#include "colormaps_bright.h"
+#include "colormaps_detail.h"
+#include "colormaps_ssec.h"
+
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
 #define NX (619)
 #define NY (523)
@@ -16,7 +19,7 @@ typedef unsigned int  uint32;
 typedef unsigned char uint8;
 
 float  SSH[NX*NY]    = {0.0};
-enum CLMAP {JET, BRIGHT, RED_BLUE,};
+enum CLMAP {JET, BRIGHT, RED_BLUE,DETAIL,SSEC};
 
 struct Colort{
   float red, green, blue, alpha;
@@ -57,6 +60,8 @@ struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
   uint32 nt = 0;
   if (CLM == JET)    nt = ArrayCount(cmap_jet);
   if (CLM == BRIGHT) nt = ArrayCount(cmap_bright);
+  if (CLM == DETAIL) nt = ArrayCount(cmap_detail);
+  if (CLM == SSEC) nt = ArrayCount(cmap_ssec);
   
   struct Colort *scolor = NULL;
   scolor = (struct Colort *)malloc(sizeof(struct Colort)*nt);
@@ -83,6 +88,26 @@ struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
       ncount++;
     }
   }
+  if (CLM == DETAIL){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_detail[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_detail[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_detail[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+  if (CLM == SSEC){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_ssec[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_ssec[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_ssec[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+
+  
   *ncol = ncount;
   return scolor;
 }
@@ -320,15 +345,17 @@ int main(void){
   for(;;){XEvent e; XNextEvent(dsp,&e); if(e.type == MapNotify) break;} //Wait for the MapNotify event  
   XFlush(dsp);
   gc = XCreateGC(dsp, win, 0, NULL);
+
   float minv = 0.0f, maxv = 0.0f;
   uint8 ured = 0x0, ugreen = 0x0, ublue = 0x0, ualpha = 0x0;
   uint32 pcolor = 0x0;
   float value =0.0f;
 
   int ncolor = 0;
-  struct Colort *scolor = getcolorfromcolormap(BRIGHT,&ncolor);
+  struct Colort *scolor = getcolorfromcolormap(SSEC,&ncolor);
   
   if (scolor == NULL) return 1;
+
   minv = -0.2;
   maxv = 0.7;
 
@@ -352,7 +379,7 @@ int main(void){
 	value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
 	getrgbpoint(&value,scolor, ncolor, &ured, &ugreen, &ublue);
 	pcolor = 0x0;
-	pcolor = (((uint32)ured << 16) | ((uint32)ugreen << 8) | ((uint32)ublue) |  ((uint32)ualpha << 24));  
+	pcolor |= (((uint32)ured << 16) | ((uint32)ugreen << 8) | ((uint32)ublue) |  ((uint32)ualpha << 24));  
 	if (SSH[(NY -j -1)*NX+i] == 0.0) pcolor=0xffffffff;
 	XSetForeground(dsp, gc, pcolor);
 	XDrawPoint(dsp,win,gc,i,j);
