@@ -313,7 +313,7 @@ int main(void){
   screen_num = DefaultScreen(dsp);
   Visual *visual=DefaultVisual(dsp, 0);
   win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,0,0x0,0x0);
-  XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask);        // We want to get MapNotify events  
+  XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask | ButtonPressMask | PointerMotionMask);        // We want to get MapNotify events  
 
   XGCValues gr_values;
   XFontStruct *fontinfo = XLoadQueryFont(dsp,"-adobe-times-bold-r-normal--18-180-75-75-p-99-iso8859-9");
@@ -327,7 +327,7 @@ int main(void){
   // "Map" the window (that is, make it appear on the screen)                                                                                                                     
   for(;;){XEvent e; XNextEvent(dsp,&e); if(e.type == MapNotify) break;} //Wait for the MapNotify event  
   XFlush(dsp);
-  
+  //printf("Xpending %d\n",XPending(dsp));
   float minv = 0.0f, maxv = 0.0f;
   uint8 ured = 0x0, ugreen = 0x0, ublue = 0x0, ualpha = 0x0;
   uint32 pcolor = 0x0;
@@ -341,25 +341,23 @@ int main(void){
   maxv = 0.0;
   XImage *ximage = NULL;
   uint32 *pimage = NULL;
-
   char *title = "NEMO_NORDIC_NS02";
-  XSetForeground(dsp, gc, 0x0); // red
-  XDrawString(dsp, win, gc, 150, 150, title, lenstring(title));
-  XFlush(dsp);
-
-  
-  for(;;){
-    for (int k=0; k < NT;++k){
-      XBell(dsp, 0);
-      //XClearWindow(dsp,win);
-      pimage = (uint32 *)image32; 
-      start[0] = k;
-      start[1] = 0;
-      start[2] = 0;
-      count[0] = 1;
-      count[1] = NY;
-      count[2] = NX;
-      nc_get_vara(ncid, issh,  start,count, SSH);
+  XEvent e;
+  int done = 1;
+  int k = 0;
+  for(;done;){
+    //printf("Xpending %d\n",XPending(dsp));
+     if (XPending(dsp) == 0){
+       //XClearWindow(dsp,win);
+       k= 0;
+       pimage = (uint32 *)image32; 
+       start[0] = k;
+       start[1] = 0;
+       start[2] = 0;
+       count[0] = 1;
+       count[1] = NY;
+       count[2] = NX;
+       nc_get_vara(ncid, issh,  start,count, SSH);
       for (int j=0; j < NY; ++j){
 	for (int i=0; i < NX; ++i){
 	  if (SSH[j*NX+i] == 1.e+20f) SSH[j*NX+i] = 0.0;
@@ -389,6 +387,7 @@ int main(void){
 	  *pimage++ = pcolor;
 	}
       }
+      printf("kt %d \n",k);
       ximage = XCreateImage(dsp, visual, 24, ZPixmap, 0, image32, NX, NY, 32, 0);
       XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
       XFlush(dsp);
@@ -404,13 +403,102 @@ int main(void){
       XSetForeground(dsp, gc, 0x00ff0000); // red
       XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
       XFlush(dsp);
-      
-      
       //usleep(1000*200);
-    }
+     }
+     else {
+       XNextEvent (dsp,&e);
+       if (e.type == KeyPress){
+	 k = 0;
+	 for (;;){
+	   //XClearWindow(dsp,win);
+	   pimage = (uint32 *)image32; 
+	     start[0] = k;
+	     start[1] = 0;
+	     start[2] = 0;
+	     count[0] = 1;
+	     count[1] = NY;
+	     count[2] = NX;
+	     nc_get_vara(ncid, issh,  start,count, SSH);
+	     for (int j=0; j < NY; ++j){
+	       for (int i=0; i < NX; ++i){
+	  if (SSH[j*NX+i] == 1.e+20f) SSH[j*NX+i] = 0.0;
+	}
+      }
+      minv = minvall(SSH, NX *NY);
+      maxv = maxvall(SSH, NX *NY);
+      char ckt[64]  = {'\0'};
+      char cmin[64] = {'\0'};
+      char cmax[64] = {'\0'};
+      intostr(k,ckt);
+      floatostr(minv,cmin,4);
+      floatostr(maxv,cmax,4);
+      char infomin[128] = {'\0'};
+      char infomax[128] = {'\0'};
+      char infokt[128]  = {'\0'};
+      writetostring(infokt,StringArrayCount(infokt),"it :",ckt,NULL);
+      writetostring(infomin,StringArrayCount(infomin),"Min :",cmin,NULL);
+      writetostring(infomax,StringArrayCount(infomax),"Max :",cmax,NULL);
+      for (int j=0; j < NY; ++j){
+	for (int i=0; i < NX; ++i){
+	  value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
+	  getrgbpoint(&value,scolor, ncolor, &ured, &ugreen, &ublue);
+	  pcolor = 0x0;
+	  pcolor = (((uint32)ured << 16) | ((uint32)ugreen << 8) | ((uint32)ublue) |  ((uint32)ualpha << 24));  
+	  if (SSH[(NY -j -1)*NX+i] == 0.0) pcolor=0xffffffff;
+	  *pimage++ = pcolor;
+	}
+      }
+      printf("kt %d \n",k);
+      ximage = XCreateImage(dsp, visual, 24, ZPixmap, 0, image32, NX, NY, 32, 0);
+      XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x000000ff); // red
+      XDrawString(dsp, win, gc, 125 , 150  , title, lenstring(title));
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x0000ffff); // red
+      XDrawString(dsp, win, gc, 10 , 50,  infokt, lenstring(infokt));
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x00000000); // red
+      XDrawString(dsp, win, gc, 60 , 50,  infomin, lenstring(infomin));
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x00ff0000); // red
+      XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
+      XFlush(dsp);
+      k++;
+      int ipend = XPending(dsp);
+      printf("ipend is %d\n",ipend);
+      if (ipend >= 1){
+	XNextEvent(dsp,&e);
+      if (e.type == ButtonPress ){
+	printf("ButtonPress is detected\n");
+	printf("ButtonPress is detected\n %d %d\n",e.xbutton.x,e.xbutton.y);
+	
+	XFlush(dsp);
+	usleep(1000*1000);
+      }
+      
+      }
+      if (k == NT) k = 0;
+      //usleep(1000*200);
+	 }
+       }
+     }
   }
   nc_close(ncid);
   XFlush(dsp);
-
+  free(scolor);
+  XCloseDisplay(dsp);
+  
   return 0;
 }
+
+
+#if 0
+int paused = 0;
+while(1)  {
+  if ((0==XPending(dsp))&&(0==paused))
+    update();
+  else
+    {
+      XNextEvent(display,&report);
+#endif      
