@@ -5,12 +5,16 @@
 #include<unistd.h>
 #include<pthread.h>
 #include<netcdf.h>
+#include<stdarg.h>
 #include"colormaps_jet.h" 
 #include"colormaps_bright.h" 
 #include"colormaps_detail.h"
 #include"colormaps_ssec.h"
+#include"intostr.c"
 
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
+#define StringArrayCount(a) (ArrayCount(a) -1)
+
 #define NX (619)
 #define NY (523)
 #define NT  (31)
@@ -46,6 +50,37 @@ uint32 lenstring(char *str){
   }
   return len;
 }
+
+void writetostring(char *buffer, int N, char *str,...){
+  if (str == NULL) return;
+  va_list vv;
+  va_start(vv,str);
+  char *tmp = buffer;
+  int counter = 0;
+  while(*str!='\0'){
+    if (counter < N){
+      *tmp = *str;
+      tmp++;
+    }
+    counter++;
+    str++;
+  }
+  while((str=va_arg(vv,char *)) != NULL){
+    while(*str!='\0'){
+      if (counter < N ){
+	*tmp = *str;
+	tmp++;
+      }
+      counter++;
+      str++;
+    }
+  }
+  va_end(vv);
+  return;
+}
+
+
+
 
 float minval(float *a, int n ){
   float mv = a[0];
@@ -229,45 +264,6 @@ void processEvent(Display *display, Window window, XImage *ximage, int width, in
       exit(0);
     }
 }
-
-
-void reverse(char *s, char *t){
-  
-  char *tmp = s;
-  int len = 0;
-  while (*tmp !='\0' ){
-    tmp++;
-    len++;
-  }
-  tmp--;
-  while (len >0 ){
-    *t = *tmp;
-    tmp--;
-    len--;
-    t++;
-  }
-}
-
-void intostr(int a, char *st){
-  
-  int index = 0;
-  int r = -1 ;
-  int q = 0;
-  char cl[64] = {'\0'};
-  do {
-    r = a % 10;
-    q = (a - r) / 10;
-    *(cl+index) = (char)(r+'0');
-    a = q;
-    index++;
-  }while(a >0);
-  
-  *(cl+index) = '\0';
-
-  reverse(cl,st);
-  
-}
-
 void *myThreadFun(void *vargp){
   
   struct xdata *xd = (struct xdata *)vargp; 
@@ -318,11 +314,20 @@ int main(void){
   Visual *visual=DefaultVisual(dsp, 0);
   win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,0,0x0,0x0);
   XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask);        // We want to get MapNotify events  
+
+  XGCValues gr_values;
+  XFontStruct *fontinfo = XLoadQueryFont(dsp,"-adobe-times-bold-r-normal--18-180-75-75-p-99-iso8859-9");
+  gr_values.font =   fontinfo->fid;
+  gr_values.function =   GXcopy;
+  gr_values.plane_mask = AllPlanes;
+  gr_values.foreground = BlackPixel(dsp,screen_num);
+  gr_values.background = WhitePixel(dsp,screen_num);
+  gc=XCreateGC(dsp,win,GCFont | GCFunction | GCPlaneMask | GCForeground | GCBackground,&gr_values);
   XMapWindow(dsp, win);
   // "Map" the window (that is, make it appear on the screen)                                                                                                                     
   for(;;){XEvent e; XNextEvent(dsp,&e); if(e.type == MapNotify) break;} //Wait for the MapNotify event  
   XFlush(dsp);
-  gc = XCreateGC(dsp, win, 0, NULL);
+  
   float minv = 0.0f, maxv = 0.0f;
   uint8 ured = 0x0, ugreen = 0x0, ublue = 0x0, ualpha = 0x0;
   uint32 pcolor = 0x0;
@@ -345,6 +350,7 @@ int main(void){
   
   for(;;){
     for (int k=0; k < NT;++k){
+      XBell(dsp, 0);
       //XClearWindow(dsp,win);
       pimage = (uint32 *)image32; 
       start[0] = k;
@@ -359,8 +365,20 @@ int main(void){
 	  if (SSH[j*NX+i] == 1.e+20f) SSH[j*NX+i] = 0.0;
 	}
       }
-      if (k==0) minv = minvall(SSH, NX *NY);
-      if (k==0) maxv = maxvall(SSH, NX *NY);
+      minv = minvall(SSH, NX *NY);
+      maxv = maxvall(SSH, NX *NY);
+      char ckt[64]  = {'\0'};
+      char cmin[64] = {'\0'};
+      char cmax[64] = {'\0'};
+      intostr(k,ckt);
+      floatostr(minv,cmin,4);
+      floatostr(maxv,cmax,4);
+      char infomin[128] = {'\0'};
+      char infomax[128] = {'\0'};
+      char infokt[128]  = {'\0'};
+      writetostring(infokt,StringArrayCount(infokt),"it :",ckt,NULL);
+      writetostring(infomin,StringArrayCount(infomin),"Min :",cmin,NULL);
+      writetostring(infomax,StringArrayCount(infomax),"Max :",cmax,NULL);
       for (int j=0; j < NY; ++j){
 	for (int i=0; i < NX; ++i){
 	  value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
@@ -375,8 +393,19 @@ int main(void){
       XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x000000ff); // red
-      XDrawString(dsp, win, gc, 10 + 8 *k, 100 , title, lenstring(title));
+      XDrawString(dsp, win, gc, 125 , 150  , title, lenstring(title));
       XFlush(dsp);
+      XSetForeground(dsp, gc, 0x0000ffff); // red
+      XDrawString(dsp, win, gc, 10 , 50,  infokt, lenstring(infokt));
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x00000000); // red
+      XDrawString(dsp, win, gc, 60 , 50,  infomin, lenstring(infomin));
+      XFlush(dsp);
+      XSetForeground(dsp, gc, 0x00ff0000); // red
+      XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
+      XFlush(dsp);
+      
+      
       //usleep(1000*200);
     }
   }
