@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include <netcdf.h>
 #include "colormaps_jet.h" 
-
+#include "colormaps_bright.h" 
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
 #define NX (619)
 #define NY (523)
@@ -54,8 +54,10 @@ void colortoRGBA(uint32 color, uint8 *red, uint8 *green, uint8 *blue, uint8 *alp
 }
 
 struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
+  uint32 nt = 0;
+  if (CLM == JET)    nt = ArrayCount(cmap_jet);
+  if (CLM == BRIGHT) nt = ArrayCount(cmap_bright);
   
-  uint32 nt = ArrayCount(cmap_jet);
   struct Colort *scolor = NULL;
   scolor = (struct Colort *)malloc(sizeof(struct Colort)*nt);
   if (scolor == NULL){
@@ -68,6 +70,15 @@ struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
       scolor[ncount].red   = (float)(cmap_jet[i]) / 255.0;
       scolor[ncount].green = (float)(cmap_jet[i+1]) / 255.0;
       scolor[ncount].blue  = (float)(cmap_jet[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+  if (CLM == BRIGHT){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_bright[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_bright[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_bright[i+2]) / 255.0;
       scolor[ncount].alpha  = 0.0;
       ncount++;
     }
@@ -289,7 +300,7 @@ int main(void){
   int ncid  = 0;
   int  issh = 0;
   char *filename  =  "sst_ssh.nc";
-  char *varname   =  "SST";
+  char *varname   =  "SSH_inst";
   size_t iassh[3] = {0,0,0};
   size_t start[3] = {0,0,0};
   size_t count[3] = {0,0,0};
@@ -315,11 +326,11 @@ int main(void){
   float value =0.0f;
 
   int ncolor = 0;
-  struct Colort *scolor = getcolorfromcolormap(JET,&ncolor);
+  struct Colort *scolor = getcolorfromcolormap(BRIGHT,&ncolor);
   
   if (scolor == NULL) return 1;
-  minv = 0.0;
-  maxv = 20.0;
+  minv = -0.2;
+  maxv = 0.7;
 
   for(;;){
   for (int k=0; k < NT;++k){
