@@ -5,19 +5,101 @@
 #include<unistd.h>
 #include <pthread.h>
 #include <netcdf.h>
-#include "colormaps_blue_red.h"
-#include "colormaps_bright.h"
+#include "colormaps_jet.h" 
 
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
+#define NX (619)
+#define NY (523)
+#define NT  (31)
 
 typedef unsigned int  uint32;
 typedef unsigned char uint8;
 
-#define NX (1238)
-#define NY (1046)
-#define NT  (726)
-float          SSH[NX*NY]    = {0.0};
-unsigned long CSSH[NX*NY]    = {0};
+float  SSH[NX*NY]    = {0.0};
+enum CLMAP {JET, BRIGHT, RED_BLUE,};
+
+struct Colort{
+  float red, green, blue, alpha;
+  int ncol;
+};
+
+float minval(float *a, int n ){
+  float mv = a[0];
+  for (int i=1; i < n;++i){
+    if (a[i] <= mv) mv = a[i];
+  }
+  return mv;
+}
+
+float maxval(float *a, int n){
+  float mv = a[0];
+  for (int i=1; i < n;++i){
+    if (a[i] >= mv) mv = a[i];
+  }
+  return mv;
+}
+
+void colortoRGBA(uint32 color, uint8 *red, uint8 *green, uint8 *blue, uint8 *alpha){
+
+  *red = 0x0;
+  *green = 0x0;
+  *blue = 0x0;
+  *alpha = 0x0;
+
+  *alpha = (color >> 24) & (0xff);
+  *red   = (color >> 16) & (0xff);
+  *green = (color >> 8) & (0xff);
+  *blue  = (color) & (0xff);
+  return;
+}
+
+struct Colort *getcolorfromcolormap(enum CLMAP CLM, int *ncol){
+  
+  uint32 nt = ArrayCount(cmap_jet);
+  struct Colort *scolor = NULL;
+  scolor = (struct Colort *)malloc(sizeof(struct Colort)*nt);
+  if (scolor == NULL){
+    *ncol = 0;
+    return NULL;
+  }
+  int ncount = 0;
+  if (CLM == JET){
+    for (size_t i= 0; i < (nt-2); i += 3){
+      scolor[ncount].red   = (float)(cmap_jet[i]) / 255.0;
+      scolor[ncount].green = (float)(cmap_jet[i+1]) / 255.0;
+      scolor[ncount].blue  = (float)(cmap_jet[i+2]) / 255.0;
+      scolor[ncount].alpha  = 0.0;
+      ncount++;
+    }
+  }
+  *ncol = ncount;
+  return scolor;
+}
+
+void getrgbpoint(float *value, struct Colort *scolor, int nc, uint8 *red, uint8 *green, uint8 *blue){
+  if (scolor == NULL) return;
+  if (nc == 0 ) return;
+  float zred = 0.0, zgreen = 0.0, zblue = 0.0; 
+  int idx1;                 
+  int idx2;                
+  float fractBetween = 0;  
+  if(*value <= 0.0){  idx1 = idx2 = 0;}    
+  else if(*value >= 1.0){idx1 = idx2 = nc-1; }   
+  else{
+    *value = *value * (nc);        
+    idx1  = floor(*value);          
+    idx2  = idx1+1;                
+    fractBetween = *value - (float)(idx1); 
+    if (idx1 >= (nc-1) ){ idx1 = (nc-1); idx2 = (nc-1);} 
+    if (idx2 > (nc-1) ) idx2 = (nc-1);
+  }
+  zred   = (scolor[idx2].red   - scolor[idx1].red  )*fractBetween + scolor[idx1].red;
+  zgreen = (scolor[idx2].green - scolor[idx1].green)*fractBetween + scolor[idx1].green;
+  zblue  = (scolor[idx2].blue  - scolor[idx1].blue )*fractBetween + scolor[idx1].blue;
+  *red   = (uint8 )(zred * 255.0);
+  *green = (uint8 )(zgreen * 255.0);
+  *blue  = (uint8 )(zblue * 255.0);
+}
 
 float minvall(float *a, long int n ){
   float mv = a[0];
@@ -35,27 +117,22 @@ float maxvall(float *a, long int n){
   return mv;
 }
 
-void fillcolor(void){
+void fillcolor(uint32 **pcolor, int *ncol){
   uint8 red = 0x0, green = 0x0, blue = 0x0, alpha = 0x0;
-  uint32 *color = NULL;
-  uint32 nt = ArrayCount(cmap_bright);
-  color = (uint32 *)malloc(nt * sizeof(uint32));
+  uint32 nt = 0;
+  *pcolor = (uint32 *)malloc(nt * sizeof(uint32));
+  if (*pcolor == NULL) return;
   int ncount = 0;
   for (size_t i= 0; i < (nt-2); i += 3){
-    color[ncount] = 0;
-    red   = cmap_bright[i];
-    green = cmap_bright[i+1];
-    blue  = cmap_bright[i+2];
-    color[ncount] = (((uint32)red << 16) | ((uint32)green << 8) | ((uint32)blue) | (uint32)alpha<<24);
+    *pcolor[ncount] = 0;
+    red   = cmap_jet[i];
+    green = cmap_jet[i+1];
+    blue  = cmap_jet[i+2];
+    *pcolor[ncount] = (((uint32)red << 16) | ((uint32)green << 8) | ((uint32)blue) | (uint32)alpha<<24);
     ncount++;
   }
-  for (int j=0; j < NY;++j){
-    for (int i=0; i < NX;++i){
-      CSSH[j*NX + i] = color[(j*NX + i) %ncount];
-    }
-  }
+  *ncol = ncount;
 }
-
 
 XImage *CreateTrueColorImage(Display *display, Visual *visual, unsigned char *image, int width, int height)
 {
@@ -211,51 +288,40 @@ int main(void){
  
   int ncid  = 0;
   int  issh = 0;
-  char *filename  =  "abborre_ssh.nc";
-  char *varname   =  "SSH_inst";
+  char *filename  =  "sst_ssh.nc";
+  char *varname   =  "SST";
   size_t iassh[3] = {0,0,0};
   size_t start[3] = {0,0,0};
   size_t count[3] = {0,0,0};
   nc_open(filename,NC_NOWRITE,&ncid);
   nc_inq_varid(ncid, varname, &issh);
-  int no_fill;
-  float fill_valuep;
-  nc_inq_var_fill(ncid, issh, &no_fill, &fill_valuep);
-  printf("%d %e\n",no_fill, fill_valuep);
+  
   Display *dsp;
   Window win;
   int screen_num;
   GC gc;                                /* handle of newly created GC.  */
-  unsigned long valuemask = 0;          /* which values in 'values' to  */
-  XGCValues values;
-  Pixmap pixmap;
   dsp = XOpenDisplay((char *)0);
   screen_num = DefaultScreen(dsp);
-  win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,2,0x0,0x00ffff00);
+  win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,0,0x0,0x00ffffff);
   XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask);        // We want to get MapNotify events  
   XMapWindow(dsp, win);
   // "Map" the window (that is, make it appear on the screen)                                                                                                                     
   for(;;){XEvent e; XNextEvent(dsp,&e); if(e.type == MapNotify) break;} //Wait for the MapNotify event  
   XFlush(dsp);
-  XColor color;
-  int depth = DefaultDepth(dsp,screen_num); 
-  pixmap = XCreatePixmap(dsp,win,NX,NY,depth);  
-  color.pixel = 0x000000ff;
   gc = XCreateGC(dsp, win, 0, NULL);
-  XSetForeground(dsp, gc, 0xffffffff);
-  unsigned int line_width = 3;          /* line width for the GC.       */
-  int line_style = LineSolid;           /* style for lines drawing and  */
-  int cap_style = CapButt;              /* style of the line's edje and */
-  int join_style = JoinBevel;           /*  joined lines.               */
-  XSetLineAttributes(dsp, gc,line_width, line_style, cap_style, join_style);
-  int ncount = 0;
-  //pixmap = XCreatePixmapFromBitmapData(dsp,win, alien_bits,NX, NY,0xffffffff,0,depth);
-  //XCopyArea ( dsp, pixmap, win,gc, 0, 0, NX, NY,0, 0);
-  fillcolor();
   float minv = 0.0f, maxv = 0.0f;
-  unsigned long pcolor = 0;
-  float dis = 0.0f;
+  uint8 ured = 0x0, ugreen = 0x0, ublue = 0x0, ualpha = 0x0;
+  uint32 pcolor = 0x0;
+  float value =0.0f;
+
+  int ncolor = 0;
+  struct Colort *scolor = getcolorfromcolormap(JET,&ncolor);
   
+  if (scolor == NULL) return 1;
+  minv = 0.0;
+  maxv = 20.0;
+
+  for(;;){
   for (int k=0; k < NT;++k){
     //XClearWindow(dsp,win);
     start[0] = k;
@@ -270,23 +336,23 @@ int main(void){
 	if (SSH[j*NX+i] == 1.e+20f) SSH[j*NX+i] = 0.0;
       }
     }
-    minv = minvall(SSH,NX*NY);
-    maxv = maxvall(SSH,NX*NY);
-    printf("maxval is %f\n",maxv);
     for (int j=0; j < NY;++j){
       for (int i=0; i < NX;++i){
-	dis = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
-	pcolor = (unsigned long)((1.0 -dis) * CSSH[0] + dis *CSSH[NX*NY-1]);
-	if (SSH[(NY -j -1)*NX+i] == 0.0) pcolor=0x0;
+	value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
+	getrgbpoint(&value,scolor, ncolor, &ured, &ugreen, &ublue);
+	pcolor = 0x0;
+	pcolor = (((uint32)ured << 16) | ((uint32)ugreen << 8) | ((uint32)ublue) |  ((uint32)ualpha << 24));  
+	if (SSH[(NY -j -1)*NX+i] == 0.0) pcolor=0xffffffff;
 	XSetForeground(dsp, gc, pcolor);
 	XDrawPoint(dsp,win,gc,i,j);
 	XFlush(dsp);
       }
     }
   }
+  }
   nc_close(ncid);
   XFlush(dsp);
-  for(;;);
+
   return 0;
 }
   
