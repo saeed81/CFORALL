@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<X11/Xlib.h>
+#include<X11/keysym.h>
 #include<math.h>
 #include<unistd.h>
 #include<pthread.h>
@@ -317,6 +318,7 @@ int main(void){
 
   XGCValues gr_values;
   XFontStruct *fontinfo = XLoadQueryFont(dsp,"-adobe-times-bold-r-normal--18-180-75-75-p-99-iso8859-9");
+  //XFontStruct *fontinfo = XLoadQueryFont(dsp,"10x20");
   gr_values.font =   fontinfo->fid;
   gr_values.function =   GXcopy;
   gr_values.plane_mask = AllPlanes;
@@ -345,6 +347,7 @@ int main(void){
   XEvent e;
   int done = 1;
   int k = 0;
+  int countertext = 0;
   for(;done;){
     //printf("Xpending %d\n",XPending(dsp));
      if (XPending(dsp) == 0){
@@ -374,9 +377,9 @@ int main(void){
       char infomin[128] = {'\0'};
       char infomax[128] = {'\0'};
       char infokt[128]  = {'\0'};
-      writetostring(infokt,StringArrayCount(infokt),"it :",ckt,NULL);
-      writetostring(infomin,StringArrayCount(infomin),"Min :",cmin,NULL);
-      writetostring(infomax,StringArrayCount(infomax),"Max :",cmax,NULL);
+      writetostring(infokt,StringArrayCount(infokt),"it : ",ckt,NULL);
+      writetostring(infomin,StringArrayCount(infomin),"Min : ",cmin,NULL);
+      writetostring(infomax,StringArrayCount(infomax),"Max : ",cmax,NULL);
       for (int j=0; j < NY; ++j){
 	for (int i=0; i < NX; ++i){
 	  value = (SSH[(NY -j -1)*NX+i] - minv) / (maxv - minv);
@@ -387,10 +390,11 @@ int main(void){
 	  *pimage++ = pcolor;
 	}
       }
-      printf("kt %d \n",k);
+      //printf("kt %d \n",k);
       ximage = XCreateImage(dsp, visual, 24, ZPixmap, 0, image32, NX, NY, 32, 0);
       XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
       XFlush(dsp);
+      if (countertext == 0){
       XSetForeground(dsp, gc, 0x000000ff); // red
       XDrawString(dsp, win, gc, 125 , 150  , title, lenstring(title));
       XFlush(dsp);
@@ -403,13 +407,26 @@ int main(void){
       XSetForeground(dsp, gc, 0x00ff0000); // red
       XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
       XFlush(dsp);
+      }
+      countertext++;
+      if (countertext >= 1000 && k == 0) countertext = 0;
       //usleep(1000*200);
      }
      else {
        XNextEvent (dsp,&e);
        if (e.type == KeyPress){
-	 k = 0;
-	 for (;;){
+	 int buffer_size = 80;
+	 char buffer[80] = {'\0'};
+	 KeySym keysym;
+	 /* XComposeStatus compose; is not used, though it's in some books */
+	 int icount = XLookupString(&e,buffer,(buffer_size)-1, &keysym);
+	 
+	 if ((buffer[0] == 'q') || ( buffer[0]== 'Q') ){
+	   done =0;
+	   break;
+	 }else{
+	   k = 0;
+	   for (;;){
 	   //XClearWindow(dsp,win);
 	   pimage = (uint32 *)image32; 
 	     start[0] = k;
@@ -448,7 +465,7 @@ int main(void){
 	  *pimage++ = pcolor;
 	}
       }
-      printf("kt %d \n",k);
+      //printf("kt %d \n",k);
       ximage = XCreateImage(dsp, visual, 24, ZPixmap, 0, image32, NX, NY, 32, 0);
       XPutImage(dsp, win, gc, ximage, 0, 0, 0, 0, NX, NY);
       XFlush(dsp);
@@ -466,20 +483,30 @@ int main(void){
       XFlush(dsp);
       k++;
       int ipend = XPending(dsp);
-      printf("ipend is %d\n",ipend);
+      //printf("ipend is %d\n",ipend);
       if (ipend >= 1){
 	XNextEvent(dsp,&e);
       if (e.type == ButtonPress ){
-	printf("ButtonPress is detected\n");
+	//printf("ButtonPress is detected\n");
 	printf("ButtonPress is detected\n %d %d\n",e.xbutton.x,e.xbutton.y);
-	
 	XFlush(dsp);
-	usleep(1000*1000);
+      }
+      if (e.type == KeyPress ){
+	int buffer_size = 80;
+	char buffer[80] = {'\0'};
+	KeySym keysym;
+	/* XComposeStatus compose; is not used, though it's in some books */
+	int icount = XLookupString(&e,buffer,(buffer_size)-1, &keysym);
+	if ((buffer[0] == 'q') || ( buffer[0]== 'Q') ){
+	  done = 0;
+	  break;
+	}
       }
       
       }
       if (k == NT) k = 0;
       //usleep(1000*200);
+	   }
 	 }
        }
      }
@@ -487,18 +514,9 @@ int main(void){
   nc_close(ncid);
   XFlush(dsp);
   free(scolor);
+  XFreeGC(dsp,gc);
+  XDestroyWindow(dsp,win);
   XCloseDisplay(dsp);
   
   return 0;
 }
-
-
-#if 0
-int paused = 0;
-while(1)  {
-  if ((0==XPending(dsp))&&(0==paused))
-    update();
-  else
-    {
-      XNextEvent(display,&report);
-#endif      
