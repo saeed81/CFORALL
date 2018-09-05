@@ -7,6 +7,7 @@
 #include<pthread.h>
 #include<netcdf.h>
 #include<stdarg.h>
+#include<time.h>
 #include"colormaps_jet.h" 
 #include"colormaps_bright.h" 
 #include"colormaps_detail.h"
@@ -313,7 +314,7 @@ int main(void){
   dsp = XOpenDisplay((char *)0);
   screen_num = DefaultScreen(dsp);
   Visual *visual=DefaultVisual(dsp, 0);
-  win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,0,0x0,0x0);
+  win    = XCreateSimpleWindow (dsp, DefaultRootWindow (dsp),0, 0, NX,NY,0,0xffffffff,0xffffffff);
   XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask | ButtonPressMask | PointerMotionMask);        // We want to get MapNotify events  
 
   XGCValues gr_values;
@@ -425,10 +426,12 @@ int main(void){
 	   done =0;
 	   break;
 	 }else{
-	   k = 0;
+	     k = 0;
 	   for (;;){
-	   //XClearWindow(dsp,win);
-	   pimage = (uint32 *)image32; 
+	     clock_t t1;
+	     t1 = clock();
+	     //XClearWindow(dsp,win);
+	     pimage = (uint32 *)image32; 
 	     start[0] = k;
 	     start[1] = 0;
 	     start[2] = 0;
@@ -479,33 +482,54 @@ int main(void){
       XDrawString(dsp, win, gc, 60 , 50,  infomin, lenstring(infomin));
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x00ff0000); // red
-      XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
+      XDrawString(dsp, win, gc, 200 , 50 , infomax, lenstring(infomax));
       XFlush(dsp);
-      k++;
+      clock_t t2 = clock();
+      float time_taken = ((float)(t2 -t1))/CLOCKS_PER_SEC; // in seconds
+      char msec[128] = {'\0'};
+      floatostr(time_taken*1.0e3,msec,6);
+      char secperframe[128]  = {'\0'};
+      writetostring(secperframe,StringArrayCount(secperframe),"msec : ",msec,NULL);
+      XSetForeground(dsp, gc, 0x00ff0000); // red
+      XDrawString(dsp, win, gc, 400 , 450 , secperframe, lenstring(secperframe));
+      XFlush(dsp);
       int ipend = XPending(dsp);
       //printf("ipend is %d\n",ipend);
       if (ipend >= 1){
-	XNextEvent(dsp,&e);
-      if (e.type == ButtonPress ){
-	//printf("ButtonPress is detected\n");
-	printf("ButtonPress is detected\n %d %d\n",e.xbutton.x,e.xbutton.y);
-	XFlush(dsp);
-      }
-      if (e.type == KeyPress ){
-	int buffer_size = 80;
-	char buffer[80] = {'\0'};
-	KeySym keysym;
-	/* XComposeStatus compose; is not used, though it's in some books */
-	int icount = XLookupString(&e,buffer,(buffer_size)-1, &keysym);
-	if ((buffer[0] == 'q') || ( buffer[0]== 'Q') ){
-	  done = 0;
-	  break;
+	//printf("we break at k %d\n",ipend);
+	//XSync(dsp,True);
+	for (int ii=0; ii < ipend;++ii){
+	  XNextEvent(dsp,&e);
+	  if (e.type == ButtonPress ){
+	//XSync(dsp,True);
+	    printf("it %3d y %3d x %3d SSH(%3d,%3d,%3d) = %f\n",k,e.xbutton.y,e.xbutton.x,k,e.xbutton.y,e.xbutton.x,SSH[(NY -e.xbutton.y -1)*NX+e.xbutton.x]);
+	    XFlush(dsp);
+	    break;
+	  }
+	  else{
+	    XFlush(dsp);
+	  }
 	}
       }
+      k++;
+      //if (e.type == KeyPress ){
+      //int buffer_size = 80;
+      //char buffer[80] = {'\0'};
+      //KeySym keysym;
+	/* XComposeStatus compose; is not used, though it's in some books */
+	//int icount = XLookupString(&e,buffer,(buffer_size)-1, &keysym);
+	//if ((buffer[0] == 'q') || ( buffer[0]== 'Q') ){
+      //done = 0;
+      //  break;
+      //}
+      //}
       
-      }
+      //}
+      
       if (k == NT) k = 0;
-      //usleep(1000*200);
+      usleep(1000*800);
+      XFlush(dsp);
+      //XSync(dsp,True);
 	   }
 	 }
        }
