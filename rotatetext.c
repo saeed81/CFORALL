@@ -41,7 +41,6 @@ int save_ximage_pnm(XImage *img,char *pnmname,enum TYPE type) {
   return(1);
 }
 
-
 void writeimagetobitmap_24(unsigned char *image, int width, int height, char *filename){
   if (image == NULL || filename == NULL) return;
   FILE *fout = NULL;
@@ -103,8 +102,28 @@ void writeimagetobitmap_24(unsigned char *image, int width, int height, char *fi
   return;
 }
 
+void save_ximage_bitmap24(XImage *img,char *filename){
 
-
+  unsigned char *image_out = (unsigned char *)malloc(img->height * img->width * 3);
+  if (image_out == NULL) return;
+  unsigned long pixel = 0x00000000;
+  unsigned char *row = image_out;
+  for (int i=0; i < img->height;i++){
+    unsigned char *pt = (unsigned char *) row; 
+    for (int j=0; j < img->width;j++){
+      pixel=XGetPixel(img,j,i);
+      //pixel = 0x00ff0000;
+      //XPutPixel(img,j,i,pixel);
+      *pt++ = (pixel & 0xff);
+      *pt++ = ((pixel >> 8) & 0xff);
+      *pt++ = ((pixel >> 16) & 0xff);
+    }
+    row += (img->width * 3);
+  }
+  writeimagetobitmap_24(image_out,img->width,img->height,filename);
+  
+  free(image_out);
+}
 
 
 
@@ -263,46 +282,14 @@ int main(void){
  printf("bytes_per_pixel %d\n",img->bits_per_pixel);         /* bits per pixel (ZPixmap) */
  }
 
- unsigned char *image_out = (unsigned char *)malloc(img->height * img->width * 3);
- unsigned long pixel = 0x00000000;
- unsigned char *row = image_out;
- for (int i=0; i < img->height;i++){
-   unsigned char *pt = (unsigned char *) row; 
-   for (int j=0; j < img->width;j++){
-     pixel=XGetPixel(img,j,i);
-     //pixel = 0x00ff0000;
-     //XPutPixel(img,j,i,pixel);
-     *pt++ = (pixel & 0xff);
-     *pt++ = ((pixel >> 8) & 0xff);
-     *pt++ = ((pixel >> 16) & 0xff);
-   }
-   row += (img->width * 3);
- }
- 
- //enum TYPE type = BINARY_PPM;
- //save_ximage_pnm(img, "sinous.pnm",type);
-
- if (img != NULL)
-   {
-     //saveXImageToBitmap(img);
-     writeimagetobitmap(img,"sinous.bmp");
-     //save image here
-     XFreePixmap (dsp, bg);
-   }
-
- if (image_out != NULL)
-   {
-     //saveXImageToBitmap(img);
-     writeimagetobitmap_24(image_out,img->width,img->height,"sinous_24.bmp");
-     //save image here
-   }
- 
-
+ save_ximage_bitmap24(img,"sinous_24.bmp");
+ XDestroyImage(img);
+ XFreePixmap (dsp, bg);
  //usleep(1000*10);
+ XFreeGC (dsp, gc);
+ XDestroyWindow(dsp,win);
  XCloseDisplay(dsp);
  
- free(image_out);
- 
-  return 0;
+ return 0;
 }
 
