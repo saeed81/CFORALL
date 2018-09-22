@@ -57,8 +57,14 @@ void stringreplace(char *src, char *sub, char *rep){
     }
     if (isexist) {
       for (char *it = beg; it <=end;++it) *it = ' ';
-      for (char *it=beg; (it <=end) && (*t3 != '\0'); ++it){
+      char *it = beg;
+      for (; (it <=end) && (*t3 != '\0'); ++it){
 	*it = *t3;
+	t3++;
+      }
+      while((*t3 != '\0') && (*it != '\0')){
+	*it = *t3;
+	it++;
 	t3++;
       }
     }
@@ -93,7 +99,7 @@ void showstring(char *string){
 
 int main(void){
 
-  char src[] = "wind.jsonXXX";
+  char src[] = "Xwind.jsonX";
   printf("size is %d \n",lenstr(src));
   stringreplace(src, "json", "nc");
   showstring(src);
@@ -104,7 +110,10 @@ int main(void){
   stringreplace(src, "X", "Y");
   showstring(src);
   printf("size is %d \n",lenstr(src));
- 
+  stringreplace(src, "Y", "ZZZ");
+  showstring(src);
+  printf("size is %d \n",lenstr(src));
+
   return 0;
 }
 
