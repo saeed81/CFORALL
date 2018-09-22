@@ -53,6 +53,7 @@ void stringreplace(char *src, char *sub, char *rep){
 	next++;
 	ts++;
       }
+      if (len2 == 1) end = beg;
     }
     if (isexist) {
       for (char *it = beg; it <=end;++it) *it = ' ';
@@ -78,22 +79,32 @@ void stringreplace(char *src, char *sub, char *rep){
   return;
 }
 
-int main(void){
-
-  char src[] = "wind.json";
-  printf("size is %d \n",lenstr(src));
-  stringreplace(src, "json", "nc");
-  printf("size is %d \n",lenstr(src));
-  stringreplace(src, "wind", "all");
-  printf("size is %d \n",lenstr(src));
-  char *tmp = src;
+void showstring(char *string){
+  
+  char *tmp = string;
   while(*tmp != '\0' ){
     printf("%c",*tmp);
     tmp++;
   }
-  
   printf("\n");
 
+}
+
+
+int main(void){
+
+  char src[] = "wind.jsonXXX";
+  printf("size is %d \n",lenstr(src));
+  stringreplace(src, "json", "nc");
+  showstring(src);
+  printf("size is %d \n",lenstr(src));
+  stringreplace(src, "wind", "all");
+  showstring(src);
+  printf("size is %d \n",lenstr(src));
+  stringreplace(src, "X", "Y");
+  showstring(src);
+  printf("size is %d \n",lenstr(src));
+ 
   return 0;
 }
 
