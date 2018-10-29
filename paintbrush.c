@@ -144,6 +144,7 @@ int main(void){
   for(;;){XEvent e; XNextEvent(dsp,&e); if(e.type == MapNotify) break;} //Wait for the MapNotify event                                                                                                             
   XFlush(dsp);
   XFontStruct *fontinfo = XLoadQueryFont(dsp,"6x10"); 
+  #if 0
   XSetFont(dsp,gc,fontinfo->fid); 
   XSetForeground(dsp,gc,0x00ff0000);
   
@@ -155,7 +156,7 @@ int main(void){
   
 
   XFlush(dsp);
-
+  #endif
   XEvent ev;
   XEvent ev1;
   int jm = 0;
@@ -202,10 +203,11 @@ int main(void){
 	/* if the 1st mouse button was held during this event, draw a pixel */
 	/* at the mouse pointer location.                                   */
 	XSetForeground(dsp,gc,0x00ff0000);
-	XDrawPoint(dsp, win, gc, x+1, y);
-	XDrawPoint(dsp, win, gc, x, y+1);
-	XDrawPoint(dsp, win, gc, x, y);
-	XDrawPoint(dsp, win, gc, x+1, y+1);
+	XDrawLine(dsp,win,gc,x,y,x+1,y+1);
+	//XDrawPoint(dsp, win, gc, x+1, y);
+	//XDrawPoint(dsp, win, gc, x, y+1);
+	//XDrawPoint(dsp, win, gc, x, y);
+	//XDrawPoint(dsp, win, gc, x+1, y+1);
       }
     }
     
@@ -216,7 +218,8 @@ int main(void){
 	printf("Mouse leave\n");
     }
     if (ev.type == KeyPress){
-      break;
+      XClearWindow(dsp,win);
+      //break;
     }
   }
 

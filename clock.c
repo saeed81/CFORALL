@@ -3,9 +3,14 @@
 #include<X11/Xlib.h>
 #include<math.h>
 #include<unistd.h>
+#include <pthread.h>
 
-#include<stdio.h>
-#include<stdlib.h>
+void *myThreadFun(void *vargp)
+  {
+    printf("Thread 1 start to work");
+    return NULL;
+}
+  
 
 void reverse(char *s, char *t){
   
@@ -47,7 +52,7 @@ void intostr(int a, char *st){
 int main(void){
   
   int nx = 10, ny = 10;
-  
+
   Display *dsp;
   Window win, win1;
   int screen_num;
@@ -80,7 +85,12 @@ int main(void){
   float x1 = 0.0, y1 = 0.0;
   float mpi = 4.0*atan(1.0);
   int ip = 0;
-
+  // A normal C function that is executed as a thread 
+  // when its name is specified in pthread_create()
+  pthread_t thread_id;
+  printf("Before Thread\n");
+  pthread_create(&thread_id, NULL, myThreadFun, NULL);
+  
   for(;;){
     angle += 1.0;
     XClearWindow(dsp, win);
@@ -112,6 +122,10 @@ int main(void){
   }
   XFlush(dsp);
   for(;;);
+  pthread_join(thread_id, NULL);
+  printf("After Thread\n");
+  
+
   return 0;
 }
   

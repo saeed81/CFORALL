@@ -398,7 +398,7 @@ void del(vector **vec){
 }
   
 int main(void){
-  int nx = 2, ny =3;
+  int nx = 1000, ny =1000;
   int   inivali = 0;
   mat veci = matrix(INT,2,nx,ny);
   showinfomembers(veci);

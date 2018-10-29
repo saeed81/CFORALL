@@ -334,11 +334,11 @@ int main(void){
   //XSetForeground(dsp, gc, blue_col.pixel);
   //XDrawLine(dsp, win, gc, 200, 200, 300, 300);      // Draw theline                                                                                                                      
   //XFlush(dsp);
-  #if 0
+  #if 1
   for (int k=0; k< 200;++k){
     for (int j=220; j < 280;++j){
       for (int i=220; i < 280;++i){
-	XSetForeground(dsp, gc, i + j + k );
+	XSetForeground(dsp, gc, i *j + k );
 	XDrawPoint(dsp, win, gc, i +k, j +k);
 	XFlush(dsp);
       }
@@ -456,7 +456,7 @@ int main(void){
      //save image here
      XFreePixmap (dsp, bg);
    }
- usleep(1000*1000*10);
+ usleep(1000*1000*1);
  XCloseDisplay(dsp);
  free(ap);
  free(ap1);

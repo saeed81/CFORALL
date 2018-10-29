@@ -147,7 +147,7 @@ void floatostr(float a, char *str, int nafterdecimalpoint){
   
   return;
 }
-
+#if 0
 int main(void){
 
   float aa = 12.1234567890;
@@ -197,7 +197,7 @@ int main(void){
   printf("\n");
   return 0;
 }
-
+#endif
  
     
   

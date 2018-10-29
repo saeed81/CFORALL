@@ -240,7 +240,8 @@ int main(void){
       XDrawLine(dsp,win,gc,150,150,150,100);
       XSetForeground(dsp, gc, 0x000000ff);
       XDrawString(dsp, win, gc, 105, 125, "Sinous", 6);
-      XSetForeground(dsp, gc, 0x000000ff);
+      XSetForeground(dsp, gc, 0x00ff00ff);
+      XDrawString(dsp, win, gc, 400, 400, "Saeed", 5);
     }break;
     }
     usleep(1000*1000);

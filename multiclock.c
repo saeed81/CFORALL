@@ -114,7 +114,7 @@ int main(void){
   XSetForeground(dsp, gc, 0x000000ff);
   XSetForeground(dsp1, gc1, 0x000000ff);
   
-  unsigned int line_width = 4;          /* line width for the GC.       */
+  unsigned int line_width = 3;          /* line width for the GC.       */
   int line_style = LineSolid;           /* style for lines drawing and  */
   int cap_style = CapButt;              /* style of the line's edje and */
   int join_style = JoinBevel;           /*  joined lines.               */
@@ -151,7 +151,6 @@ int main(void){
     }
     info = localtime(&tt);
     int hour = info->tm_hour, min = info->tm_min, sec = info->tm_sec;
-    printf("%d %d %d\n",hour, min, sec);
     x1= 100.0 * cos(angle* (mpi / 180.0));
     y1= 100.0 * sin(angle* (mpi / 180.0));
     XDrawLine(dsp, win,  gc, i1 +ip, j1 + ip, i1 + 2*(int)x1 + ip, j1 + 2*(int)y1 + ip);

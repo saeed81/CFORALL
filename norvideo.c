@@ -17,9 +17,9 @@
 #define ArrayCount(a) (sizeof(a) / sizeof(a[0]))
 #define StringArrayCount(a) (ArrayCount(a) -1)
 
-#define NX (619)
-#define NY (523)
-#define NT  (31)
+#define NX (1238)
+#define NY (1046)
+#define NT  (726)
 
 typedef unsigned int  uint32;
 typedef unsigned char uint8;
@@ -299,7 +299,7 @@ int main(void){
  
   int ncid  = 0;
   int  issh = 0;
-  char *filename  =  "sst_ssh.nc";
+  char *filename  =  "abborre_ssh.nc";
   char *varname   =  "SSH_inst";
   size_t iassh[3] = {0,0,0};
   size_t start[3] = {0,0,0};
@@ -318,8 +318,8 @@ int main(void){
   XSelectInput(dsp, win, ExposureMask | StructureNotifyMask | KeyPressMask | ButtonPressMask | PointerMotionMask);        // We want to get MapNotify events  
 
   XGCValues gr_values;
-  XFontStruct *fontinfo = XLoadQueryFont(dsp,"-adobe-times-bold-r-normal--18-180-75-75-p-99-iso8859-9");
-  //XFontStruct *fontinfo = XLoadQueryFont(dsp,"10x20");
+  //XFontStruct *fontinfo = XLoadQueryFont(dsp,"-adobe-times-bold-r-normal--18-180-75-75-p-99-iso8859-9");
+  XFontStruct *fontinfo = XLoadQueryFont(dsp,"10x20");
   gr_values.font =   fontinfo->fid;
   gr_values.function =   GXcopy;
   gr_values.plane_mask = AllPlanes;
@@ -337,14 +337,14 @@ int main(void){
   float value =0.0f;
 
   int ncolor = 0;
-  struct Colort *scolor = getcolorfromcolormap(SSEC,&ncolor);
+  struct Colort *scolor = getcolorfromcolormap(JET,&ncolor);
   
   if (scolor == NULL) return 1;
   minv = 0.0;
   maxv = 0.0;
   XImage *ximage = NULL;
   uint32 *pimage = NULL;
-  char *title = "NEMO_NORDIC_NS02";
+  char *title = "NEMO_NORDIC_NS01";
   XEvent e;
   int done = 1;
   int k = 0;
@@ -399,11 +399,11 @@ int main(void){
       XSetForeground(dsp, gc, 0x000000ff); // red
       XDrawString(dsp, win, gc, 125 , 150  , title, lenstring(title));
       XFlush(dsp);
-      XSetForeground(dsp, gc, 0x0000ffff); // red
+      XSetForeground(dsp, gc, 0x00ffe1e1); // red
       XDrawString(dsp, win, gc, 10 , 50,  infokt, lenstring(infokt));
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x00000000); // red
-      XDrawString(dsp, win, gc, 60 , 50,  infomin, lenstring(infomin));
+      XDrawString(dsp, win, gc, 80 , 50,  infomin, lenstring(infomin));
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x00ff0000); // red
       XDrawString(dsp, win, gc, 200 , 50, infomax, lenstring(infomax));
@@ -475,23 +475,23 @@ int main(void){
       XSetForeground(dsp, gc, 0x000000ff); // red
       XDrawString(dsp, win, gc, 125 , 150  , title, lenstring(title));
       XFlush(dsp);
-      XSetForeground(dsp, gc, 0x0000ffff); // red
+      XSetForeground(dsp, gc, 0x00ff0101); // red
       XDrawString(dsp, win, gc, 10 , 50,  infokt, lenstring(infokt));
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x00000000); // red
-      XDrawString(dsp, win, gc, 60 , 50,  infomin, lenstring(infomin));
+      XDrawString(dsp, win, gc, 100 , 50,  infomin, lenstring(infomin));
       XFlush(dsp);
       XSetForeground(dsp, gc, 0x00ff0000); // red
-      XDrawString(dsp, win, gc, 200 , 50 , infomax, lenstring(infomax));
+      XDrawString(dsp, win, gc, 250 , 50 , infomax, lenstring(infomax));
       XFlush(dsp);
       clock_t t2 = clock();
       float time_taken = ((float)(t2 -t1))/CLOCKS_PER_SEC; // in seconds
       char msec[128] = {'\0'};
       floatostr(time_taken*1.0e3,msec,6);
       char secperframe[128]  = {'\0'};
-      writetostring(secperframe,StringArrayCount(secperframe),"msec : ",msec,NULL);
+      writetostring(secperframe,StringArrayCount(secperframe),"time per frame : ",msec," ms",NULL);
       XSetForeground(dsp, gc, 0x00ff0000); // red
-      XDrawString(dsp, win, gc, 400 , 450 , secperframe, lenstring(secperframe));
+      XDrawString(dsp, win, gc, 800 , 900 , secperframe, lenstring(secperframe));
       XFlush(dsp);
       int ipend = XPending(dsp);
       //printf("ipend is %d\n",ipend);
@@ -527,7 +527,7 @@ int main(void){
       //}
       
       if (k == NT) k = 0;
-      usleep(1000*800);
+      usleep(1000*200);
       XFlush(dsp);
       //XSync(dsp,True);
 	   }
