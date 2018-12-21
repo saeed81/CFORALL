@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-enum CMD {Init, Draw, Repaint, Clear,};
 typedef void fun(void);
 
 void init   (void){printf("init     commnad \n");}
@@ -28,14 +27,18 @@ void push_command(struct queue *qu, fun *com){
   }
 }
 
+void pop_command(struct queue *qu){
+  if (qu->cur > 0)qu->cur--;
+}
+
 void run_allcommand(struct queue *qu){
-  for (int i=0; i < qu->cur;++i){ 
+  for (int i=0; i < qu->cur && qu->cur > 0;++i){ 
     (**((fun**)qu->command + i))();
   }
 }
 
-void run_command(struct queue *qu, enum CMD cmd){
-  (**((fun**)qu->command + cmd))();
+void run_command(struct queue *qu, int cmd){
+  if (qu->cur > 0) (**((fun**)qu->command + cmd))();
 }
 
 int main(void){
@@ -47,8 +50,18 @@ int main(void){
   push_command(&que,&repaint);
   push_command(&que,&clear);
   run_allcommand(&que);
-  run_command(&que, Init);
+  run_command(&que,0);
 
+  pop_command(&que);
+  pop_command(&que);
+  pop_command(&que);
+  pop_command(&que);
+  push_command(&que,&clear);
+  push_command(&que,&draw);
+  push_command(&que,&init);
+  run_allcommand(&que);
+  pop_command(&que);
+  run_allcommand(&que);
   return 0;
 }
 
