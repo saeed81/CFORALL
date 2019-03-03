@@ -2,11 +2,10 @@
 #include<stdlib.h>
 
 enum type{
-  CHAR   = 0,
-  STRING = 1,
-  FLOAT  = 2,
-  DOUBLE = 3,
-  INT    = 4,
+  STRING = 0,
+  FLOAT  = 1,
+  INT    = 2,
+  NOTYPE = 3,
 };
 
 
@@ -29,7 +28,6 @@ struct member{
 
 
 struct position{
-
   char *beg;
   char *end;
 };
@@ -95,7 +93,8 @@ void dumpcontent(struct content *cont){
 }
 
 void removewhitespace(struct content *cont){
-
+  if (cont){
+    if (cont->data){
   char *st = cont->data;
   char *ss = cont->data;
   long int ne = 0;
@@ -109,14 +108,8 @@ void removewhitespace(struct content *cont){
   *(ss + ne) = '\0';
   cont->data = ss;
   cont->size = ne;
-}
-
-
-struct member get(struct content *cont,char *sec, char *subsec){
-  struct member result = {NULL,0,CHAR};
-
-  return result;
-  
+    }
+  }
 }
 
 int numberofsections(struct content *cont){
@@ -156,11 +149,11 @@ int numberofsections(struct content *cont){
 
 void dumpkeysinsection(struct content *cont, char *sec){
 
-  char *ss = NULL;
-  int nn = 0;
-  int found = 0;
-  char *beg = NULL;
-  char *end = NULL;
+  char *ss   = NULL;
+  int  nn    = 0;
+  int  found = 0;
+  char *beg  = NULL;
+  char *end  = NULL;
   
   if (cont){
     if (cont->data){
@@ -189,20 +182,20 @@ void dumpkeysinsection(struct content *cont, char *sec){
 	st++;
       }
       if (found && beg && end){
-	for (char *ct = end + 1;*ct != '\0' && *ct != '[';++ct ){
-	  if (*ct == '='){
-	    struct position pos = {NULL, NULL};
-	    pos.end = ct - 1;
-	    while (*pos.end != '\n') pos.end--;
-	    pos.beg = pos.end+1;
-	    printf("\nkey   :\n");
-	    for (char *ckey=pos.beg;ckey < ct;++ckey)printf("%c",*ckey);
-	    printf("\nvalue :\n");
-	    pos.beg = ct + 1;
-	    while (*pos.beg != '\n' && *pos.beg != '\0') pos.beg++;
-	    pos.end = pos.beg - 1;
-	    for (char *cval=ct + 1;cval<=pos.end;++cval)printf("%c",*cval);
-	  }
+	 struct position pos = {NULL, NULL};
+	 for (char *ct = end + 1;*ct != '\0' && *ct != '[';++ct ){
+	   if (*ct == '='){
+	     pos.end = ct - 1;
+	     while (*pos.end != '\n') pos.end--;
+	     pos.beg = pos.end+1;
+	     printf("\nkey   :\n");
+	     for (char *ckey=pos.beg;ckey < ct;++ckey)printf("%c",*ckey);
+	     printf("\nvalue :\n");
+	     pos.beg = ct + 1;
+	     while (*pos.beg != '\n' && *pos.beg != '\0') pos.beg++;
+	     pos.end = pos.beg - 1;
+	     for (char *cval=ct + 1;cval<=pos.end;++cval)printf("%c",*cval);
+	   }
 	}
       }
     }
@@ -210,6 +203,77 @@ void dumpkeysinsection(struct content *cont, char *sec){
   
   return;
 }
+
+struct member get(struct content *cont,char *sec, char *key){
+  struct member result = {NULL,0,NOTYPE};
+
+  if (!sec || !key || !cont || !cont->data ) return result;
+  
+  char *ss     = NULL;
+  int  nn      = 0;
+  int  found   = 0;
+  char *beg    = NULL;
+  char *end    = NULL;
+  int matchkey = 0;
+  struct position pos = {NULL, NULL};
+  char *st = cont->data;
+  
+  while(*st != '\0' && found == 0){
+    if (*st == '['){
+      beg = st;
+      ss = st + 1;
+      while(*ss != '\0' ){
+	if (*ss == ']'){
+	  end = ss;
+	  char *ct = sec;
+	  found = 1;
+	  for (char *C=beg+1;C <=end-1 && *ct != '\0';++C,++ct){
+	    if (*ct != *C){
+	      found = 0;
+	      break;
+	    }
+	  }
+	  st = ss;
+	  break;
+	}
+	ss++; 
+      }
+    }
+	st++;
+  }
+  if (found && beg && end){
+    for (char *ct = end + 1;*ct != '\0' && matchkey == 0 && *ct != '[';++ct ){
+      if (*ct == '='){
+	pos.end = ct - 1;
+	while (*pos.end != '\n') pos.end--;
+	pos.beg = pos.end+1;
+	char *tk = key;
+	matchkey = 1;
+	for (char *ckey=pos.beg;ckey < ct && *tk != '\0';++ckey,++tk){
+	  if (*tk != *ckey){
+	    matchkey = 0;
+	    break;
+	  }
+	}
+	if (matchkey){
+	  pos.beg = ct + 1;
+	  while (*pos.beg != '\n' && *pos.beg != '\0') pos.beg++;
+	  pos.end = pos.beg - 1;
+	  result.data = ct + 1;
+	  result.size = 0; 
+	  for (char *cval=ct + 1;cval<=pos.end;++cval)result.size++;
+	}
+      }
+    }
+  }
+  
+  return result;
+}
+
+
+
+
+
 
 int main(void){
 
@@ -219,12 +283,26 @@ int main(void){
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
   
-  struct member memb1 = get(&cont,"input","dir");
-  struct member memb2 = get(&cont,"input","owner");
   
   dumpkeysinsection(&cont, "drivers");
+  dumpkeysinsection(&cont, "mci");
+
+  printf("==================\n");
   
+  struct member memb1 = get(&cont,"mci","os");
+  struct member memb2 = get(&cont,"mci","lan");
+
+  for (int i = 0; i <=memb1.size;++i){
+    printf("%c",*(memb1.data + i));
+  }
+  printf("==================\n");
+
+  for (int i = 0; i <=memb2.size;++i){
+    printf("%c",*(memb2.data + i));
+  }
+  printf("==================\n");
   
+
   return 0;
 
 
