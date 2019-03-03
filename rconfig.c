@@ -32,7 +32,19 @@ struct position{
   char *end;
 };
 
+char *Keys[] = {"os","lan","lang","cpu",NULL};
 
+
+int lenstring(char *str){
+  int result = 0;
+  if (str){
+    while(*str != '\0'){
+      result++;
+      str++;
+    }
+  }
+  return result;
+}
 
 int iswhitespace(char C){
 
@@ -217,7 +229,10 @@ struct member get(struct content *cont,char *sec, char *key){
   int matchkey = 0;
   struct position pos = {NULL, NULL};
   char *st = cont->data;
-  
+  char *tk   = key;
+  int lenkey = lenstring(key);
+  int ncount = 0;
+	
   while(*st != '\0' && found == 0){
     if (*st == '['){
       beg = st;
@@ -247,14 +262,19 @@ struct member get(struct content *cont,char *sec, char *key){
 	pos.end = ct - 1;
 	while (*pos.end != '\n') pos.end--;
 	pos.beg = pos.end+1;
-	char *tk = key;
-	matchkey = 1;
-	for (char *ckey=pos.beg;ckey < ct && *tk != '\0';++ckey,++tk){
+	tk      = key;
+	lenkey  = lenstring(key);
+	matchkey= 1;
+	ncount = 0;
+	for (char *ckey=pos.beg;ckey < ct;++ckey){
 	  if (*tk != *ckey){
-	    matchkey = 0;
-	    break;
+	   matchkey = 0;
+	   break;
 	  }
+	  ncount++;
+	  tk++;
 	}
+	if (matchkey && ncount != lenkey) matchkey = 0;
 	if (matchkey){
 	  pos.beg = ct + 1;
 	  while (*pos.beg != '\n' && *pos.beg != '\0') pos.beg++;
@@ -271,10 +291,6 @@ struct member get(struct content *cont,char *sec, char *key){
 }
 
 
-
-
-
-
 int main(void){
 
   struct content cont = readfilecontent("config.ini");
@@ -288,20 +304,14 @@ int main(void){
   dumpkeysinsection(&cont, "mci");
 
   printf("==================\n");
-  
-  struct member memb1 = get(&cont,"mci","os");
-  struct member memb2 = get(&cont,"mci","lan");
-
-  for (int i = 0; i <=memb1.size;++i){
-    printf("%c",*(memb1.data + i));
+  for (char **vk = &Keys[0];*vk;++vk){
+    struct member memb1 = get(&cont,"mci",*vk);
+    printf("%s =",*vk);
+    for (int i = 0; i <=memb1.size;++i){
+      printf("%c",*(memb1.data + i));
+    }
+    printf("==================\n");
   }
-  printf("==================\n");
-
-  for (int i = 0; i <=memb2.size;++i){
-    printf("%c",*(memb2.data + i));
-  }
-  printf("==================\n");
-  
 
   return 0;
 
