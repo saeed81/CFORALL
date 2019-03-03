@@ -70,6 +70,26 @@ int isemptynextline(char *C){
   return result;
 }
 
+void removewhitespace(struct content *cont){
+  if (cont){
+    if (cont->data){
+  char *st = cont->data;
+  char *ss = cont->data;
+  long int ne = 0;
+  while(*st != '\0'){
+    if (!iswhitespace(*st)){
+      *(ss + ne) = *st;
+      ne++;
+    }
+    st++;
+  }
+  *(ss + ne) = '\0';
+  cont->data = ss;
+  cont->size = ne;
+    }
+  }
+}
+
 struct content readfilecontent(char *filename){
   
   struct content result = {NULL,0};
@@ -87,11 +107,11 @@ struct content readfilecontent(char *filename){
       fclose(file);
     }
   }
+
+  removewhitespace(&result);
+  
   return result;
 }
-
-
-
 
 void dumpcontent(struct content *cont){
 
@@ -100,26 +120,6 @@ void dumpcontent(struct content *cont){
       for (long int i=0; i< cont->size;++i ){
 	printf("%c",*(cont->data +i));
       }
-    }
-  }
-}
-
-void removewhitespace(struct content *cont){
-  if (cont){
-    if (cont->data){
-  char *st = cont->data;
-  char *ss = cont->data;
-  long int ne = 0;
-  while(*st != '\0'){
-    if (!iswhitespace(*st)){
-      *(ss + ne) = *st;
-      ne++;
-    }
-    st++;
-  }
-  *(ss + ne) = '\0';
-  cont->data = ss;
-  cont->size = ne;
     }
   }
 }
@@ -266,7 +266,7 @@ struct member get(struct content *cont,char *sec, char *key){
 	lenkey  = lenstring(key);
 	matchkey= 1;
 	ncount = 0;
-	for (char *ckey=pos.beg;ckey < ct;++ckey){
+	for (char *ckey=pos.beg;ckey < ct && *tk != '\0';++ckey){
 	  if (*tk != *ckey){
 	   matchkey = 0;
 	   break;
@@ -294,11 +294,10 @@ struct member get(struct content *cont,char *sec, char *key){
 int main(void){
 
   struct content cont = readfilecontent("config.ini");
-  removewhitespace(&cont);
   dumpcontent(&cont);
+
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
-  
   
   dumpkeysinsection(&cont, "drivers");
   dumpkeysinsection(&cont, "mci");
