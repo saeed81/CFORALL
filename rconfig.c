@@ -231,8 +231,9 @@ struct member get(struct content *cont,char *sec, char *key){
   char *st = cont->data;
   char *tk   = key;
   int lenkey = lenstring(key);
+  int lensec = lenstring(sec);
   int ncount = 0;
-	
+  printf("lensc is %d\n",lensec);
   while(*st != '\0' && found == 0){
     if (*st == '['){
       beg = st;
@@ -242,19 +243,23 @@ struct member get(struct content *cont,char *sec, char *key){
 	  end = ss;
 	  char *ct = sec;
 	  found = 1;
+	  ncount = 0;
+	  int lens = end - beg - 1 ;
 	  for (char *C=beg+1;C <=end-1 && *ct != '\0';++C,++ct){
 	    if (*ct != *C){
 	      found = 0;
 	      break;
 	    }
+	    ncount++;
 	  }
+	  if (found && lens != lensec ) found = 0;
 	  st = ss;
 	  break;
 	}
 	ss++; 
       }
     }
-	st++;
+    st++;
   }
   if (found && beg && end){
     for (char *ct = end + 1;*ct != '\0' && matchkey == 0 && *ct != '[';++ct ){
@@ -263,9 +268,10 @@ struct member get(struct content *cont,char *sec, char *key){
 	while (*pos.end != '\n') pos.end--;
 	pos.beg = pos.end+1;
 	tk      = key;
-	lenkey  = lenstring(key);
 	matchkey= 1;
 	ncount = 0;
+	int lenk = 0;
+	for (char *ckey=pos.beg;ckey < ct;++ckey)lenk++;
 	for (char *ckey=pos.beg;ckey < ct && *tk != '\0';++ckey){
 	  if (*tk != *ckey){
 	   matchkey = 0;
@@ -274,7 +280,7 @@ struct member get(struct content *cont,char *sec, char *key){
 	  ncount++;
 	  tk++;
 	}
-	if (matchkey && ncount != lenkey) matchkey = 0;
+	if (matchkey && lenk != lenkey) matchkey = 0;
 	if (matchkey){
 	  pos.beg = ct + 1;
 	  while (*pos.beg != '\n' && *pos.beg != '\0') pos.beg++;
@@ -299,8 +305,8 @@ int main(void){
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
   
-  dumpkeysinsection(&cont, "drivers");
-  dumpkeysinsection(&cont, "mci");
+  //dumpkeysinsection(&cont, "drivers");
+  //dumpkeysinsection(&cont, "mci");
 
   printf("==================\n");
   for (char **vk = &Keys[0];*vk;++vk){
