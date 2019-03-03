@@ -166,6 +166,7 @@ void dumpkeysinsection(struct content *cont, char *sec){
   int  found = 0;
   char *beg  = NULL;
   char *end  = NULL;
+  int lensec = lenstring(sec);
   
   if (cont){
     if (cont->data){
@@ -179,12 +180,14 @@ void dumpkeysinsection(struct content *cont, char *sec){
 	      end = ss;
 	      char *ct = sec;
 	      found = 1;
+	      int lens = end - beg - 1 ;
 	      for (char *C=beg+1;C <=end-1 && *ct != '\0';++C,++ct){
 		if (*ct != *C){
 		  found = 0;
 		  break;
 		}
 	      }
+	      if (found && lens != lensec ) found = 0;
 	      st = ss;
 	      break;
 	    }
@@ -305,8 +308,8 @@ int main(void){
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
   
-  //dumpkeysinsection(&cont, "drivers");
-  //dumpkeysinsection(&cont, "mci");
+  dumpkeysinsection(&cont, "drivers");
+  dumpkeysinsection(&cont, "mcij");
 
   printf("==================\n");
   for (char **vk = &Keys[0];*vk;++vk){
