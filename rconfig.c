@@ -54,6 +54,15 @@ int iswhitespace(char C){
 }
 
 
+int iscomment(char C){
+  int result = 0;
+  if (C == '#') result = 1;
+  return result;
+}
+
+
+
+
 int isendofline(char C){
 
   int result = 0;
@@ -90,6 +99,36 @@ void removewhitespace(struct content *cont){
   }
 }
 
+void removecomments(struct content *cont){
+  if (cont){
+    if (cont->data){
+      char *st = cont->data;
+      char *ss = cont->data;
+      long int ne = 0;
+      while(*st != '\0'){
+	if (iscomment(*st)){
+	  while(*st != '\0'){
+	    st++;
+	    if (*st == '\n' ){
+	      st--;
+	      break;
+	    }
+	  }
+	}
+	else{
+	  *(ss + ne) = *st;
+	  ne++;
+	}
+	st++;
+      }
+      *(ss + ne) = '\0';
+      cont->data = ss;
+      cont->size = ne;
+    }
+  }
+}
+
+
 struct content readfilecontent(char *filename){
   
   struct content result = {NULL,0};
@@ -109,6 +148,7 @@ struct content readfilecontent(char *filename){
   }
 
   removewhitespace(&result);
+  removecomments(&result);
   
   return result;
 }
@@ -313,7 +353,7 @@ int main(void){
 
   printf("==================\n");
   for (char **vk = &Keys[0];*vk;++vk){
-    struct member memb1 = get(&cont,"mci",*vk);
+    struct member memb1 = get(&cont,"mcij",*vk);
     printf("%s =",*vk);
     for (int i = 0; i <=memb1.size;++i){
       printf("%c",*(memb1.data + i));
