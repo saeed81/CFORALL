@@ -32,7 +32,7 @@ struct position{
   char *end;
 };
 
-char *Keys[] = {"os","lan","lang","cpu",NULL};
+char *Keys[] = {"vars","leveltypes","flux",NULL};
 
 
 int lenstring(char *str){
@@ -348,12 +348,11 @@ int main(void){
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
   
-  dumpkeysinsection(&cont, "drivers");
-  dumpkeysinsection(&cont, "mcij");
-
+  dumpkeysinsection(&cont, "GRIB");
+  
   printf("==================\n");
   for (char **vk = &Keys[0];*vk;++vk){
-    struct member memb1 = get(&cont,"mcij",*vk);
+    struct member memb1 = get(&cont,"GRIB",*vk);
     printf("%s =",*vk);
     for (int i = 0; i <=memb1.size;++i){
       printf("%c",*(memb1.data + i));
