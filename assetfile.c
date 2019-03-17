@@ -1,9 +1,16 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+
+struct string{
+  char *beg;
+  long int size;
+};
+
+
 struct chunk {
   char *filename;
-  void *content;
+  char *content;
   int size;
   struct chunk *next;
 };
@@ -13,6 +20,29 @@ struct stream{
   struct chunk *end;
   int total;
 };
+
+
+struct string readentirefile(char *filename){
+
+  struct string result = {NULL,0};
+  if (filename){
+    FILE *file = fopen(filename,"rb");
+    if (file){
+      fseek(file,0,SEEK_END);
+      result.size = ftell(file);
+      fseek(file,0,SEEK_SET);
+      result.beg = (char *)malloc(result.size +1);
+      if (result.beg){
+	fread(result.beg,1,result.size,file);
+	*(result.beg + result.size) = '\0';
+      }
+      fclose(file);
+    }
+  }
+  return result;
+}
+
+
 
 void addchunk(struct stream *strm, char *filename){
 
@@ -24,16 +54,22 @@ void addchunk(struct stream *strm, char *filename){
   #endif
   
   if (strm->beg == NULL){
-    strm->beg = (struct chunk *)malloc(sizeof(struct chunk));
+    strm->beg           = (struct chunk *)malloc(sizeof(struct chunk));
     strm->beg->filename = filename;
-    strm->end = strm->beg;
-    strm->end->next = NULL;
+    struct string ctemp = readentirefile(filename);   
+    strm->beg->content  = ctemp.beg;
+    strm->beg->size     = ctemp.size;
+    strm->end           = strm->beg;
+    strm->end->next     = NULL;
   }else{
-    struct chunk * tmp = (struct chunk *)malloc(sizeof(struct chunk));
-    tmp->filename   = filename;
-    strm->end->next = tmp;
-    strm->end       = tmp;
-    strm->end->next = NULL; 
+    struct chunk * tmp  = (struct chunk *)malloc(sizeof(struct chunk));
+    tmp->filename       = filename;
+    struct string ctemp = readentirefile(filename);   
+    tmp->content        = ctemp.beg;
+    tmp->size           = ctemp.size;
+    strm->end->next     = tmp;
+    strm->end           = tmp;
+    strm->end->next     = NULL; 
   }
 }
 
@@ -50,6 +86,20 @@ void showfilenames(struct stream *strm){
     printf("%s\n",elm->filename);
   }
 }
+
+
+void showfilescontent(struct stream *strm){
+
+  for(struct chunk *elm = strm->beg;elm;elm = elm->next){
+    printf("content of the file %s\n",elm->filename);
+    for (long int i=0; i < elm->size;++i)printf("%c",*(elm->content+i));
+  }
+}
+
+
+
+
+
 
 void cleanstream(struct stream *strm){
   
@@ -70,28 +120,15 @@ int main(int argc, char *argv[]){
   struct stream stream   = {(struct chunk *)0,(struct chunk *)0,0};
   struct stream *pstream = &stream;
   
-  addchunk(pstream, "pr01.c");
-  addchunk(pstream, "pr02.c");
-  addchunk(pstream, "pr03.c");
-  addchunk(pstream, "pr04.c");
-  addchunk(pstream, "pr05.c");
-  addchunk(pstream, "pr06.c");
-  addchunk(pstream, "pr07.c");
-  addchunk(pstream, "pr08.c");
-  addchunk(pstream, "pr09.c");
-  addchunk(pstream, "pr10.c"); 
-
+  addchunk(pstream, "vector.c");
+  addchunk(pstream, "visual.c");
+  
   showfilenames(pstream);
   printf("total chunks is %d\n",gettoalchunks(pstream));
-  
+  showfilescontent(pstream);
   cleanstream(pstream);
   showfilenames(pstream);
 
-  struct chunk *ch = (struct chunk *)malloc(sizeof(struct chunk));
-  ch->filename = "test";
-  printf("%s\n",ch->filename);
-  free(ch);
-  ch =  NULL;
     
   return 0;
 }
