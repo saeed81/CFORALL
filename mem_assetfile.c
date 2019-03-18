@@ -2,7 +2,9 @@
 #include<stdlib.h>
 
 
-#define MEM_MB(n) (n * 1024L * 1024L)   
+#define MEM_MB(n) (n * 1024L * 1024L)
+#define PSIZE (256)
+#define TSIZE (16)   
 
 
 struct mempool{
@@ -40,8 +42,7 @@ struct string{
 
 struct chunk {
   char *filename;
-  char *content;
-  int size;
+  struct string file;
   struct chunk *next;
 };
 
@@ -82,22 +83,18 @@ void addchunk(struct mempool *memp, struct stream *strm, char *filename){
   #endif
   
   if (strm->beg == NULL){
-    strm->beg           = (struct chunk *)push_mempool(memp,sizeof(struct chunk));
-    strm->beg->filename = filename;
-    struct string ctemp = readentirefile(memp,filename);   
-    strm->beg->content  = ctemp.beg;
-    strm->beg->size     = ctemp.size;
-    strm->end           = strm->beg;
-    strm->end->next     = NULL;
+      strm->beg           = (struct chunk *)push_mempool(memp,sizeof(struct chunk));
+      strm->beg->filename = filename;
+      strm->beg->file     = readentirefile(memp,filename);   
+      strm->end           = strm->beg;
+      strm->end->next     = NULL;
   }else{
-    struct chunk * tmp  = (struct chunk *)push_mempool(memp,sizeof(struct chunk));
-    tmp->filename       = filename;
-    struct string ctemp = readentirefile(memp,filename);   
-    tmp->content        = ctemp.beg;
-    tmp->size           = ctemp.size;
-    strm->end->next     = tmp;
-    strm->end           = tmp;
-    strm->end->next     = NULL; 
+    struct chunk * tmp    = (struct chunk *)push_mempool(memp,sizeof(struct chunk));
+    tmp->filename         = filename;
+    tmp->file             = readentirefile(memp,filename);   
+    strm->end->next       = tmp;
+    strm->end             = tmp;
+    strm->end->next       = NULL; 
   }
 }
 
@@ -120,7 +117,7 @@ void showfilescontent(struct stream *strm){
 
   for(struct chunk *elm = strm->beg;elm;elm = elm->next){
     printf("content of the file %s\n",elm->filename);
-    for (long int i=0; i < elm->size;++i)printf("%c",*(elm->content+i));
+    for (long int i=0; i < elm->file.size;++i)printf("%c",*(elm->file.beg+i));
   }
 }
 
@@ -129,40 +126,28 @@ int main(int argc, char *argv[]){
 
   struct mempool  pool  = {NULL,0,0};
   struct mempool *ppool = &pool;
+  init_mempool(ppool,MEM_MB(PSIZE));
+
+  struct mempool  tmp_pool  = {NULL,0,0};
+  struct mempool *ptmp      = &tmp_pool;
+  init_mempool(ptmp,MEM_MB(TSIZE));
   
-  init_mempool(ppool,MEM_MB(64));
   
   
   struct stream stream   = {(struct chunk *)0,(struct chunk *)0,0};
   struct stream *pstream = &stream;
-  
-  addchunk(ppool,pstream, "vector.c");
-  addchunk(ppool,pstream, "visual.c");
-  
+
+  addchunk(ppool,pstream,"visual.c"      );
+  addchunk(ppool,pstream,"addquote.c"    );
+  addchunk(ppool,pstream,"animatexlib.c" );
+  addchunk(ppool,pstream,"arraypointer.c");
+  addchunk(ppool,pstream,"assetfile.c"   );
+  addchunk(ppool,pstream,"bitmap.c"      );
+
   showfilenames(pstream);
   printf("total chunks is %d\n",gettoalchunks(pstream));
   showfilescontent(pstream);
       
   return 0;
 }
-
-
-
-
-
-
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
 
