@@ -3,8 +3,8 @@
 
 
 #define MEM_MB(n) (n * 1024L * 1024L)
-#define PSIZE (256)
-#define TSIZE (16)   
+#define PSIZE (1024)
+#define TSIZE (2)   
 
 
 struct mempool{
@@ -143,11 +143,15 @@ int main(int argc, char *argv[]){
   addchunk(ppool,pstream,"arraypointer.c");
   addchunk(ppool,pstream,"assetfile.c"   );
   addchunk(ppool,pstream,"bitmap.c"      );
-
+  addchunk(ppool,pstream,"ssh.json"      );
+  addchunk(ppool,pstream,"T__1mn_15mn_501-201.nc");
+  
   showfilenames(pstream);
   printf("total chunks is %d\n",gettoalchunks(pstream));
   showfilescontent(pstream);
       
   return 0;
 }
+
+
 

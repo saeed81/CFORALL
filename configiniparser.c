@@ -348,7 +348,7 @@ int main(void){
   int nsections = numberofsections(&cont);
   printf("number of sections is %d\n",nsections);
   
-  dumpkeysinsection(&cont, "GRIB");
+  //dumpkeysinsection(&cont, "GRIB");
   
   printf("==================\n");
   for (char **vk = &Keys[0];*vk;++vk){
